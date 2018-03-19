@@ -2,6 +2,8 @@ branch-defaults:
   default:
     environment: seng3011-turtle
     group_suffix: null
+  master:
+    environment: seng3011-turtle
 global:
   application_name: seng3011-flask
   branch: null

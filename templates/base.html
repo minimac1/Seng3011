@@ -1,0 +1,12 @@
+{% extends "homepage.html" %}
+{% block content %}
+    <h3>Contents</h3>
+    <p>These links will be updated as the API is progrossed.</p>
+    <ul>
+        {% for href, caption in [('version.html', 'Version'), ('implemented.html', 'Implemented'),
+                                 ('diff.html', 'Differences'), ('instructions.html', 'Instructions'),
+                                 ('integration.html', 'Integration'), ('test.html', 'Test')] %}
+        <li><a href="{{ href }}">{{ caption }}</a></li>
+    {% endfor %}
+    </ul>
+{% endblock %}
