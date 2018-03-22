@@ -1,26 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="utf-8">
     <title>Team Turtle</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <style type="text/css">
-        .container {
-            max-width: 500px;
-            padding-top: 100px;
-        }
-    </style>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet">
+
 </head>
 <body>
-    <div class="container">
-        <h2>Team Turtle: News API home page</h2>
+    <main role="main" class="container">
+        <h1 class="mt-5">Team Turtle: News API home page</h1>
         <br>
         {% block content %}{% endblock %}
-    </div>
-    <div class="footer">
-        <p>Members: Dominic McDonald, Jack Vincent, Jeremy Hamann, Rohan Bhat, Troy Murray</p>
-    </div>
-    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-    <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <span class="text-muted">Members: Dominic McDonald, Jack Vincent,
+                                    Jeremy Hamann, Rohan Bhat, Troy Murray</span>
+        </div>
+    </footer>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 </body>
 </html>
