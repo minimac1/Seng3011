@@ -17,16 +17,23 @@ class InputProcess(Resource):
         parser.add_argument('companyId', type=str)
         parser.add_argument('topic', type=str)
         args = parser.parse_args()
-        #arguements are unprocessed and are as is
-        #in the url I wasn't sure
-        #how exactly we wanted to pass it into the guardian api
 
-        #print statements for debugging
-        #print("hello")
-        #print(args['startDate'])
+        #parsing to guardian Api
+        # we will need a function that turns company names's to company ids and
+        # vice versa. we should also have a separate function called in this
+        # function that gets the "type" of company they are to parse into
+        # the tags field for guardian api. eg. technology/apple
 
-        #for now its returning the inputs
-        #@Jez after passing into guardian api just return
+        # startDate => from-date [YYYY-MM-DD]
+        # endDate => to-date [YYYY-MM-DD]
+        # companyId => tag
+        # topic => q
+        #
+        # https://content.guardianapis.com/search?q="information%20technology"
+        # &tag=technology/apple
+        # &from-date=2014-01-01
+        # &to-date=2018-01-01
+        # &api-key=6a81a5ed-2739-409d-8ada-059c122c8b43
         #the json file here should work.
         return parser.parse_args()
 
