@@ -19,13 +19,18 @@
                         Contents
                     </a>
                 </li>
-                {% for caption, id in [('Module Version', '1'), ('Implemented Features', '2'),
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active">
+                        <a role="tab" data-toggle="tab" href="#panel1">Module Version</a>
+                    </li>
+                    {% for caption, id in [('Implemented Features', '2'),
                                    ('Version Differences', '3'), ('Module Instructions', '4'),
                                    ('Module Integration', '5'), ('Test Data', '6')] %}
-                    <li>
-                        <a href="#" onclick="myFunc()" id="{{ id }}">{{ caption }}</a>
-                    </li>
-                {% endfor %}
+                        <li>
+                        <a role="tab" data-toggle="tab" href="#panel{{ id }}">{{ caption }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
             </ul>
         </div>
         <!-- /#sidebar-wrapper -->
@@ -35,13 +40,35 @@
             <div class="container-fluid">
                 <a href="#menu-toggle" class="btn btn-secondary" id="menu-toggle">Menu</a>
                 <h1 class="mt-5">Team Turtle: News API home page</h1>
-
                 <!-- content to be updated should go here -->
-                <h2 class="mt-5" id="title"></h1>
-                    <p id="page"></p>
-                {% block content %}{% endblock %}
-            </div>
+                <div class="tab-content">
+                    <div role="tabpanel" id="panel1" class="tab-pane active">
+                        <h3 class="mt-5">Module Version</h3>
+                        {% include "version.html" %}
+                    </div>
+                    <div role="tabpanel" id="panel2" class="tab-pane">
+                        <h3 class="mt-5">Implemented Features</h3>
+                        {% include "features.html" %}
+                    </div>
+                    <div role="tabpanel" id="panel3" class="tab-pane">
+                        <h3 class="mt-5">Version Differences</h3>
+                        {% include "differences.html" %}
+                    </div>
+                    <div role="tabpanel" id="panel4" class="tab-pane">
+                        <h3 class="mt-5">Module Instructions</h3>
+                        {% include "instructions.html" %}
+                    </div>
+                    <div role="tabpanel" id="panel5" class="tab-pane">
+                        <h3 class="mt-5">Module Integration</h3>
+                        {% include "integration.html" %}
+                    </div>
+                    <div role="tabpanel" id="panel6" class="tab-pane">
+                        <h3 class="mt-5">Test Data</h3>
+                        {% include "test.html" %}
+                    </div>
 
+                </div>
+            </div>
         </div>
         <!-- /#page-content-wrapper -->
         <footer class="footer">
@@ -66,13 +93,11 @@
     });
     </script>
 
-    <!-- on click function for sidebar -->
     <script>
-    function myFunc() {
-        var x = "on click works, doesnt change";
-        document.getElementById("page").innerHTML = x;
-    }
-    </script>
-
+    $('.nav li').on("click", function () {
+        $(".nav li").removeClass("active");
+        $(this).addClass("active");
+        $(this).tab('show');
+    })
 </body>
 </html>

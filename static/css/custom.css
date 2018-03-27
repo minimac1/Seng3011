@@ -93,6 +93,13 @@ body {
   background: none;
 }
 
+.nav-tabs {
+    border-bottom :0 solid #ddd;
+    position: absolute;
+    margin-bottom: 0;
+    overflow-y: auto;
+}
+
 @media(min-width:768px) {
   #wrapper {
     padding-left: 0;
