@@ -15,7 +15,7 @@
         <div id="sidebar-wrapper">
             <ul class="sidebar-nav">
                 <li class="sidebar-brand">
-                    <a href="homepage.html">
+                    <a href="homepage">
                         Homepage
                     </a>
                 </li>
@@ -24,7 +24,7 @@
                 </li>
                 <li>
                 <h3>Our API</h3>
-                {% for caption, id, page in [('Change log', '1','changes.html'), ('Features', '2','features.html'), ('Test Data', '3','test.html')] %}
+                {% for caption, id, page in [('Change log', '1','changes'), ('Features', '2','features'), ('Test Data', '3','test')] %}
                     <li>
                         <a href="{{ page }}" onclick="myFunc()" id="{{ id }}">{{ caption }}</a>
                     </li>
