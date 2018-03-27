@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 from flask_restful import Resource, Api, reqparse, fields, marshal
 from datetime import datetime
+import csv
 application = Flask(__name__)
 api = Api(application)
 currentVersion = 'v1.0'
@@ -15,7 +16,7 @@ def base():
 @application.route('/changes')
 def changesPage():
     return render_template('changes.html')
-    
+
 @application.route('/features')
 def featuresPage():
     return render_template('features.html')
@@ -60,6 +61,45 @@ def parseGuardian():
 
     #!marshal orders the data alphabetically. will need a way to change this!
     return marshal(data, output_fields)
+
+
+def openCompanyList():
+    with open('static\csv\ASXListedCompanies.csv', newline='') as csvfile:
+        companyList = csv.DictReader(csvfile, delimiter=',', quotechar='"')
+        newlist = []
+        for row in companyList:
+            newlist.append(row)
+    return newlist
+
+
+# Checks if a given company name or ASX code is in our ASX database, returns false if not
+def asxCheckValid(thingToCheck):
+    companyList = openCompanyList()
+    isValid = False
+    if any(item["ASX code"] == thingToCheck for item in companyList):
+        isValid = True
+    elif any(item["Company name"] == thingToCheck for item in companyList):
+        isValid = True
+    return isValid
+
+
+# Returns the full name of a company from its ASX code, if not in our database then returns the input given
+def asxCodeToName(thingToCheck):
+    companyList = openCompanyList()
+    return next((item for item in companyList if item["ASX code"] == thingToCheck), {"Company name": thingToCheck})["Company name"]
+
+
+# Returns the ASX code of a company from its full name, if not in our database then returns the input given
+def asxNameToCode(thingToCheck):
+    companyList = openCompanyList()
+    return next((item for item in companyList if item["Company name"] == thingToCheck), {"ASX code": thingToCheck})["ASX code"]
+
+
+# Returns the industry group of a company from its full name, if not in our database then returns the input given
+def asxNameToType(thingToCheck):
+    companyList = openCompanyList()
+    return next((item for item in companyList if item["Company name"] == thingToCheck), {"GICS industry group": thingToCheck})["GICS industry group"]
+
 
 class InputProcess(Resource):
     def get(self):
