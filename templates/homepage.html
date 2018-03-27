@@ -1,78 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>Team Turtle</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet">
-
-</head>
-<body>
-    <div id="wrapper">
-
-        <!-- Sidebar -->
-        <div id="sidebar-wrapper">
-            <ul class="sidebar-nav">
-                <li class="sidebar-brand">
-                    <a href="#">
-                        Contents
-                    </a>
-                </li>
-                {% for caption, id in [('Module Version', '1'), ('Implemented Features', '2'),
-                                   ('Version Differences', '3'), ('Module Instructions', '4'),
-                                   ('Module Integration', '5'), ('Test Data', '6')] %}
-                    <li>
-                        <a href="#" onclick="myFunc()" id="{{ id }}">{{ caption }}</a>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
-        <!-- /#sidebar-wrapper -->
-
-        <!-- Page Content -->
-        <div id="page-content-wrapper">
-            <div class="container-fluid">
-                <a href="#menu-toggle" class="btn btn-secondary" id="menu-toggle">Menu</a>
-                <h1 class="mt-5">Team Turtle: News API home page</h1>
-
-                <!-- content to be updated should go here -->
-                <h2 class="mt-5" id="title"></h1>
-                    <p id="page"></p>
-                {% block content %}{% endblock %}
-            </div>
-
-        </div>
-        <!-- /#page-content-wrapper -->
-        <footer class="footer">
-            <div class="container">
-                <span class="text-muted">Members: Dominic McDonald, Jack Vincent,
-                                        Jeremy Hamann, Rohan Bhat, Troy Murray</span>
-            </div>
-        </footer>
-    </div>
-    <!-- /#wrapper -->
-
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-
-    <!-- Menu Toggle Script -->
-    <script>
-    $("#menu-toggle").click(function(e) {
-        e.preventDefault();
-        $("#wrapper").toggleClass("toggled");
-    });
-    </script>
-
-    <!-- on click function for sidebar -->
-    <script>
-    function myFunc() {
-        var x = "on click works, doesnt change";
-        document.getElementById("page").innerHTML = x;
-    }
-    </script>
-
-</body>
-</html>
+{% extends "base.html" %}
+{% block content %}
+    <h1 class="mt-5">Team Turtle: News API home page</h1> 
+    <h3>Contents</h3>
+    <p class="lead">These links (and our homepage) will be updated as the project is progressed.</p>
+    <ul>
+        {% for href, caption in [('changes.html', 'Change log'), ('features.html', 'Features'), ('test.html', 'Test Data')] %}
+        <li><a href="{{ href }}">{{ caption }}</a></li>
+    {% endfor %}
+    </ul>
+{% endblock %}

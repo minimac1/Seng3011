@@ -6,9 +6,25 @@ api = Api(application)
 currentVersion = 'v1.0'
 
 @application.route('/')
+@application.route('/homepage.html')
 ##@app.route('/News/<name>')
 def base():
-    return render_template('base.html')
+    return render_template('homepage.html')
+
+@application.route('/changes.html')
+##@app.route('/News/<name>')
+def changesPage():
+    return render_template('changes.html')
+    
+@application.route('/features.html')
+##@app.route('/News/<name>')
+def featuresPage():
+    return render_template('features.html')
+
+@application.route('/test.html')
+##@app.route('/News/<name>')
+def testPage():
+    return render_template('test.html')
 
 #def parseGuardian(jsonData,logFile):
 def parseGuardian():
