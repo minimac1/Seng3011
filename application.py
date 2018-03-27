@@ -5,10 +5,24 @@ application = Flask(__name__)
 api = Api(application)
 currentVersion = 'v1.0'
 
+
 @application.route('/')
+@application.route('/homepage')
 ##@app.route('/News/<name>')
 def base():
-    return render_template('base.html')
+    return render_template('homepage.html')
+#shud probably change these to /Api/changes etc
+@application.route('/changes')
+def changesPage():
+    return render_template('changes.html')
+    
+@application.route('/features')
+def featuresPage():
+    return render_template('features.html')
+
+@application.route('/test')
+def testPage():
+    return render_template('test.html')
 
 #def parseGuardian(jsonData,logFile):
 def parseGuardian():

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block content %}
+    
+    <!-- this page will include all updates to our api. Each new version will have its version v1.n.k -> v1.(n+1).0 whenever we add a feature or v1.n.k -> v1.n.(k+1) whenever its just a fix. This will be a list of all changes, the title will only be the version number, within the item it will include another list of every update. Use + for any added features, (dot) for any changed features and - for any removed features -->
+    
+    <!-- might be ideal to store both changes and features in text files then use python to fill a list of records to push into here, but for now hardcoding a few should be fine-->
+    
+    <!-- not sure how complicated it will be but if we could create a webhook so that git automatically adds update to our file that stores our update logs wud be gud but not necessary and definitely not for the upcoming prototypes-->
+{% endblock %}
