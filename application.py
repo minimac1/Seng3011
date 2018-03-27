@@ -5,24 +5,22 @@ application = Flask(__name__)
 api = Api(application)
 currentVersion = 'v1.0'
 
+
 @application.route('/')
-@application.route('/homepage.html')
+@application.route('/homepage')
 ##@app.route('/News/<name>')
 def base():
     return render_template('homepage.html')
-
-@application.route('/changes.html')
-##@app.route('/News/<name>')
+#shud probably change these to /Api/changes etc
+@application.route('/changes')
 def changesPage():
     return render_template('changes.html')
     
-@application.route('/features.html')
-##@app.route('/News/<name>')
+@application.route('/features')
 def featuresPage():
     return render_template('features.html')
 
-@application.route('/test.html')
-##@app.route('/News/<name>')
+@application.route('/test')
 def testPage():
     return render_template('test.html')
 
