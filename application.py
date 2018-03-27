@@ -2,6 +2,9 @@ from flask import Flask, render_template
 from flask_restful import Resource, Api, reqparse, fields, marshal
 from datetime import datetime
 import csv
+import json
+import requests
+import re
 application = Flask(__name__)
 api = Api(application)
 currentVersion = 'v1.0'
@@ -105,7 +108,21 @@ class InputProcess(Resource):
     def get(self):
 
         # TODO: create a log file
+        api_url = "http://content.guardianapis.com/search"
 
+        #arguments/parameters passed to the guardian
+        #IMPORTANT some fields are hidden and to unhide them
+        #add arguments t0 show-fields in my_params
+        my_params = {
+            'q': "",
+            'from-date': "",
+            'to-date': "",
+            'order-by': "newest",
+            'show-fields': 'body-text',
+            'api-key':"6a81a5ed-2739-409d-8ada-059c122c8b43"
+        }
+
+        #extracting arguments from url
         parser = reqparse.RequestParser()
         parser.add_argument('startDate', type=str)
         parser.add_argument('endDate', type=str)
@@ -113,31 +130,56 @@ class InputProcess(Resource):
         parser.add_argument('topic', type=str)
         args = parser.parse_args()
 
-        #parsing to guardian Api
-        # we will need a function that turns company names's to company ids and
-        # vice versa. we should also have a separate function called in this
-        # function that gets the "type" of company they are to parse into
-        # the tags field for guardian api. eg. technology/apple.
-        # see ASX..csv file
+        # startDate = are accepted in url call format
+        # endDate = are accepted in url call format
+        # companyId => q (multiple ids, separated by %20OR%20)
+        # topic => q (multiple ids, separated by %20OR%20)
 
-        # startDate => from-date [YYYY-MM-DD]
-        # endDate => to-date [YYYY-MM-DD]
-        # companyId => q (multiple ids, separated by %20AND%20)
-        # topic => q (multiple ids, separated by %20AND%20)
-        #
-        #
-        # https://content.guardianapis.com/search?q="information%20technology"%20AND%20apple
-        # &from-date=2014-01-01
-        # &to-date=2018-01-01
-        # &api-key=6a81a5ed-2739-409d-8ada-059c122c8b43
+        my_params['from-date'] = re.sub(r'\.[0-9]+', '', args['startDate'] )
+        my_params['to-date'] = re.sub(r'\.[0-9]+', '', args['endDate'] )
+
+        comp = re.split('_', args['companyId'])
+        topics = re.split('_', args['topic'])
+
+        #compId us this to get the InstrumentIDs or companyIds
+        compId = []
+        compIdTemp = []
+        topicTemp = []
+        for c in comp:
+            a = c.replace("-", " ")
+            compId.append(a)
+            a = c.replace("-", "%20")
+            compIdTemp.append(a)
+
+        for c in topics:
+            a = c.replace("-", "%20")
+            topicTemp.append(a)
+
+        delimeter = "%20OR%20"
+        my_params['q'] = delimeter.join(compIdTemp)
+        my_params['q'] = '(' + my_params['q'] + ')'
+        my_params['q'] = '(' + delimeter.join(topicTemp) + ')' + '%20AND%20' + my_params['q']
+
+        api_url = (api_url + '?q=' + my_params['q'] + '&from-date='
+        + my_params['from-date'] + '&to-date=' + my_params['to-date']
+        + '&order-by=' + my_params['order-by']
+        + '&show-fields=' + my_params['show-fields'] + '&api-key=' + my_params['api-key'])
 
 
+        response = requests.get(api_url)
+        data = response.json()
+
+        #print statments for debugging please keep for future use
+        #print(response.url) #to see the url call to the api to make sure its correct
+        #print(response.text)
         # once the data is correct, call guardian api
         #
         # then we can return the data from parseGuardian
-        # return parseGuardian(jsonData,logFile)
+        #return parseGuardian(jsonData,logFile)
 
-        return parseGuardian()
+        #return parseGuardian()
+        #return parser.parse_args()
+        return data
 
 # add a rule for the index page.
 application.add_url_rule('/', 'index', (lambda: base()))
