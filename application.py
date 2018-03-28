@@ -150,11 +150,11 @@ def errorReturn(errorCode,params):
     errorCase = {
         1 : "startDate is empty",
         2 : "endDate is empty",
-        3 : "startDate is after endDate"
-        4 : "A Company Name you entered is invalid"
-        5 : "An Instrument ID you entered is invalid"
-        6 : "The Guardian API returned no articles"
-        7 : "The time period you entered is too big"
+        3 : "startDate is after endDate",
+        4 : "A Company Name you entered is invalid",
+        5 : "An Instrument ID you entered is invalid",
+        6 : "The Guardian API returned no articles",
+        7 : "The time period you entered is too big",
         8 : "You entered an invalid character"
     }
 
