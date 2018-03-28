@@ -9,8 +9,6 @@ application = Flask(__name__)
 api = Api(application)
 currentVersion = 'v1.0'
 
-
-@application.route('/')
 # Log JSON fields
 log_fields = {}
 log_fields['Developer Team'] = fields.String(default='Team Turtle')
@@ -22,6 +20,7 @@ log_fields['Parameters passed'] = fields.String
 log_fields['Execution Result'] = fields.List(fields.String)
 
 
+@application.route('/')
 @application.route('/homepage')
 ##@app.route('/News/<name>')
 def base():
