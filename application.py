@@ -240,15 +240,12 @@ class InputProcess(Resource):
         data = response.json()
 
         # check if guardian returned no articles
-
+        if not data["response"]["results"]:
+            return errorReturn(6,args)
 
         #print statments for debugging please keep for future use
         #print(response.url) #to see the url call to the api to make sure its correct
         #print(response.text)
-        # once the data is correct, call guardian api
-        #
-        # then we can return the data from parseGuardian
-        #return parseGuardian(jsonData,logFile)
 
         # if you get to this point, there should be no errors
         return parseGuardian(data, compId, args, execStartTime)
