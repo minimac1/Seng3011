@@ -82,12 +82,21 @@ def parseGuardian(jsonData, compNameList, params, execStartTime):
     return marshal(data, output_fields)
 
 
+def asxRemoveTails(companyName):
+    nameEndings = [" Limited", " LTD"]
+    for end in nameEndings:
+        if(companyName.upper().endswith(end.upper())):
+            companyName = companyName[:-len(end)]
+    return companyName
+
+
 def openCompanyList():
     with open('static/csv/ASXListedCompanies.csv', newline='') as csvfile:
         companyList = csv.DictReader(csvfile, delimiter=',', quotechar='"')
         newlist = []
         for row in companyList:
             newlist.append(row)
+            newlist[-1]["Company name"] = asxRemoveTails(newlist[-1]["Company name"])
     return newlist
 
 
@@ -95,10 +104,9 @@ def openCompanyList():
 def asxCheckValid(thingToCheck):
     companyList = openCompanyList()
     isValid = False
-    if any(item["ASX code"] == thingToCheck for item in companyList):
-        #should caps matter?
+    if len(thingToCheck) >= 3 and any(item["ASX code"].upper() == thingToCheck[:3].upper() for item in companyList):
         isValid = True
-    elif any(item["Company name"] == thingToCheck for item in companyList):
+    elif any(thingToCheck.upper() in item["Company name"].upper() for item in companyList):
         isValid = True
     return isValid
 
@@ -106,19 +114,35 @@ def asxCheckValid(thingToCheck):
 # Returns the full name of a company from its ASX code, if not in our database then returns the input given
 def asxCodeToName(thingToCheck):
     companyList = openCompanyList()
-    return next((item for item in companyList if item["ASX code"] == thingToCheck), {"Company name": thingToCheck})["Company name"]
+    if(len(thingToCheck) < 3):
+        return thingToCheck
+    return next((item for item in companyList if item["ASX code"].upper() == thingToCheck[:3].upper()), {"Company name": thingToCheck.upper()})["Company name"]
 
 
 # Returns the ASX code of a company from its full name, if not in our database then returns the input given
 def asxNameToCode(thingToCheck):
+    thingToCheck = asxRemoveTails(thingToCheck)
     companyList = openCompanyList()
-    return next((item for item in companyList if item["Company name"] == thingToCheck), {"ASX code": thingToCheck})["ASX code"]
+    return next((item for item in companyList if item["Company name"].upper() == thingToCheck.upper()), {"ASX code": thingToCheck.upper()})["ASX code"]
 
 
 # Returns the industry group of a company from its full name, if not in our database then returns the input given
 def asxNameToType(thingToCheck):
+    thingToCheck = asxRemoveTails(thingToCheck)
     companyList = openCompanyList()
-    return next((item for item in companyList if item["Company name"] == thingToCheck), {"GICS industry group": thingToCheck})["GICS industry group"]
+    return next((item for item in companyList if item["Company name"].upper() == thingToCheck.upper()), {"GICS industry group": thingToCheck.upper()})["GICS industry group"]
+
+# a "fuzzy" version of the asxNameToCode function, looks for a substring instead of an exact match
+def asxNameToCodeFuzzy(thingToCheck):
+    thingToCheck = asxRemoveTails(thingToCheck)
+    companyList = openCompanyList()
+    return next((item for item in companyList if thingToCheck.upper() in item["Company name"].upper()), {"ASX code": thingToCheck.upper()})["ASX code"]
+
+# a "fuzzy" version of the asxNameToCode function, looks for a substring instead of an exact match
+def asxNameToTypeFuzzy(thingToCheck):
+    thingToCheck = asxRemoveTails(thingToCheck)
+    companyList = openCompanyList()
+    return next((item for item in companyList if thingToCheck.upper() in item["Company name"].upper()), {"GICS industry group": thingToCheck.upper()})["GICS industry group"]
 
 
 # Each entry in the dictionary corresponds to the error code required
