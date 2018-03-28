@@ -2,6 +2,26 @@ body {
   overflow-x: hidden;
 }
 
+.page-title{
+  font-size: 50px;
+  font-family:"red serifs", serif;
+}
+.CL-container{
+  padding-left:20%;
+  
+}
+
+.CL-heading{
+  font-size: 30px;
+  line-height: 4;
+  font-family:serif;
+}
+
+.CL-body{
+  font-size: 20px;
+  line-height: 1.5;
+  font-family:serif;
+}
 
 #wrapper {
   padding-left: 0;
@@ -137,3 +157,6 @@ body {
   max-width: 680px;
   padding: 0 15px;
 }
+
+
+
