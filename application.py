@@ -5,6 +5,7 @@ import csv
 import json
 import requests
 import re
+import datetime
 application = Flask(__name__)
 api = Api(application)
 currentVersion = 'v1.0'
@@ -68,7 +69,7 @@ def parseGuardian(jsonData, compNameList, params, execStartTime):
         }
         newsDataList.append(newsData)
     # make a json of the nested fields
-    execEndTime = datetime.now()
+    execEndTime = datetime.datetime.now()
     logOutput = {'Parameters passed' : str(params),
                 'Execution Result' :
                     ["Successful", str(execStartTime),
@@ -167,7 +168,7 @@ def errorReturn(errorCode,params):
 
 class InputProcess(Resource):
     def get(self):
-        execStartTime = datetime.now()
+        execStartTime = datetime.datetime.now()
         api_url = "http://content.guardianapis.com/search"
 
         #arguments/parameters passed to the guardian
@@ -195,21 +196,50 @@ class InputProcess(Resource):
         # companyId => q (multiple ids, separated by %20OR%20)
         # topic => q (multiple ids, separated by %20OR%20)
 
-        # Error check if args is empty
-        if args['startDate'] == "":
-            return errorReturn(1,args)
-        if args['endDate'] == "":
-            return errorReturn(2,args)
+        #checks if dates exists before formating
+        if args['startDate'] != None:
+            my_params['from-date'] = re.sub(r'\.[0-9]+', '', args['startDate'] )
+        else:
+            return "error startDate not supplied"
+
+        if args['endDate'] != None:
+            my_params['to-date'] = re.sub(r'\.[0-9]+', '', args['endDate'] )
+        else:
+            return "error endDate not supplied"
+
+        #checking if the dates are in correct format
+        strptime_format = '%Y-%m-%dT%H:%M:%SZ'
+
+        dt_str = my_params['from-date']
+        try:
+            dt = datetime.datetime.strptime(dt_str, strptime_format)
+            print(dt)
+        except ValueError:
+            print('date fail')
+            return "error startDate is invalid format"
+
+        dt_str = my_params['to-date']
+        try:
+            dt = datetime.datetime.strptime(dt_str, strptime_format)
+            print(dt)
+        except ValueError:
+            print('date fail')
+            return "error endDate is invalid format"
+
+        #checking if endDate is before startDate
+        if datetime.datetime.strptime(my_params['from-date'],
+        strptime_format) > datetime.datetime.strptime(my_params['to-date'], strptime_format):
+            return "error startDate must be before endDate"
+
+        comp = []
+        if args['companyId'] != None:
+            comp = re.split('_', args['companyId'])
+
+        topics =[]
+        if args['topic'] != None:
+            topics = re.split('_', args['topic'])
 
 
-        #if (args['startDate'])
-        # Error checkj if args are in correct format
-
-        my_params['from-date'] = re.sub(r'\.[0-9]+', '', args['startDate'] )
-        my_params['to-date'] = re.sub(r'\.[0-9]+', '', args['endDate'] )
-
-        comp = re.split('_', args['companyId'])
-        topics = re.split('_', args['topic'])
 
         #compId use this to get the InstrumentIDs or companyIds
         compId = []
@@ -225,10 +255,20 @@ class InputProcess(Resource):
             a = c.replace("-", "%20")
             topicTemp.append(a)
 
-        delimeter = "%20OR%20"
-        my_params['q'] = delimeter.join(compIdTemp)
-        my_params['q'] = '(' + my_params['q'] + ')'
-        my_params['q'] = '(' + delimeter.join(topicTemp) + ')' + '%20AND%20' + my_params['q']
+        #checks for the number of companys and topics and
+        #forms q based on that
+        if len(compIdTemp) > 0 and len(topicTemp) > 0:
+            delimeter = "%20OR%20"
+            my_params['q'] = delimeter.join(compIdTemp)
+            my_params['q'] = '(' + my_params['q'] + ')'
+            my_params['q'] = '(' + delimeter.join(topicTemp) + ')' + '%20AND%20' + my_params['q']
+        elif len(compIdTemp) == 0 and len(topicTemp) > 0:
+            delimeter = "%20OR%20"
+            my_params['q'] = delimeter.join(topicTemp)
+        elif len(topicTemp) == 0 and len(compIdTemp) > 0:
+            delimeter = "%20OR%20"
+            my_params['q'] = delimeter.join(compIdTemp)
+
 
         api_url = (api_url + '?q=' + my_params['q'] + '&from-date='
         + my_params['from-date'] + '&to-date=' + my_params['to-date']
@@ -238,6 +278,7 @@ class InputProcess(Resource):
 
         response = requests.get(api_url)
         data = response.json()
+
 
         # check if guardian returned no articles
         if not data["response"]["results"]:
