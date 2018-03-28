@@ -68,11 +68,11 @@ def parseGuardian(jsonData, compNameList, params, execStartTime):
         }
         newsDataList.append(newsData)
     # make a json of the nested fields
-    endExecTime = datetime.now()
+    execEndTime = datetime.now()
     logOutput = {'Parameters passed' : str(params),
                 'Execution Result' :
                     ["Successful", str(execStartTime),
-                    str(endExecTime),  str(endExecTime-execStartTime)]
+                    str(execEndTime),  str(execEndTime-execStartTime)]
                 }
     data = {'Log Output' : logOutput,
             'NewsDataSet' : newsDataList}
@@ -121,6 +121,26 @@ def asxNameToType(thingToCheck):
     return next((item for item in companyList if item["Company name"] == thingToCheck), {"GICS industry group": thingToCheck})["GICS industry group"]
 
 
+# Each entry in the dictionary corresponds to the error code required
+def errorReturn(errorCode,params):
+    errorCase = {
+        1 : "startDate is empty",
+        2 : "endDate is empty",
+        3 : "startDate is after endDate"
+        4 : "A Company Name you entered is invalid"
+        5 : "An Instrument ID you entered is invalid"
+        6 : "The Guardian API returned no articles"
+        7 : "The time period you entered is too big"
+        8 : "You entered an invalid character"
+    }
+
+    logOutput = {'Parameters passed' : str(params),
+                'Execution Result' :
+                    ["Error", str(errorCase.get(errorCode, "Invalid Error Code"))]
+                }
+
+    return marshal(logOutput, log_fields)
+
 class InputProcess(Resource):
     def get(self):
         execStartTime = datetime.now()
@@ -152,7 +172,13 @@ class InputProcess(Resource):
         # topic => q (multiple ids, separated by %20OR%20)
 
         # Error check if args is empty
+        if args['startDate'] == "":
+            return errorReturn(1,args)
+        if args['endDate'] == "":
+            return errorReturn(2,args)
 
+
+        #if (args['startDate'])
         # Error checkj if args are in correct format
 
         my_params['from-date'] = re.sub(r'\.[0-9]+', '', args['startDate'] )
@@ -200,8 +226,7 @@ class InputProcess(Resource):
         # then we can return the data from parseGuardian
         #return parseGuardian(jsonData,logFile)
 
-        #return data
-        #return parser.parse_args()
+        # if you get to this point, there should be no errors
         return parseGuardian(data, compId, args, execStartTime)
 
 # add a rule for the index page.
