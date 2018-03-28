@@ -156,7 +156,9 @@ def errorReturn(errorCode,params):
         5 : "An Instrument ID you entered is invalid",
         6 : "The Guardian API returned no articles",
         7 : "The time period you entered is too big",
-        8 : "You entered an invalid character"
+        8 : "You entered an invalid character",
+        9 : "startDate is invalid format",
+        10 : "endDate is invalid format"
     }
 
     logOutput = {'Parameters passed' : str(params),
@@ -200,12 +202,12 @@ class InputProcess(Resource):
         if args['startDate'] != None:
             my_params['from-date'] = re.sub(r'\.[0-9]+', '', args['startDate'] )
         else:
-            return "error startDate not supplied"
+            return errorReturn(1,args)
 
         if args['endDate'] != None:
             my_params['to-date'] = re.sub(r'\.[0-9]+', '', args['endDate'] )
         else:
-            return "error endDate not supplied"
+            return errorReturn(2,args)
 
         #checking if the dates are in correct format
         strptime_format = '%Y-%m-%dT%H:%M:%SZ'
@@ -216,7 +218,7 @@ class InputProcess(Resource):
             print(dt)
         except ValueError:
             print('date fail')
-            return "error startDate is invalid format"
+            return errorReturn(9,args)
 
         dt_str = my_params['to-date']
         try:
@@ -224,12 +226,12 @@ class InputProcess(Resource):
             print(dt)
         except ValueError:
             print('date fail')
-            return "error endDate is invalid format"
+            return errorReturn(10,args)
 
         #checking if endDate is before startDate
         if datetime.datetime.strptime(my_params['from-date'],
         strptime_format) > datetime.datetime.strptime(my_params['to-date'], strptime_format):
-            return "error startDate must be before endDate"
+            return errorReturn(3,args)
 
         comp = []
         if args['companyId'] != None:
