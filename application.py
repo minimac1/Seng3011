@@ -247,10 +247,31 @@ class InputProcess(Resource):
         compId = []
         compIdTemp = []
         topicTemp = []
+
         for c in comp:
             a = c.replace("-", " ")
             compId.append(a)
-            a = c.replace("-", "%20")
+
+        #converting InstrumentIDs to companyId
+        #also checking for valid InstrumentIDs
+        i = 0;
+        while i < len(compId):
+            if (re.match(r'.*\.AX',compId[i])):
+                print(compId[i])
+                if not asxCheckValid(compId[i]):
+                    return errorReturn(5, args)
+                compId[i] = asxCodeToName(compId[i])
+
+            i=i+1
+
+        #check if company exists
+
+        for c in compId:
+            if not asxCheckValid(c):
+                return errorReturn(4, args)
+
+        for c in compId:
+            a = c.replace(" ", "%20")
             compIdTemp.append(a)
 
         for c in topics:
