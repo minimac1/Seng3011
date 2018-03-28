@@ -65,7 +65,7 @@ def parseGuardian(jsonData, compNameList):
 
 
 def openCompanyList():
-    with open('static\csv\ASXListedCompanies.csv', newline='') as csvfile:
+    with open('static/csv/ASXListedCompanies.csv', newline='') as csvfile:
         companyList = csv.DictReader(csvfile, delimiter=',', quotechar='"')
         newlist = []
         for row in companyList:
