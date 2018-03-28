@@ -11,6 +11,17 @@ currentVersion = 'v1.0'
 
 
 @application.route('/')
+# Log JSON fields
+log_fields = {}
+log_fields['Developer Team'] = fields.String(default='Team Turtle')
+log_fields['Module Name'] = fields.String(default='News API')
+log_fields['API Version'] = fields.String(default=currentVersion)
+#log_fields['Parameters passed'] = fields.List(fields.String)
+log_fields['Parameters passed'] = fields.String
+#change exec result if error occurs
+log_fields['Execution Result'] = fields.List(fields.String)
+
+
 @application.route('/homepage')
 ##@app.route('/News/<name>')
 def base():
@@ -29,7 +40,7 @@ def testPage():
     return render_template('test.html')
 
 #def parseGuardian(jsonData,logFile):
-def parseGuardian(jsonData, compNameList):
+def parseGuardian(jsonData, compNameList, params, execStartTime):
     #use compNameList to make a instrIdList
     instrIdList = []
     for c in compNameList:
@@ -44,6 +55,7 @@ def parseGuardian(jsonData, compNameList):
     newsData_fields['NewsText'] = fields.String
     #sets up the main field, which has the nested data
     output_fields = {}
+    output_fields['Log Output'] = fields.Nested(log_fields)
     output_fields['NewsDataSet'] = fields.List(fields.Nested(newsData_fields))
 
     #parse the given json into a nested field, append to list
@@ -57,9 +69,16 @@ def parseGuardian(jsonData, compNameList):
         }
         newsDataList.append(newsData)
     # make a json of the nested fields
-    data = {'NewsDataSet' : newsDataList}
+    endExecTime = datetime.now()
+    logOutput = {'Parameters passed' : str(params),
+                'Execution Result' :
+                    ["Successful", str(execStartTime),
+                    str(endExecTime),  str(endExecTime-execStartTime)]
+                }
+    data = {'Log Output' : logOutput,
+            'NewsDataSet' : newsDataList}
 
-    #marshal orders the data alphabetically. is this a problem?!
+    # marshal orders the data alphabetically. is this a problem?!
     # return the json marshalled with the fields
     return marshal(data, output_fields)
 
@@ -105,8 +124,7 @@ def asxNameToType(thingToCheck):
 
 class InputProcess(Resource):
     def get(self):
-
-        # TODO: create a log file
+        execStartTime = datetime.now()
         api_url = "http://content.guardianapis.com/search"
 
         #arguments/parameters passed to the guardian
@@ -137,7 +155,6 @@ class InputProcess(Resource):
         # Error check if args is empty
 
         # Error checkj if args are in correct format
-
 
         my_params['from-date'] = re.sub(r'\.[0-9]+', '', args['startDate'] )
         my_params['to-date'] = re.sub(r'\.[0-9]+', '', args['endDate'] )
@@ -173,6 +190,9 @@ class InputProcess(Resource):
         response = requests.get(api_url)
         data = response.json()
 
+        # check if guardian returned no articles
+
+
         #print statments for debugging please keep for future use
         #print(response.url) #to see the url call to the api to make sure its correct
         #print(response.text)
@@ -183,7 +203,7 @@ class InputProcess(Resource):
 
         #return data
         #return parser.parse_args()
-        return parseGuardian(data, compId)
+        return parseGuardian(data, compId, args, execStartTime)
 
 # add a rule for the index page.
 application.add_url_rule('/', 'index', (lambda: base()))
