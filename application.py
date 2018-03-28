@@ -29,40 +29,38 @@ def testPage():
     return render_template('test.html')
 
 #def parseGuardian(jsonData,logFile):
-def parseGuardian():
-    # parse guardian json
+def parseGuardian(jsonData, compNameList):
+    #use compNameList to make a instrIdList
+    instrIdList = []
+    for c in compNameList:
+        instrIdList.append(asxNameToCode(c))
 
-
+    #sets up the nested fields
     newsData_fields = {}
     newsData_fields['InstrumentIDs'] = fields.List(fields.String)
     newsData_fields['CompanyNames'] = fields.List(fields.String)
     newsData_fields['TimeStamp'] = fields.String
     newsData_fields['Headline'] = fields.String
     newsData_fields['NewsText'] = fields.String
-
+    #sets up the main field, which has the nested data
     output_fields = {}
     output_fields['NewsDataSet'] = fields.List(fields.Nested(newsData_fields))
 
-    #will need to loop through guardian json data
+    #parse the given json into a nested field, append to list
+    newsDataList = []
+    for x in jsonData["response"]["results"]:
+        newsData = {'InstrumentIDs': instrIdList,
+            'CompanyNames': compNameList,
+            'TimeStamp': x["webPublicationDate"],
+            'Headline': x["webTitle"],
+            'NewsText': x["fields"]["bodyText"]
+        }
+        newsDataList.append(newsData)
+    # make a json of the nested fields
+    data = {'NewsDataSet' : newsDataList}
 
-    #
-
-    newsData1 = {'InstrumentIDs': ['CBA', 'DMP'],
-        'CompanyNames': ['COUGAR METALS NL', 'DOMINO\'S PIZZA ENTERPRISES LIMITED'],
-        'TimeStamp': datetime.now(),
-        'Headline': 'pizza is good for you',
-        'NewsText': 'lol get clickbaited'
-    }
-
-    newsData2 = {'InstrumentIDs': ['CBA', 'TLS'],
-        'CompanyNames': ['COMMONWEALTH BANK OF AUSTRALIA', 'TELSTRA CORPORATION LIMITED'],
-        'TimeStamp': datetime.now(),
-        'Headline': 'OMG NEWZ',
-        'NewsText': 'give us ur money thx'
-    }
-    data = {'NewsDataSet' : [newsData1, newsData2]}
-
-    #!marshal orders the data alphabetically. will need a way to change this!
+    #marshal orders the data alphabetically. is this a problem?!
+    # return the json marshalled with the fields
     return marshal(data, output_fields)
 
 
@@ -80,6 +78,7 @@ def asxCheckValid(thingToCheck):
     companyList = openCompanyList()
     isValid = False
     if any(item["ASX code"] == thingToCheck for item in companyList):
+        #should caps matter?
         isValid = True
     elif any(item["Company name"] == thingToCheck for item in companyList):
         isValid = True
@@ -135,13 +134,18 @@ class InputProcess(Resource):
         # companyId => q (multiple ids, separated by %20OR%20)
         # topic => q (multiple ids, separated by %20OR%20)
 
+        # Error check if args is empty
+
+        # Error checkj if args are in correct format
+
+
         my_params['from-date'] = re.sub(r'\.[0-9]+', '', args['startDate'] )
         my_params['to-date'] = re.sub(r'\.[0-9]+', '', args['endDate'] )
 
         comp = re.split('_', args['companyId'])
         topics = re.split('_', args['topic'])
 
-        #compId us this to get the InstrumentIDs or companyIds
+        #compId use this to get the InstrumentIDs or companyIds
         compId = []
         compIdTemp = []
         topicTemp = []
@@ -177,9 +181,9 @@ class InputProcess(Resource):
         # then we can return the data from parseGuardian
         #return parseGuardian(jsonData,logFile)
 
-        #return parseGuardian()
+        #return data
         #return parser.parse_args()
-        return data
+        return parseGuardian(data, compId)
 
 # add a rule for the index page.
 application.add_url_rule('/', 'index', (lambda: base()))
