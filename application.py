@@ -196,10 +196,6 @@ class InputProcess(Resource):
         # companyId => q (multiple ids, separated by %20OR%20)
         # topic => q (multiple ids, separated by %20OR%20)
 
-        # Error check if args is empty
-
-        # Error checkj if args are in correct format
-
         #checks if dates exists before formating
         if args['startDate'] != None:
             my_params['from-date'] = re.sub(r'\.[0-9]+', '', args['startDate'] )
@@ -259,6 +255,8 @@ class InputProcess(Resource):
             a = c.replace("-", "%20")
             topicTemp.append(a)
 
+        #checks for the number of companys and topics and
+        #forms q based on that
         if len(compIdTemp) > 0 and len(topicTemp) > 0:
             delimeter = "%20OR%20"
             my_params['q'] = delimeter.join(compIdTemp)
