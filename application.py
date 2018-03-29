@@ -105,7 +105,9 @@ def openCompanyList():
 def asxCheckValid(thingToCheck):
     companyList = openCompanyList()
     isValid = False
-    if len(thingToCheck) >= 3 and any(item["ASX code"].upper() == thingToCheck[:3].upper() for item in companyList):
+    if len(thingToCheck) == 3 and any(item["ASX code"].upper() == thingToCheck.upper() for item in companyList):
+        isValid = True
+    elif (len(thingToCheck) == 6 and thingToCheck.upper().endswith(".AX")) and any(item["ASX code"].upper() == thingToCheck[:3].upper() for item in companyList):
         isValid = True
     elif any(thingToCheck.upper() in item["Company name"].upper() for item in companyList):
         isValid = True
@@ -114,10 +116,12 @@ def asxCheckValid(thingToCheck):
 
 # Returns the full name of a company from its ASX code, if not in our database then returns the input given
 def asxCodeToName(thingToCheck):
+    if(len(thingToCheck) == 6 and thingToCheck.upper().endswith(".AX")):
+        thingToCheck = thingToCheck[:3]
     companyList = openCompanyList()
     if(len(thingToCheck) < 3):
         return thingToCheck
-    return next((item for item in companyList if item["ASX code"].upper() == thingToCheck[:3].upper()), {"Company name": thingToCheck.upper()})["Company name"]
+    return next((item for item in companyList if item["ASX code"].upper() == thingToCheck.upper()), {"Company name": thingToCheck.upper()})["Company name"]
 
 
 # Returns the ASX code of a company from its full name, if not in our database then returns the input given
