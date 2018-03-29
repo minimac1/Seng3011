@@ -1,11 +1,53 @@
 {% extends "base.html" %}
 {% block content %}
-    <div class="container-fluid CL-container">
-        <div class="page-title">Documentation</div>
-        <div class="CL-heading">Implemented features as of current version 1.0</div>
-        <div class="CL-body">
+<div class="container-fluid CL-container">
+    <div class="page-title">Documentation</div>
+        <div class="CL-body" style="width: 100%; height: 250px; overflow: auto">
+            <div class="CL-heading">Input Documentation</div>
+            <p>Input variables: type, format, what they represent, refer to the examples below for acceptable inputs</p>
+            <ul style="list-style-type: none">
+                <li>startDate: String, %Y-%m-%dT%H:%M:%SZ, represents the starting period for the API to search from.</li>
+                <li>endDate:   String, %Y-%m-%dT%H:%M:%SZ, represents the end of the time period for the API to search till.</li>
+                <li>companyId: string, either ID (WOW.AX) or Name (Woolworths), represents companies in the ASX that will be searched for by the API.</li>
+                <li>topic: string, single words seperated by %20OR%20, terms that the API will look for before including the article in the output file</li>
+            </ul>
+            <div class="CL-heading">Output Documentation</div>
+                <ul style="list-style-type: none">
+                    <li>Example of failed API call.</li>
+                    <pre><code>
+url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?""
+i.e. no input data
 
-        <div class="CL-heading">Examples for Calling the API</div>
+result:
+{"Developer Team": "Team Turtle", "Module Name": "News API", "API Version": "v1.0",
+"Parameters passed": "{'startDate': None, 'endDate': None, 'companyId': None, 'topic': None}",
+"Execution Result": ["Error", "startDate is empty"]}
+                    </pre></code>
+
+                    <li>Example of Successful API call</li>
+                    <pre><code>
+url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?startDate=2017-09-20T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=AUSTRALIA%20AND%20NEW%20ZEALAND%20BANKING&topic=iphone"
+i.e. searches between the dates 2017/09/20:45:31.235 and 2017/09/24:45:31.235
+ for the company name AUSTRALIA AND NEW ZEALAND BANKING
+ with the topic "iphone".
+
+result:
+{"Log Output": {"Developer Team": "Team Turtle", "Module Name": "News API", "API Version": "v1.0",
+"Parameters passed": "{'startDate': '2017-09-20T09:45:31.235Z', 'endDate': '2017-09-24T09:45:31.235Z',
+'companyId': 'AUSTRALIA AND NEW ZEALAND BANKING', 'topic': 'iphone'}",
+"Execution Result": ["Successful", "2018-03-29 06:11:15.464927", "2018-03-29 06:11:16.076337", "0:00:00.611410"]},
+"NewsDataSet": [{"InstrumentIDs": ["AUSTRALIA AND NEW ZEALAND BANKING"], "CompanyNames": ["AUSTRALIA AND NEW ZEALAND BANKING"],
+"TimeStamp": "2017-09-23T09:30:14Z", "Headline": "iPhone 8: muted reaction and small queues lead to questions over demand",
+"NewsText": "As the iPhone 8 goes on sale, questions remain over the demand for Apple\u2019s latest offering following ...
+people lining up before the store opened on Friday. A similar level of interest was seen across Asia and in Europe. ...
+For the iPhone 8, the question remains whether buyers that simply ... "}]}
+
+(note some text removed for the sake of the example)
+                    </pre></code>
+                </ul>
+        </div>
+    <div class="CL-heading">Examples for Calling the API</div>
+    <div style="width: 100%; height: 250px; overflow: auto">
         <div class="CL-body">
             <ul style="list-style-type: none">
                 <li>Python example API call.</li>
@@ -31,9 +73,15 @@ topic = "projected-profit_share-price-prediction"
 
 $.getJSON(url+"startDate="+startDate+"&endDate="+endDate+"&companyId="+companyID+"&topic="+topic, myFunction(Data));
                     </code></pre>
+
+                    <li>curl example API call.</li>
+                        <pre><code>
+curl "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?startDate=2017-09-20T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=AUSTRALIA%20AND%20NEW%20ZEALAND%20BANKING&topic=iphone"
+                        </code></pre>
             </ul>
         </div>
     </div>
+</div>
     <!-- this page will contain a list of all our implemented features, instructions on how to use each feature and examples of each feature (using python) -->
 
     <!-- might be ideal to store both changes and features in text files then use python to fill a list of records to push into here, but for now hardcoding a few should be fine-->
