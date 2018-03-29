@@ -1,6 +1,86 @@
 {% extends "base.html" %}
 {% block content %}
-
+    <div class="container-fluid CL-container">
+        <div class="page-title">Features</div>
+        <div class="CL-heading">Implemented features as of prototype 1.0.0</div>
+        <div class="CL-body">
+            <ul style="list-style-type:none">
+               <li>Ability to Supply, Process, and Parse User Arguments to Guardian API</li>
+                  <ul>
+                      <li>parseGuardian function: <code>def parseGuardian(jsonData, compNameList, params, execStartTime):</code></li>
+                      <ul style="list-style-type:none">
+                          <li>- The given json data is parsed into newly created nested search fields, then appended to a data list.</li>
+                          <li>- New json is created of the nested fields</li>
+                          <li>- Finally, return json data marshalled with the search fields, data ordered alphabetically</li>
+                      </ul>
+                      <li>InputProcess function: <code>class InputProcess(Resource):</code></li>
+                      <ul style="list-style-type:none">
+                          <li>- Function to process the supplied arguments passed to the guardian API.</li>
+                          <li>- Initally sets up argument parameters, then extracts them from the URL.</li>
+                          <li>- Then does a validity check on the dates before formatting the URL into the argument parameters.</li>
+                          <li>- Converts the instrumentIDs to comapanyIDs and does a validity check.</li>
+                          <li>- Next, the number of companies and topics are counted, and a query is based of the result.</li>
+                          <li>- If the quardian API returns no articles, an error is produced, otherwise parseGuardian is called with the API data as input parameters.</li>
+                          <li>- That is: <code>return parseGuardian(data, compId, args, execStartTime)</code></li>
+                     </ul>
+                  </ul>
+               <br>
+               <li>Validity Checks on Supplied Company Name or InstrumentID</li>
+                  <ul>
+                      <li>asxCheckValid function: <code>def asxCheckValid(thingToCheck):</code></li>
+                      <ul style="list-style-type:none">
+                          <li>- Completes a validity check on the supplied ASX code with our ASX database.</li>
+                          <li>- Returns false if the code is not found.</li>
+                      </ul>
+                  </ul>
+               <br>
+               <li>Convert InstrumentID to Company Name</li>
+                  <ul>
+                      <li>asxCodeToName function: <code>def asxCodeToName(thingToCheck):</code></li>
+                      <ul style="list-style-type:none">
+                          <li>If the ASX code is in the database, the company's full name is returned.</li>
+                          <li>Otherwise the input is returned</li>
+                      </ul>
+                  </ul>
+               <br>
+               <li>Convert Company Name to InstrumentID</li>
+                  <ul>
+                     <li>asxNameToCode function: <code>def asxNameToCode(thingToCheck):</code></li>
+                     <ul style="list-style-type:none">
+                         <li>If the asx code is in the database, the company's ASX code is returned.</li>
+                         <li>Otherwise the input is returned</li>
+                     </ul>
+                  </ul>
+               <br>
+               <li>Find Industry Group From a Company Name</li>
+                  <ul>
+                     <li>asxNameToType function: <code>def asxNameToType(thingToCheck):</code></li>
+                     <ul style="list-style-type:none">
+                         <li>If the company's full name is in the database, the industry group is returned.</li>
+                         <li>Otherwise the input is returned</li>
+                     </ul>
+                  </ul>
+               <br>
+               <li>'Fuzzy' Searches for Company Name or Industry Group</li>
+                  <ul>
+                     <li>Similar functionality as the asxNameToCode/Type functions</li>
+                     <ul style="list-style-type:none">
+                         <li>Instead of searching for exact matches, substrings of the input are searched for</li>
+                     </ul>
+                  </ul>
+               <br>
+               <li>Produce an Error File if Required</li>
+                  <ul>
+                     <li>errorReturn function: <code>def errorReturn(errorCode,params):</code></li>
+                     <ul style="list-style-type:none">
+                         <li>The function is supplied with errorCode(s) from 1 to 10, each indicating a different error that has been encountered.</li>
+                         <li>It then logs the error output, and returns a marshalled output.</li>
+                     </ul>
+                  </ul>
+               <br>
+            </ul>
+        </div>
+    </div>
     <!-- this page will contain a list of all our implemented features, instructions on how to use each feature and examples of each feature (using python) -->
     
     <!-- might be ideal to store both changes and features in text files then use python to fill a list of records to push into here, but for now hardcoding a few should be fine-->
