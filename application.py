@@ -10,6 +10,9 @@ application = Flask(__name__)
 api = Api(application)
 currentVersion = 'v1.0'
 
+defaultPageSize = 200
+api_url = "http://content.guardianapis.com/search"
+
 # Log JSON fields
 log_fields = {}
 log_fields['Developer Team'] = fields.String(default='Team Turtle')
@@ -39,7 +42,6 @@ def featuresPage():
 def testPage():
     return render_template('test.html')
 
-#def parseGuardian(jsonData,logFile):
 def parseGuardian(jsonData, compNameList, params, execStartTime):
     #use compNameList to make a instrIdList
     instrIdList = []
@@ -60,7 +62,7 @@ def parseGuardian(jsonData, compNameList, params, execStartTime):
 
     #parse the given json into a nested field, append to list
     newsDataList = []
-    for x in jsonData["response"]["results"]:
+    for x in jsonData:
         newsData = {'InstrumentIDs': instrIdList,
             'CompanyNames': compNameList,
             'TimeStamp': x["webPublicationDate"],
@@ -172,10 +174,23 @@ def errorReturn(errorCode,params):
 
     return marshal(logOutput, log_fields)
 
+# Given parsed params and a pageNumber, returns the json from Guardian Api
+# Used for recursive calling of the api when there is more than 1 page of data
+def callGuardian(my_params, curPageNum):
+    parsed_url = (api_url + '?q=' + my_params['q'] + '&from-date='
+    + my_params['from-date'] + '&to-date=' + my_params['to-date']
+    + '&order-by=' + my_params['order-by']
+    + '&show-fields=' + my_params['show-fields']
+    + '&page=' + str(curPageNum)
+    + '&page-size=' + str(defaultPageSize)
+    + '&api-key=' + my_params['api-key'])
+
+    response = requests.get(parsed_url)
+    return response.json()
+
 class InputProcess(Resource):
     def get(self):
         execStartTime = datetime.datetime.now()
-        api_url = "http://content.guardianapis.com/search"
 
         #arguments/parameters passed to the guardian
         #IMPORTANT some fields are hidden and to unhide them
@@ -296,16 +311,23 @@ class InputProcess(Resource):
             delimeter = "%20OR%20"
             my_params['q'] = delimeter.join(compIdTemp)
 
+        data = callGuardian(my_params, 1)
 
-        api_url = (api_url + '?q=' + my_params['q'] + '&from-date='
-        + my_params['from-date'] + '&to-date=' + my_params['to-date']
-        + '&order-by=' + my_params['order-by']
-        + '&show-fields=' + my_params['show-fields'] + '&api-key=' + my_params['api-key'])
-
-
-        response = requests.get(api_url)
-        data = response.json()
-
+        resultsList = []
+        # if there is one page
+        print("Total Articles: " + str(data["response"]["total"]))
+        print("Pages: " + str(data["response"]["pages"]))
+        if (data["response"]["pages"] == 1):
+            print("Calling page: 1")
+            resultsList = data["response"]["results"]
+        # if there is more than one page
+        elif (data["response"]["pages"] != 1):
+            for x in range(0, data["response"]["pages"]):
+                print("Calling page: " + str(x+1))
+                data = callGuardian(my_params, x+1)
+                resultsList = resultsList + data["response"]["results"]
+        else:
+            print("\nYou shouldn't be here!!!!\n")
 
         # check if guardian returned no articles
         if not data["response"]["results"]:
@@ -316,7 +338,7 @@ class InputProcess(Resource):
         #print(response.text)
 
         # if you get to this point, there should be no errors
-        return parseGuardian(data, compId, args, execStartTime)
+        return parseGuardian(resultsList, compId, args, execStartTime)
 
 # add a rule for the index page.
 application.add_url_rule('/', 'index', (lambda: base()))
