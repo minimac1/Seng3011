@@ -2,15 +2,45 @@
 {% block content %}
 <div class="container-fluid CL-container">
     <div class="page-title">Documentation</div>
-        <div class="CL-body" style="width: 100%; height: 250px; overflow: auto">
+        <div class="CL-body">
             <div class="CL-heading">Input Documentation</div>
-            <p>Input variables: type, format, what they represent, refer to the examples below for acceptable inputs</p>
-            <ul style="list-style-type: none">
-                <li>startDate: String, %Y-%m-%dT%H:%M:%SZ, represents the starting period for the API to search from.</li>
-                <li>endDate:   String, %Y-%m-%dT%H:%M:%SZ, represents the end of the time period for the API to search till.</li>
-                <li>companyId: string, either ID (WOW.AX) or Name (Woolworths), represents companies in the ASX that will be searched for by the API.</li>
-                <li>topic: string, single words seperated by %20OR%20, terms that the API will look for before including the article in the output file</li>
-            </ul>
+            <div class="CL-body">
+                <table class="inTable">
+                    <tr>
+                        <td>Name</td>
+                        <td>Description</td> 
+                        <td>Type</td>
+                        <td>Accepted values</td>
+                    </tr>
+                    <tr>
+                        <td>startDate</td>
+                        <td>The start of the time period for which you would like to search through</td>
+                        <td>String</td>
+                        <td>A single date in the format: yyyy-mm-ddThh:mm:ss.SSSZ</td>
+                    </tr>
+                    <tr>
+                        <td>endDate</td>
+                        <td>The end of the time period for which you would like to search through</td>
+                        <td>String</td>
+                        <td>A single date in the format: yyyy-mm-ddThh:mm:ss.SSSZ</td>
+                        
+                    </tr>
+                    <tr>
+                        <td>companyID</td>
+                        <td>Company/ies of which you would like to search for related news</td>
+                        <td>String</td>
+                        <td>Either asx ID e.g. WOW.AX or full name e.g. Woolworths. Replace spaces with %20 and seperate multiple companies with |BLABLABAL not sure what it is pls put it here and is the id always followed by .AX, just checkin|</td>
+                        
+                    </tr>
+                    <tr>
+                        <td>topic</td>
+                        <td>Topics of which you would like to search for related news</td>
+                        <td>String</td>
+                        <td>Single words seperated by %20OR%20 |also want to ask, can topics be multiple words???|</td>
+                        
+                    </tr>
+                </table>
+            </div>
             <div class="CL-heading">Output Documentation</div>
                 <ul style="list-style-type: none">
                     <li>Example of failed API call.</li>
@@ -55,10 +85,8 @@ For the iPhone 8, the question remains whether buyers that simply ... "}]}
                     <li>NewsText: Content of the matched news articles.</li>
                     <li>Execution Result: Either successful or an error description is given.</li>
                 </ul>
-        </div>
+        
     <div class="CL-heading">Examples for Calling the API</div>
-    <div style="width: 100%; height: 250px; overflow: auto">
-        <div class="CL-body">
             <ul style="list-style-type: none">
                 <li>Python example API call.</li>
                     <pre><code>
@@ -89,8 +117,8 @@ $.getJSON(url+"startDate="+startDate+"&endDate="+endDate+"&companyId="+companyID
 curl "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?startDate=2017-09-20T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=AUSTRALIA%20AND%20NEW%20ZEALAND%20BANKING&topic=iphone"
                         </code></pre>
             </ul>
-        </div>
-    </div>
+
+</div>
 </div>
     <!-- this page will contain a list of all our implemented features, instructions on how to use each feature and examples of each feature (using python) -->
 

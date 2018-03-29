@@ -2,13 +2,39 @@ body {
   overflow-x: hidden;
 }
 
+
 .page-title{
   font-size: 50px;
   font-family:"red serifs", serif;
 }
-.CL-container{
-  padding-left:20%;
 
+.inTable { 
+  border: none; 
+  border-collapse: collapse; 
+}
+.inTable td { 
+  border-left: 1px solid #ddd; 
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.inTable td:first-child { 
+  border-left: none; 
+}
+.inTable tr {
+  border-top: 1px solid #ddd; 
+}
+.inTable tr:first-child { 
+  border-top: none; 
+  border-bottom:2px solid #ddd;
+}
+.CL-container{
+  position:fixed;
+  margin-left:0px;
+  top:100px;
+  left:250px; 
+  height:83vh;
+  width:85vw;
+  overflow:auto;
 }
 
 .CL-heading{

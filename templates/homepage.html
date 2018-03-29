@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
+    <div class="container-fluid CL-container">
     <h1 class="mt-5">Team Turtle: News API home page</h1> 
     <h3>Contents</h3>
     <p class="lead">These links (and our homepage) will be updated as the project is progressed.</p>
     <ul>
-        {% for href, caption in [('changes', 'Change log'), ('features', 'Features'), ('test', 'Test Data')] %}
+        {% for href, caption in [('changes', 'Change log'), ('features', 'Documentation'), ('test', 'Test Data')] %}
         <li><a href="{{ href }}">{{ caption }}</a></li>
     {% endfor %}
     </ul>
+    </div>
 {% endblock %}

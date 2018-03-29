@@ -158,7 +158,7 @@ def errorReturn(errorCode,params):
     errorCase = {
         1 : "startDate is empty",
         2 : "endDate is empty",
-        3 : "startDate is after endDate",
+        3 : "startDate must be before endDate",
         4 : "A Company Name you entered is invalid",
         5 : "An Instrument ID you entered is invalid",
         6 : "The Guardian API returned no articles",
@@ -276,7 +276,7 @@ class InputProcess(Resource):
         #also checking for valid InstrumentIDs
         i = 0;
         while i < len(compId):
-            if (re.match(r'.*\.AX',compId[i])):
+            if (re.match(r'.*\.AX',compId[i])): # JUST WANT TO ASK, SHUD THIS BE .AX$ SO THAT IT MAKES SURE THERE IS NOTHING AFTER
                 print(compId[i])
                 if not asxCheckValid(compId[i]):
                     return errorReturn(5, args)

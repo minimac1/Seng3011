@@ -24,7 +24,7 @@
                 </li>
                 <li>
                 <h3>Our API</h3>
-                {% for caption, id, page in [('Change log', '1','changes'), ('Features', '2','features'), ('Test Data', '3','test')] %}
+                {% for caption, id, page in [('Change log', '1','changes'), ('Documentation', '2','features'), ('Test Data', '3','test')] %}
                     <li>
                         <a href="{{ page }}" onclick="myFunc()" id="{{ id }}">{{ caption }}</a>
                     </li>
@@ -38,6 +38,7 @@
         <div id="page-content-wrapper">
             <div class="container-fluid">
                 <a href="#menu-toggle" class="btn btn-secondary" id="menu-toggle">Menu</a>
+                <div>&nbsp</div>
                 <!-- <h1 class="mt-5">Team Turtle: News API home page</h1>
 
                  content to be updated should go here
@@ -71,11 +72,9 @@
     </script>
 
     <!-- on click function for sidebar -->
-    <!-- below func redundant -->
     <script>
-    function myFunc() {
-        var x = "on click works, doesnt change";
-        document.getElementById("page").innerHTML = x;
+    function checkMenu() {
+        // not implemented yet, but want to make it so that the menu stays toggled
     }
     </script>
 
