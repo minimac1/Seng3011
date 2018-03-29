@@ -105,6 +105,7 @@ def openCompanyList():
 
 # Checks if a given company name or ASX code is in our ASX database, returns false if not
 def asxCheckValid(thingToCheck):
+    thingToCheck = asxRemoveTails(thingToCheck)
     companyList = openCompanyList()
     isValid = False
     if len(thingToCheck) == 3 and any(item["ASX code"].upper() == thingToCheck.upper() for item in companyList):
