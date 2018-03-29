@@ -80,8 +80,36 @@
                <br>
             </ul>
         </div>
+        <div class="CL-heading">Examples for Calling the API</div>
+        <div class="CL-body">
+            <ul style="list-style-type: none">
+                <li>Python example API call.</li>
+                    <pre><code>
+import requests
+
+
+url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?"
+startDate = "2017-08-24T09:45:31.233Z"
+endDate = "2017-09-24T09:45:31.233Z"
+companyID = "ANZ_Woolworths"
+topic = "projected-profit_share-price-prediction"
+
+response = requests.get(url+"startDate="+startDate+"&endDate="+endDate+"&companyId="+companyID+"&topic="+topic)
+                    </code></pre>
+                <li>JavaScript/jQuery example API call.</li>
+                    <pre><code>
+url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?"
+startDate = "2017-08-24T09:45:31.233Z"
+endDate = "2017-09-24T09:45:31.233Z"
+companyID = "ANZ_Woolworths"
+topic = "projected-profit_share-price-prediction"
+
+$.getJSON(url+"startDate="+startDate+"&endDate="+endDate+"&companyId="+companyID+"&topic="+topic, //put your function here);
+                    </code></pre>
+            </ul>
+        </div>
     </div>
     <!-- this page will contain a list of all our implemented features, instructions on how to use each feature and examples of each feature (using python) -->
-    
+
     <!-- might be ideal to store both changes and features in text files then use python to fill a list of records to push into here, but for now hardcoding a few should be fine-->
 {% endblock %}
