@@ -172,7 +172,8 @@ def errorReturn(errorCode,params):
         7 : "The time period you entered is too big",
         8 : "You entered an invalid character",
         9 : "startDate is invalid format",
-        10 : "endDate is invalid format"
+        10 : "endDate is invalid format",
+        11 : "Please eneter date before or equal to current date"
     }
 
     logOutput = {'Parameters passed' : str(params),
@@ -259,6 +260,14 @@ class InputProcess(Resource):
         if datetime.datetime.strptime(my_params['from-date'],
         strptime_format) > datetime.datetime.strptime(my_params['to-date'], strptime_format):
             return errorReturn(3,args)
+
+        if datetime.datetime.strptime(my_params['from-date'],
+        strptime_format) > datetime.datetime.now():
+            return errorReturn(11,args)
+
+        if datetime.datetime.strptime(my_params['to-date'],
+        strptime_format) > datetime.datetime.now():
+            return errorReturn(11,args)
 
         comp = []
         if args['companyId'] != None:
