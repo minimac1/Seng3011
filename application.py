@@ -136,6 +136,7 @@ def fullName(thingToCheck):
         for idx, val in enumerate(companyList):
             if thingToCheck.upper() in val["Company name"]:
                 full = val["Company name"]
+                break
     return full
 # Returns the full name of a company from its ASX code, if not in our database then returns the input given
 def asxCodeToName(thingToCheck):
