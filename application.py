@@ -86,7 +86,7 @@ def parseGuardian(jsonData, compNameList, params, execStartTime):
 
 
 def asxRemoveTails(companyName):
-    nameEndings = [" Limited", " LTD"]
+    nameEndings = [" Group Limited", " Limited", " LTD"]
     for end in nameEndings:
         if(companyName.upper().endswith(end.upper())):
             companyName = companyName[:-len(end)]
@@ -276,7 +276,7 @@ class InputProcess(Resource):
         #also checking for valid InstrumentIDs
         i = 0;
         while i < len(compId):
-            if (re.match(r'.*\.AX',compId[i])): # JUST WANT TO ASK, SHUD THIS BE .AX$ SO THAT IT MAKES SURE THERE IS NOTHING AFTER
+            if (re.match(r'.*\.AX$',compId[i])): # JUST WANT TO ASK, SHUD THIS BE .AX$ SO THAT IT MAKES SURE THERE IS NOTHING AFTER
                 print(compId[i])
                 if not asxCheckValid(compId[i]):
                     return errorReturn(5, args)
