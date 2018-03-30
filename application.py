@@ -48,10 +48,10 @@ def parseGuardian(jsonData, compNameList, params, execStartTime):
     for c in range(0, len(compNameList)):
         if len(compNameList[c]) <= 3:
             instrIdList.append(compNameList[c])
-            compNameList[c] = asxCodeToName(compNameList[c])
-            print("\nyo")
-            print(compNameList[c])
-            print("\n")
+            if (asxCheckValid(compNameList[c])):
+                compNameList[c] = asxCodeToName(compNameList[c])
+            else:
+                compNameList[c] = "Abbreviation not supported"
         else:
             instrIdList.append(asxNameToCode(compNameList[c]))
 
