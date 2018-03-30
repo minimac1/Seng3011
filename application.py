@@ -45,8 +45,15 @@ def testPage():
 def parseGuardian(jsonData, compNameList, params, execStartTime):
     #use compNameList to make a instrIdList
     instrIdList = []
-    for c in compNameList:
-        instrIdList.append(asxNameToCode(c))
+    for c in range(0, len(compNameList)):
+        if len(compNameList[c]) <= 3:
+            instrIdList.append(compNameList[c])
+            compNameList[c] = asxCodeToName(compNameList[c])
+            print("\nyo")
+            print(compNameList[c])
+            print("\n")
+        else:
+            instrIdList.append(asxNameToCode(compNameList[c]))
 
     #sets up the nested fields
     newsData_fields = {}
