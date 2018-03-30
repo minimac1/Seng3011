@@ -9,7 +9,7 @@
             </ul>
             <div class="CL-heading">Parameters</div>
             <div class="CL-body">
-                Example url: http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?startDate=BLANK&endDate=BLANK&companyId=BLANK&topic=BLANK
+                Example blank url: http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?startDate=BLANK&endDate=BLANK&companyId=BLANK&topic=BLANK
                 <div>Replace each BLANK with an accepted value for the parameter.</div>
                 <table class="inTable">
                     <tr>
@@ -46,46 +46,33 @@
 
                     </tr>
                 </table>
+                <div style="display:block">Example valid URL: http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?startDate=2015-08-24T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=ANZ&topic="apple-pay"</div>
             </div>
-            <div class="CL-heading">Examples</div>
-                    <pre><code>
-url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?""
-i.e. no input data
+            <div class="CL-heading">Example successful response</div>
 
-result:
-{"Developer Team": "Team Turtle", "Module Name": "News API", "API Version": "v1.0",
-"Parameters passed": "{'startDate': None, 'endDate': None, 'companyId': None, 'topic': None}",
-"Execution Result": ["Error", "startDate is empty"]}
-                    </pre></code>
-
-                    Searching for articles related 
+                    Searching for articles about the new apple pay system so we decide to include apple-pay in the topic and a related bank, lets say Australia and New Zealand Bank (ANZ).
                     <pre><code>
-url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?startDate=2017-05-20T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=ANZ_Woolworths&topic=iphone"
-i.e. searches between the dates 2017/05/20:45:31.235 and 2017/09/24:45:31.235
- for the company name ANZ and Woolworths
- with the topic "iphone".
+url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?startDate=2015-08-24T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=ANZ.AX&topic="apple-pay""
+
 
 result:
 {
-    "Log Output": {"Developer Team": "Team Turtle", "Module Name": "News API", "API Version": "v1.0",
-    "Parameters passed": "{'startDate': '2017-09-20T09:45:31.235Z', 'endDate': '2017-09-24T09:45:31.235Z',
-                           'companyId': 'ANZ_WOOLWORTHS', 'topic': 'iphone'}",
-    "Execution Result": ["Successful", "2018-03-29 06:11:15.464927", "2018-03-29 06:11:16.076337", "0:00:00.611410"]},
-"NewsDataSet": [
-{
-    "InstrumentIDs": ["ANZ", "WOOLWORTHS"],
-    "CompanyNames": ["ANZ", "Woolworths"],
-    "TimeStamp": "2017-05-23T07:20:03Z",
-    "Headline": "Labor targets bank tax and school funding in question time as it happened",
-    "NewsText": "The day started marking 20 years of the Bringing Them Home report into the stolen generations. It moved on to school funding when ...
-                 The opposition maintains the controversial project can proceed on its merits, but without any government support. Singh, ...
-                 @gabriellechan and him @mpbowers. Join the thread or take up your cudgels on Facebook."}]
+    "Log Output": {"Developer Team": "Team Turtle", "Module Name": "News API", "API Version": "v1.0", 
+    "Parameters passed": "{'startDate': '2015-08-24T09:45:31.235Z', 'endDate': '2017-09-24T09:45:31.235Z', 'companyId': 'ANZ', 'topic': '\"apple-pay\"'}", 
+    "Execution Result": ["Successful", "2018-03-30 05:12:38.290995", "2018-03-30 05:12:39.027918", "0:00:00.736923"]}, 
+    "NewsDataSet": [{
+        "InstrumentIDs": ["ANZ"], 
+        "CompanyNames": ["AUSTRALIA AND NEW ZEALAND BANKING"], 
+        "TimeStamp": "2017-05-30T18:24:16Z", 
+        "Headline": "EU targets lawyers and accountants in tax-avoidance clampdown", 
+        "NewsText": "Brussels is preparing to crack down on accountants and lawyers running tax-avoidance schemes in response to the Panama Papers scandal that showed how the rich and powerful hide their money..."}]
 }
 
-(note: majority of the article, stored in NewsText, was left out)
-                    </pre></code>
+
+(note: majority of the article, stored in NewsText, was left out for the sake of this example)
+                    </code></pre>
                 
-                <p>Output Semantic: Description</p>
+                <div class="CL-heading">Output Semantics</div>
                 <table class="inTable">
                     <tr>
                         <td>Field</td><td>Description</td><td>Type</td>
@@ -124,10 +111,45 @@ result:
                         <td>NewsText</td><td>Content of the matched news articles.</td><td>String</td>
                     </tr>
                 </table>
+                <div class="CL-heading">Other examples</div>
+                This example contains no parameters and should return an error
+                <pre><code>
+url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?"
 
+result:
+{
+    "Developer Team": "Team Turtle", 
+    "Module Name": "News API", 
+    "API Version": "v1.0",
+    "Parameters passed": "{'startDate': None, 'endDate': None, 'companyId': None, 'topic': None}",
+    "Execution Result": ["Error", "startDate is empty"]}
+                </code></pre>
+                We want to know everything that happened on a specific day, so we just include the date and nothing else. Be careful because broad requests will take a very long time.
+                <pre><code>
+url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?startDate=2015-08-24T09:45:31.235Z&endDate=2015-08-25T09:50:21.222Z"
+
+result:
+{
+    "Log Output": {
+        "Developer Team": "Team Turtle", 
+        "Module Name": "News API version 1.0", 
+        "API Version": "v1.0", 
+        "Parameters passed": "{'startDate': '2015-08-24T09:45:31.235Z', 'endDate': '2015-08-25T09:50:21.222Z', 'companyId': None, 'topic': None
+    }", 
+    "Execution Result": ["Successful", "2018-03-30 05:41:24.020809", "2018-03-30 05:41:30.520694", "0:00:06.499885"]},
+    "NewsDataSet": [{
+        "InstrumentIDs": [], 
+        "CompanyNames": [], 
+        "TimeStamp": "2015-08-25T09:41:35Z", 
+        "Headline": "Citizenfour director to preview Assange documentary at New York film festival", 
+        "NewsText": "Oscar-winning director Laura Poitras is to focus on controversial WikiLeaks co-founder Julian Assange..."}]
+    }
+                
+                </code></pre>    
     <div class="CL-heading">Examples for Calling the API</div>
                 Python example API call.
                     <pre><code>
+                    
 import requests
 
 
