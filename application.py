@@ -34,9 +34,9 @@ def base():
 def changesPage():
     return render_template('changes.html')
 
-@application.route('/features')
+@application.route('/documentation')
 def featuresPage():
-    return render_template('features.html')
+    return render_template('documentation.html')
 
 @application.route('/test')
 def testPage():
