@@ -33,9 +33,9 @@
                     </tr>
                     <tr>
                         <td>companyID</td>
-                        <td>Company/ies of which you would like to search for related news</td>
+                        <td>Company/ies of which you would like to search for related news. </td>
                         <td>String</td>
-                        <td>Either ASX ID e.g. WOW.AX or full name e.g. Woolworths. Note it is not necessary to add the suffix '.AX' to ASX ID's. Replace all spaces with '-' and seperate multiple companies with '_'. This field can be left blank.</td>
+                        <td>Either ASX ID e.g. WOW.AX or full name e.g. Woolworths. Note it is not necessary to add the suffix '.AX' to ASX ID's. Replace all spaces with '-' and seperate multiple companies with '_'. This field can be left blank. If you do not fully spell a companies name, we will guess a company that contains the same text.</td>
 
                     </tr>
                     <tr>
@@ -46,30 +46,31 @@
 
                     </tr>
                 </table>
-                <div style="display:block">Example valid URL: http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?startDate=2015-08-24T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=ANZ&topic="apple-pay"</div>
+                <div style="display:block">Example valid URL: http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?startDate=2015-08-24T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=CBA.AX&topic="apple-pay"</div>
             </div>
             <div class="CL-heading">Example successful response</div>
 
-                    Searching for articles about the new apple pay system so we decide to include apple-pay in the topic and a related bank, lets say Australia and New Zealand Bank (ANZ).
+                    Searching for articles about the new apple pay system so we decide to include apple-pay in the topic and a local bank, lets say Commonwealth Bank(CBA).
                     <pre><code>
-url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?startDate=2015-08-24T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=ANZ.AX&topic="apple-pay""
+url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?startDate=2015-08-24T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=CBA.AX&topic="apple-pay""
 
 
 result:
 {
     "Log Output": {"Developer Team": "Team Turtle", "Module Name": "News API", "API Version": "v1.0", 
-    "Parameters passed": "{'startDate': '2015-08-24T09:45:31.235Z', 'endDate': '2017-09-24T09:45:31.235Z', 'companyId': 'ANZ', 'topic': '\"apple-pay\"'}", 
-    "Execution Result": ["Successful", "2018-03-30 05:12:38.290995", "2018-03-30 05:12:39.027918", "0:00:00.736923"]}, 
+    "Parameters passed": "{'startDate': '2015-08-24T09:45:31.235Z', 'endDate': '2017-09-24T09:45:31.235Z', 'companyId': 'CBA.AX', 'topic': '\"apple-pay\"'}", 
+    "Execution Result": ["Successful", "2018-03-30 10:29:00.112032", "2018-03-30 10:29:01.605245", "0:00:01.493213"]}, 
     "NewsDataSet": [{
-        "InstrumentIDs": ["ANZ"], 
-        "CompanyNames": ["AUSTRALIA AND NEW ZEALAND BANKING"], 
-        "TimeStamp": "2017-05-30T18:24:16Z", 
-        "Headline": "EU targets lawyers and accountants in tax-avoidance clampdown", 
-        "NewsText": "Brussels is preparing to crack down on accountants and lawyers running tax-avoidance schemes in response to the Panama Papers scandal that showed how the rich and powerful hide their money..."}]
+        "InstrumentIDs": ["CBA"], 
+        "CompanyNames": ["COMMONWEALTH BANK OF AUSTRALIA."], 
+        "TimeStamp": "2017-03-31T01:28:26Z", 
+        "Headline": "Apple Pay: Australian banks not allowed to negotiate collectively", 
+        "NewsText": "Australia\u2019s competition regulator has rejected a request by four banks that they be allowed to collectively bargain with Apple..."}]
 }
 
 
-(note: majority of the article, stored in NewsText, was left out for the sake of this example)
+This is the only first article that is returned.
+(majority of the article, stored in NewsText, was left out for the sake keeping this short)
                     </code></pre>
                 
                 <div class="CL-heading">Output Semantics</div>
