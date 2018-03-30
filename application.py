@@ -126,14 +126,14 @@ def asxCheckValid(thingToCheck):
 def fullName(check):
     thingToCheck = asxRemoveTails(thingToCheck)
     companyList = openCompanyList()
-    full = check;
+    full = check
     if len(thingToCheck) == 3 and any(item["ASX code"].upper() == thingToCheck.upper() for item in companyList):
-        pass;
+        pass
     elif (len(thingToCheck) == 6 and thingToCheck.upper().endswith(".AX")) and any(item["ASX code"].upper() == thingToCheck[:3].upper() for item in companyList):
-        pass;
+        pass
     elif any(thingToCheck.upper() in item["Company name"].upper() for item in companyList):
-        full = item;
-    return full;
+        full = item
+    return full
 # Returns the full name of a company from its ASX code, if not in our database then returns the input given
 def asxCodeToName(thingToCheck):
     if(len(thingToCheck) == 6 and thingToCheck.upper().endswith(".AX")):
