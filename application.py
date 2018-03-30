@@ -16,7 +16,7 @@ api_url = "http://content.guardianapis.com/search"
 # Log JSON fields
 log_fields = {}
 log_fields['Developer Team'] = fields.String(default='Team Turtle')
-log_fields['Module Name'] = fields.String(default='News API')
+log_fields['Module Name'] = fields.String(default='News API version 1.0')
 log_fields['API Version'] = fields.String(default=currentVersion)
 #log_fields['Parameters passed'] = fields.List(fields.String)
 log_fields['Parameters passed'] = fields.String

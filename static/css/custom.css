@@ -9,6 +9,8 @@ body {
 }
 
 .inTable { 
+  margin-top:5px;
+  margin-bottom:5px;
   border: none; 
   border-collapse: collapse; 
 }
@@ -31,15 +33,16 @@ body {
   position:fixed;
   margin-left:0px;
   top:100px;
-  left:250px; 
+  padding-left:260px; 
+  left:0px;
   height:83vh;
-  width:85vw;
+  width:100vw;
   overflow:auto;
 }
 
 .CL-heading{
   font-size: 30px;
-  line-height: 4;
+  line-height: 3;
   font-family:serif;
 }
 

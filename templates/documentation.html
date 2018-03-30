@@ -3,8 +3,14 @@
 <div class="container-fluid CL-container">
     <div class="page-title">Documentation</div>
         <div class="CL-body">
-            <div class="CL-heading">Input Documentation</div>
+            <div class="CL-heading">Endpoint URL</div>
+            <ul>
+                <li>http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?</li>
+            </ul>
+            <div class="CL-heading">Parameters</div>
             <div class="CL-body">
+                Example url: http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?startDate=BLANK&endDate=BLANK&companyId=BLANK&topic=BLANK
+                <div>Replace each BLANK with an accepted value for the parameter.</div>
                 <table class="inTable">
                     <tr>
                         <td>Name</td>
@@ -16,34 +22,32 @@
                         <td>startDate</td>
                         <td>The start of the time period for which you would like to search through</td>
                         <td>String</td>
-                        <td>A single date in the format: yyyy-mm-ddThh:mm:ss.SSSZ. This field must be correctly filled out.</td>
+                        <td>A single date in the format: yyyy-MM-ddThh:mm:ss.SSSZ. This field must be completely filled out (the T remains a T).</td>
                     </tr>
                     <tr>
                         <td>endDate</td>
                         <td>The end of the time period for which you would like to search through</td>
                         <td>String</td>
-                        <td>A single date in the format: yyyy-mm-ddThh:mm:ss.SSSZ. This field must be correctly filled out.</td>
+                        <td>A single date in the format: yyyy-MM-ddThh:mm:ss.SSSZ. This field must be completely filled out (the T remains a T).</td>
 
                     </tr>
                     <tr>
                         <td>companyID</td>
                         <td>Company/ies of which you would like to search for related news</td>
                         <td>String</td>
-                        <td>Either ASX ID e.g. WOW.AX or full name e.g. Woolworths. Note all ASX ID's use the prefix '.AX'. Multiple companies are seperated with an underscore ( _ ) between each input. This field can be left blank.</td>
+                        <td>Either ASX ID e.g. WOW.AX or full name e.g. Woolworths. Note it is not necessary to add the suffix '.AX' to ASX ID's. Replace all spaces with '-' and seperate multiple companies with '_'. This field can be left blank.</td>
 
                     </tr>
                     <tr>
                         <td>topic</td>
-                        <td>Topics of which you would like to search for related news</td>
+                        <td>Topics of which you would like to search for related news. Can also enclose phrases in quotation marks to add articles that include that phrase</td>
                         <td>String</td>
-                        <td>Keywords, spaces are indicated with dashes( - ). Multiple topics can be entered, separated with an underscore ( _ ). This field can also be left blank.</td>
+                        <td>Topic names or phrases as strings. Replace all spaces with '-' and seperate multiple topics with '_'. This field can be left blank.</td>
 
                     </tr>
                 </table>
             </div>
-            <div class="CL-heading">Output Documentation</div>
-                <ul style="list-style-type: none">
-                    <li>Example of failed API call.</li>
+            <div class="CL-heading">Examples</div>
                     <pre><code>
 url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?""
 i.e. no input data
@@ -54,7 +58,7 @@ result:
 "Execution Result": ["Error", "startDate is empty"]}
                     </pre></code>
 
-                    <li>Example of Successful API call</li>
+                    Searching for articles related 
                     <pre><code>
 url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?startDate=2017-05-20T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=ANZ_Woolworths&topic=iphone"
 i.e. searches between the dates 2017/05/20:45:31.235 and 2017/09/24:45:31.235
@@ -78,27 +82,51 @@ result:
                  @gabriellechan and him @mpbowers. Join the thread or take up your cudgels on Facebook."}]
 }
 
-(note some text removed for the sake of the example)
+(note: majority of the article, stored in NewsText, was left out)
                     </pre></code>
-                </ul>
+                
                 <p>Output Semantic: Description</p>
-                <ul style="list-style-type: none">
-                    <li>LogOutput: contains Developer Team, Module Name, API Version, [Parameters Passed], [Execution Result].</li>
-                    <li>Developer Team: Our team name, Team Turtle.</li>
-                    <li>Module Name: The name of the API; News API.</li>
-                    <li>Parameters Passed: A list of the input variables, detailed above, passed to the API.</li>
-                    <li>Execution Result: Either successful, or an error description is given.</li>
-                    <li>NewsDataSet: contains [InstrumentIDs], [CompanyNames], TimeStamp, Headline, NewsText.</li>
-                    <li>InstrumentIDs: InstrumentIDs (ASX code) for the matched article.</li>
-                    <li>CompanyNames: name of the company for the matched article.</li>
-                    <li>TimeStamp: The date that the matched article was published.</li>
-                    <li>Headline: Title of the matched article.</li>
-                    <li>NewsText: Content of the matched news articles.</li>
-                </ul>
+                <table class="inTable">
+                    <tr>
+                        <td>Field</td><td>Description</td><td>Type</td>
+                    </tr>
+                    <tr>
+                        <td>Log Output</td><td>Contains Developer Team, Module Name, API Version, Parameters Passed and Execution Result. Each field is written below. </td><td>Record</td>
+                    </tr>
+                    <tr>
+                        <td>Developer Team</td><td>Our team name.</td><td>String</td>
+                    </tr>
+                    <tr>
+                        <td>Module Name</td><td> The module name for our API and currently used version.</td><td>String</td>
+                    </tr>
+                    <tr>
+                        <td>Parameters Passed</td><td> A list of all the parameters passed to our API. See Parameters near the top to know about each parameter</td><td>Record</td>
+                    </tr>
+                    <tr>
+                        <td>Execution Result</td><td> Whether the API call was successful or not. If success, includes executation start and end times and elapsed time. If not includes the error that occured.</td><td>List of Strings</td>
+                    </tr>
+                    <tr>
+                        <td>NewsDataSet</td><td>contains InstrumentIDs, CompanyNames, TimeStamp, Headline and NewsText. Each field is written below</td><td>Record</td>
+                    </tr>
+                    <tr>
+                        <td>InstrumentIDs</td><td> InstrumentID (ASX code) of the companie/s for the matched article.</td><td>List of Strings</td>
+                    </tr>
+                    <tr>
+                        <td>CompanyNames</td><td> Name/s of the company/ies for the matched article.</td><td>List of Strings</td>
+                    </tr>
+                    <tr>
+                        <td>TimeStamp</td><td> The date that the matched article was published.</td><td>String</td>
+                    </tr>
+                    <tr>
+                        <td>Headline</td><td>Headline of the matched article.</td><td>String</td>
+                    </tr>
+                    <tr>
+                        <td>NewsText</td><td>Content of the matched news articles.</td><td>String</td>
+                    </tr>
+                </table>
 
     <div class="CL-heading">Examples for Calling the API</div>
-            <ul style="list-style-type: none">
-                <li>Python example API call.</li>
+                Python example API call.
                     <pre><code>
 import requests
 
@@ -111,7 +139,7 @@ topic = "projected-profit_share-price-prediction"
 
 response = requests.get(url+"startDate="+startDate+"&endDate="+endDate+"&companyId="+companyID+"&topic="+topic)
                     </code></pre>
-                <li>JavaScript/jQuery example API call.</li>
+                JavaScript/jQuery example API call.
                     <pre><code>
 url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?"
 startDate = "2017-08-24T09:45:31.233Z"
@@ -122,11 +150,11 @@ topic = "projected-profit_share-price-prediction"
 $.getJSON(url+"startDate="+startDate+"&endDate="+endDate+"&companyId="+companyID+"&topic="+topic, myFunction(Data));
                     </code></pre>
 
-                    <li>curl example API call.</li>
+                    curl example API call.
                         <pre><code>
 curl "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?startDate=2017-09-20T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=ANZ_Woolworths&topic=iphone"
                         </code></pre>
-            </ul>
+            
 
 </div>
 </div>
