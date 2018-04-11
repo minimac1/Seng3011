@@ -92,86 +92,137 @@ def parseGuardian(jsonData, compNameList, params, execStartTime):
     return marshal(data, output_fields)
 
 
-def asxRemoveTails(companyName):
+def csvRemoveTails(companyName):
     nameEndings = [" Group Limited", " Limited", " LTD"]
     for end in nameEndings:
         if(companyName.upper().endswith(end.upper())):
             companyName = companyName[:-len(end)]
-    return companyName
+    return companyName.upper()
 
 
-def openCompanyList():
-    with open('static/csv/ASXListedCompanies.csv', newline='') as csvfile:
+def openCompanyList(csvName):
+    with open("static/csv/"+csvName+".csv", newline='') as csvfile:
         companyList = csv.DictReader(csvfile, delimiter=',', quotechar='"')
         newlist = []
         for row in companyList:
             newlist.append(row)
-            newlist[-1]["Company name"] = asxRemoveTails(newlist[-1]["Company name"])
+            newlist[-1]["Company name"] = csvRemoveTails(newlist[-1]["Company name"])
+
     return newlist
 
 
-# Checks if a given company name or ASX code is in our ASX database, returns false if not
+def getExchanges(withDot):
+    exchanges = ["AX", "NASDAQ"]
+    if withDot:
+        exchanges = ['.'+item for item in exchanges]
+    return exchanges
+
+
+def removeExchangeCode(exchange):
+    ends = getExchanges(True)
+    for end in ends:
+        if exchange.endswith(end):
+            exchange = exchange[:-len(end)]
+    return exchange
+
+
+def openAllCompanyLists():
+    companyDict = {}
+    exchanges = getExchanges(False)
+    for exchange in exchanges:
+        companyDict[exchange] = openCompanyList(exchange)
+    return companyDict
+
+
+# an exact checkIfValid function
 def asxCheckValid(thingToCheck):
-    thingToCheck = asxRemoveTails(thingToCheck)
-    companyList = openCompanyList()
-    isValid = False
-    if len(thingToCheck) == 3 and any(item["ASX code"].upper() == thingToCheck.upper() for item in companyList):
-        isValid = True
-    elif (len(thingToCheck) == 6 and thingToCheck.upper().endswith(".AX")) and any(item["ASX code"].upper() == thingToCheck[:3].upper() for item in companyList):
-        isValid = True
-    elif any(thingToCheck.upper() in item["Company name"].upper() for item in companyList):
-        isValid = True
-    return isValid
+    thingToCheck = csvRemoveTails(thingToCheck)
+    companyDict = openAllCompanyLists()
+    # check if it ends in an exchange code
+    for end in getExchanges(True):
+        if thingToCheck.endswith(end):
+            return any(removeExchangeCode(thingToCheck) == item["Symbol"].upper() for item in companyDict[end[1:]])
+    # check all exchanges
+    if(not (" " in thingToCheck or "." in thingToCheck)):
+        return any(any(removeExchangeCode(thingToCheck) == item["Symbol"].upper() for item in companyDict[end]) for end in getExchanges(False))
+    # check all exchanges for name
+    else:
+        return any(any(thingToCheck == item["Company name"].upper() for item in companyDict[end]) for end in getExchanges(False))
+
+
+# a fuzzy checkIfValid function
+def asxCheckValidFuzzy(thingToCheck):
+    thingToCheck = csvRemoveTails(thingToCheck)
+    companyDict = openAllCompanyLists()
+    # check if it ends in an exchange code
+    for end in getExchanges(True):
+        if thingToCheck.endswith(end):
+            return any(removeExchangeCode(thingToCheck)in item["Symbol"].upper() for item in companyDict[end[1:]])
+    # check all exchanges
+    if(not (" " in thingToCheck or "." in thingToCheck)):
+        return any(any(removeExchangeCode(thingToCheck) in item["Symbol"].upper() for item in companyDict[end]) for end in getExchanges(False))
+    # check all exchanges for name
+    else:
+        return any(any(thingToCheck in item["Company name"].upper() for item in companyDict[end]) for end in getExchanges(False))
+
 
 def fullName(thingToCheck):
-    thingToCheck = asxRemoveTails(thingToCheck)
-    companyList = openCompanyList()
-    full = thingToCheck
-    if len(thingToCheck) == 3 and any(item["ASX code"].upper() == thingToCheck.upper() for item in companyList):
-        pass
-    elif (len(thingToCheck) == 6 and thingToCheck.upper().endswith(".AX")) and any(item["ASX code"].upper() == thingToCheck[:3].upper() for item in companyList):
-        pass
-    elif any(thingToCheck.upper() in item["Company name"].upper() for item in companyList):
-        
-        for idx, val in enumerate(companyList):
-            if thingToCheck.upper() in val["Company name"]:
-                full = val["Company name"]
-                break
-    return full
+    thingToCheck = csvRemoveTails(thingToCheck)
+    companyDict = openAllCompanyLists()
+    for end in getExchanges(False):
+        for company in companyDict[end]:
+            if(thingToCheck.upper() in company["Company name"].upper()):
+                return company["Company name"]
+    return thingToCheck
+
+
 # Returns the full name of a company from its ASX code, if not in our database then returns the input given
 def asxCodeToName(thingToCheck):
-    if(len(thingToCheck) == 6 and thingToCheck.upper().endswith(".AX")):
-        thingToCheck = thingToCheck[:3]
-    companyList = openCompanyList()
-    if(len(thingToCheck) < 3):
-        return thingToCheck
-    return next((item for item in companyList if item["ASX code"].upper() == thingToCheck.upper()), {"Company name": thingToCheck.upper()})["Company name"]
+    companyDict = openAllCompanyLists()
+    # check if it ends in an exchange code
+    for end in getExchanges(True):
+        if thingToCheck.endswith(end):
+            for company in companyDict[end[1:]]:
+                if removeExchangeCode(thingToCheck) == company["Symbol"].upper():
+                    return company["Company name"]
+
+    # check all exchanges
+    if(not (" " in thingToCheck or "." in thingToCheck)):
+        for end in getExchanges(False):
+            for company in companyDict[end]:
+                if removeExchangeCode(thingToCheck) == company["Symbol"].upper():
+                    return company["Company name"]
+    return thingToCheck
 
 
 # Returns the ASX code of a company from its full name, if not in our database then returns the input given
 def asxNameToCode(thingToCheck):
-    thingToCheck = asxRemoveTails(thingToCheck)
-    companyList = openCompanyList()
-    return next((item for item in companyList if item["Company name"].upper() == thingToCheck.upper()), {"ASX code": thingToCheck.upper()})["ASX code"]
+    thingToCheck = csvRemoveTails(thingToCheck)
+    companyDict = openAllCompanyLists()
+    for end in getExchanges(False):
+        for company in companyDict[end]:
+            if(company["Company name"].upper() == thingToCheck.upper()):
+                return company["Symbol"]+"."+end
+    return thingToCheck
 
-
-# Returns the industry group of a company from its full name, if not in our database then returns the input given
-def asxNameToType(thingToCheck):
-    thingToCheck = asxRemoveTails(thingToCheck)
-    companyList = openCompanyList()
-    return next((item for item in companyList if item["Company name"].upper() == thingToCheck.upper()), {"GICS industry group": thingToCheck.upper()})["GICS industry group"]
 
 # a "fuzzy" version of the asxNameToCode function, looks for a substring instead of an exact match
 def asxNameToCodeFuzzy(thingToCheck):
-    thingToCheck = asxRemoveTails(thingToCheck)
-    companyList = openCompanyList()
-    return next((item for item in companyList if thingToCheck.upper() in item["Company name"].upper()), {"ASX code": thingToCheck.upper()})["ASX code"]
+    thingToCheck = csvRemoveTails(thingToCheck)
+    companyDict = openAllCompanyLists()
 
-# a "fuzzy" version of the asxNameToCode function, looks for a substring instead of an exact match
-def asxNameToTypeFuzzy(thingToCheck):
-    thingToCheck = asxRemoveTails(thingToCheck)
-    companyList = openCompanyList()
-    return next((item for item in companyList if thingToCheck.upper() in item["Company name"].upper()), {"GICS industry group": thingToCheck.upper()})["GICS industry group"]
+    if("." in thingToCheck):
+        return thingToCheck
+
+    exactReturn = asxNameToCode(thingToCheck)
+    if("." in exactReturn):
+        return exactReturn
+
+    for end in getExchanges(False):
+        for company in companyDict[end]:
+            if(thingToCheck.upper() in company["Company name"].upper()):
+                return company["Symbol"]+"."+end
+    return thingToCheck
 
 
 # Each entry in the dictionary corresponds to the error code required
@@ -322,8 +373,8 @@ class InputProcess(Resource):
 
         for idx, val in enumerate(compId):
             compId[idx] = fullName(val)
-            
-        
+
+
         for c in compId:
             a = c.replace(" ", "%20")
             compIdTemp.append(a)
