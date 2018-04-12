@@ -33,13 +33,10 @@ def testPage():
     return render_template('test.html')
 
 #Temporary
-<<<<<<< HEAD
 @application.route('/homepage')
 def homepage1():
     return render_template('homepage.html')
-    
-=======
->>>>>>> 52e30c4d564b46b6ffa9624d5d10273d70dd4174
+
 @application.route('/changes')
 def changesPage1():
     return render_template('changes.html')
