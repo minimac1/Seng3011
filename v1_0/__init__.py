@@ -82,7 +82,7 @@ def asxRemoveTails(companyName):
 
 
 def openCompanyList():
-    with open('static/csv/ASXListedCompanies.csv', newline='') as csvfile:
+    with open('static/csv/AX.csv', newline='') as csvfile:
         companyList = csv.DictReader(csvfile, delimiter=',', quotechar='"')
         newlist = []
         for row in companyList:
@@ -91,14 +91,14 @@ def openCompanyList():
     return newlist
 
 
-# Checks if a given company name or ASX code is in our ASX database, returns false if not
+# Checks if a given company name or Symbol is in our ASX database, returns false if not
 def asxCheckValid(thingToCheck):
     thingToCheck = asxRemoveTails(thingToCheck)
     companyList = openCompanyList()
     isValid = False
-    if len(thingToCheck) == 3 and any(item["ASX code"].upper() == thingToCheck.upper() for item in companyList):
+    if len(thingToCheck) == 3 and any(item["Symbol"].upper() == thingToCheck.upper() for item in companyList):
         isValid = True
-    elif (len(thingToCheck) == 6 and thingToCheck.upper().endswith(".AX")) and any(item["ASX code"].upper() == thingToCheck[:3].upper() for item in companyList):
+    elif (len(thingToCheck) == 6 and thingToCheck.upper().endswith(".AX")) and any(item["Symbol"].upper() == thingToCheck[:3].upper() for item in companyList):
         isValid = True
     elif any(thingToCheck.upper() in item["Company name"].upper() for item in companyList):
         isValid = True
@@ -108,9 +108,9 @@ def fullName(thingToCheck):
     thingToCheck = asxRemoveTails(thingToCheck)
     companyList = openCompanyList()
     full = thingToCheck
-    if len(thingToCheck) == 3 and any(item["ASX code"].upper() == thingToCheck.upper() for item in companyList):
+    if len(thingToCheck) == 3 and any(item["Symbol"].upper() == thingToCheck.upper() for item in companyList):
         pass
-    elif (len(thingToCheck) == 6 and thingToCheck.upper().endswith(".AX")) and any(item["ASX code"].upper() == thingToCheck[:3].upper() for item in companyList):
+    elif (len(thingToCheck) == 6 and thingToCheck.upper().endswith(".AX")) and any(item["Symbol"].upper() == thingToCheck[:3].upper() for item in companyList):
         pass
     elif any(thingToCheck.upper() in item["Company name"].upper() for item in companyList):
 
@@ -119,21 +119,21 @@ def fullName(thingToCheck):
                 full = val["Company name"]
                 break
     return full
-# Returns the full name of a company from its ASX code, if not in our database then returns the input given
+# Returns the full name of a company from its Symbol, if not in our database then returns the input given
 def asxCodeToName(thingToCheck):
     if(len(thingToCheck) == 6 and thingToCheck.upper().endswith(".AX")):
         thingToCheck = thingToCheck[:3]
     companyList = openCompanyList()
     if(len(thingToCheck) < 3):
         return thingToCheck
-    return next((item for item in companyList if item["ASX code"].upper() == thingToCheck.upper()), {"Company name": thingToCheck.upper()})["Company name"]
+    return next((item for item in companyList if item["Symbol"].upper() == thingToCheck.upper()), {"Company name": thingToCheck.upper()})["Company name"]
 
 
-# Returns the ASX code of a company from its full name, if not in our database then returns the input given
+# Returns the Symbol of a company from its full name, if not in our database then returns the input given
 def asxNameToCode(thingToCheck):
     thingToCheck = asxRemoveTails(thingToCheck)
     companyList = openCompanyList()
-    return next((item for item in companyList if item["Company name"].upper() == thingToCheck.upper()), {"ASX code": thingToCheck.upper()})["ASX code"]
+    return next((item for item in companyList if item["Company name"].upper() == thingToCheck.upper()), {"Symbol": thingToCheck.upper()})["Symbol"]
 
 
 # Returns the industry group of a company from its full name, if not in our database then returns the input given
@@ -146,7 +146,7 @@ def asxNameToType(thingToCheck):
 def asxNameToCodeFuzzy(thingToCheck):
     thingToCheck = asxRemoveTails(thingToCheck)
     companyList = openCompanyList()
-    return next((item for item in companyList if thingToCheck.upper() in item["Company name"].upper()), {"ASX code": thingToCheck.upper()})["ASX code"]
+    return next((item for item in companyList if thingToCheck.upper() in item["Company name"].upper()), {"Symbol": thingToCheck.upper()})["Symbol"]
 
 # a "fuzzy" version of the asxNameToCode function, looks for a substring instead of an exact match
 def asxNameToTypeFuzzy(thingToCheck):
