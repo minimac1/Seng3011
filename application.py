@@ -7,17 +7,15 @@ application = Flask(__name__)
 application.register_blueprint(api_v1, url_prefix='/newsapi/v1.0')
 application.register_blueprint(api_v2, url_prefix='/newsapi/v2.0')
 
-@application.route('/')
-@application.route('/homepage')
+@application.route('/newsapi')
+@application.route('/newsapi/homepage')
 ##@app.route('/News/<name>')
 def base():
     return render_template('homepage.html')
-@application.route('/newsapi')
-@application.route('/newsapi/homepage')
+
 def apiIndex():
     return render_template('homepage.html')
-@application.route('/gui')
-@application.route('/gui/homepage')
+
 # change homepage to gui implementation
 def gui():
     return render_template('homepage.html')
@@ -33,6 +31,27 @@ def featuresPage():
 @application.route('/newsapi/test')
 def testPage():
     return render_template('test.html')
+
+#Temporary
+@application.route('/homepage')
+def homepage1():
+    return render_template('homepage.html')
+    
+@application.route('/changes')
+def changesPage1():
+    return render_template('changes.html')
+
+@application.route('/documentation')
+def featuresPage1():
+    return render_template('documentation.html')
+
+@application.route('/test')
+def testPage1():
+    return render_template('test.html')
+
+
+
+
 
 # this will change with a gui
 application.add_url_rule('/', 'index', (lambda: base()))
