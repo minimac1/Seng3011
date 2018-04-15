@@ -59,12 +59,20 @@ def parseGuardian(jsonData, compNameList, params, execStartTime):
         }
         newsDataList.append(newsData)
     # make a json of the nested fields
+
+    # check if guardian returned no articles
+    devMessage = ""
+    if not jsonData:
+        devMessage = ": Guardian API returned no articles"
+
     execEndTime = datetime.datetime.now()
     logOutput = {'Parameters passed' : str(params),
                 'Execution Result' :
-                    ["Successful", str(execStartTime),
+                    ["Successful" + devMessage, str(execStartTime),
                     str(execEndTime),  str(execEndTime-execStartTime)]
                 }
+
+
     data = {'Log Output' : logOutput,
             'NewsDataSet' : newsDataList}
 
@@ -395,10 +403,6 @@ class InputProcess(Resource):
                 resultsList = resultsList + data["response"]["results"]
         else:
             print("\nYou shouldn't be here!!!!\n")
-
-        # check if guardian returned no articles
-        if not data["response"]["results"]:
-            return errorReturn(6,args)
 
         #print statments for debugging please keep for future use
         #print(response.url) #to see the url call to the api to make sure its correct
