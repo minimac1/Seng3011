@@ -222,9 +222,9 @@ def errorReturn(errorCode,params):
         3 : "startDate must be before endDate",
         4 : "A Company Name you entered is invalid",
         5 : "An Instrument ID you entered is invalid",
-        6 : "The Guardian API returned no articles",
-        7 : "The time period you entered is too big",
-        8 : "You entered an invalid character",
+        6 : "The Guardian API returned no articles", #not used atm
+        7 : "The time period you entered is too big", #not used atm
+        8 : "You entered an invalid character", #not used atm
         9 : "startDate is invalid format",
         10 : "endDate is invalid format",
         11 : "Please eneter date before or equal to current date"
@@ -415,8 +415,13 @@ class InputProcess(Resource):
 #application.add_url_rule('/', 'index', (lambda: base()))
 #THIS SHOULD 404
 
+class notQuery(Resource):
+    def get(self,endpointString):
+        # Set the response code to 404
+        return {'404 Error': endpointString+' isn\'t a valid endpoint'}, 404
+
 #add rule for api call, calls InputProcess
 api.add_resource(InputProcess, '/query', endpoint = 'query')
-
+api.add_resource(notQuery, '/<string:endpointString>')
 if __name__ == '__main__':
     application.run(debug=True)
