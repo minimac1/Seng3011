@@ -2,9 +2,15 @@
 {% block content %}
     <div class="container-fluid CL-container">
     <h1 class="page-title" >Api Gui</h1> 
-    <div class="CL-heading"></div>
-    <ul>
-        
-    </ul>
+    <div class="CL-heading">Enter valid parameters </div>
+    <form action="/newsapi/gui/go" method =GET|POST" >
+    Start date: <input type="date" name="startDate" placeholder="Start date" value = "{{sdate}}">
+    End date: <input type="date" name="endDate" placeholder="End date" value = "{{edate}}"><br>
+    Company names or Id: <input type="text" name="companyId" placeholder="Enter names or ids of companies" value = "{{names}}"><br>
+    Tags: <input type="text" name="topic" placeholder="Enter any tags you want to search for" value = "{{tags}}"><br>
+    <input type="submit" value="Submit">
+    </form>
+    {% block interface %}{% endblock %}
+    
     </div>
 {% endblock %}

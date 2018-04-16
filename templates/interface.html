@@ -1,0 +1,12 @@
+{% extends "gui.html" %}
+{% block interface %}
+    <div class="container-fluid int-container">
+    <h1 class="page-title" ></h1> 
+    <div class="CL-body">requested url {{url}}</div>
+    <ul>
+    {% for field in re %}
+        <li>{{field}}</li>
+    {% endfor %}
+    </ul>
+    </div>
+{% endblock %}
