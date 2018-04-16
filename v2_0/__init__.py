@@ -262,7 +262,7 @@ class InputProcess(Resource):
             'q': "",
             'from-date': "",
             'to-date': "",
-            'order-by': "newest",
+            'order-by': "relevance",
             'show-fields': 'body-text',
             'api-key':"6a81a5ed-2739-409d-8ada-059c122c8b43"
         }
