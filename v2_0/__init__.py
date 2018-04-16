@@ -355,7 +355,7 @@ class InputProcess(Resource):
             i=i+1
 
         #check if company exists
-
+        abbrevID = []
         for c in compId:
             if not asxCheckValid(c):
                 return errorReturn(4, args)
@@ -366,6 +366,7 @@ class InputProcess(Resource):
 
         for c in compId:
             a = c.replace(" ", "%20")
+            a = '\"' + a + '\"'
             compIdTemp.append(a)
 
         for c in topics:
