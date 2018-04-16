@@ -101,7 +101,7 @@ def openCompanyList(csvName):
 
 
 def getExchanges(withDot):
-    exchanges = ["AX", "NASDAQ"]
+    exchanges = ["AX", "NASDAQ", "EUX", "LSE", "NYSE", "SSX"]
     if withDot:
         exchanges = ['.'+item for item in exchanges]
     return exchanges
