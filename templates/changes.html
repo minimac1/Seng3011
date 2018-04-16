@@ -2,6 +2,28 @@
 {% block content %}
             <div class="container-fluid CL-container">
                 <div class="page-title">Change log</div>         
+                <div class="CL-body">Use the first version number to choose which version to use. e.g. v1.0 or v2.0 . It will always access the latest
+                within that version.</div>
+                <div class="CL-heading"> Second prototype, first update &nbsp version 2.0 &nbsp 11/04/2018</div>
+                    <ul style="list-style: none;margin-left: 20px;padding-left: 1em; text-indent: -1em;">
+                        <li><b>+</b>&nbsp&nbsp Added 2 new pages. 1 a homepage for the api which will include a summary of everything about our api and a 
+                        gui page, which is an example of what you can do with our api</li>
+                        <li><b>+</b>&nbsp&nbsp Added versioning support so that you can check out older versions of our api as well as
+                         the latest. Change the first number of the version to choose which version you are using.</li>
+                        <li><b>+</b>&nbsp&nbsp Added 4 new stock exchanges (in addition to Australian Stock Exchange 'AX'). This includes:</li>
+                        <ul style="list-style: none;">
+                        <li> Euro Next Stock Exchange 'EUX'</li>
+                        <li> London Stock Exchange 'LSE'</li>
+                        <li> New York Stock Exchange 'NYSE'</li>
+                        <li> Shangehai Stock Exchange 'SSX'</li>
+                        </ul>
+                    </ul>
+                    <ul>
+                       <li>Improved relevance for returned articles and articles are returned in order of relevance.</li>
+                       <li>In the case where there are no articles from using our api, we have changed this from an error to 
+                       still being successful but with a helpful message.</li>
+                        <li>Now correctly returns an error and message on malformed endpoints.</li>
+                    </ul>
                 <div class="CL-heading"> First prototype &nbsp version 1.0 &nbsp 30/03/2018</div>
                 <div class="CL-body">
                     <ul style="list-style: none;margin-left: 20px;padding-left: 1em; text-indent: -1em;">

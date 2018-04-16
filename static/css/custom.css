@@ -33,7 +33,7 @@ body {
   position:fixed;
   margin-left:0px;
   top:100px;
-  padding-left:260px; 
+  padding-left:270px; 
   left:0px;
   height:83vh;
   width:100vw;
@@ -111,7 +111,35 @@ body {
   margin-right: -250px;
 }
 
+.sidebar-brands {
+  margin-top:30px;
+  margin-bottom:20px;
+  color:#eeeeee;
+  font-size: 40px;
+  font-family:serif;
+}
 
+.sidebar-head {
+  color:#cccccc;
+  margin-bottom:10px;
+  font-size: 30px;
+  line-height: 3;
+  font-family:serif;
+}
+
+.sidebar-sub {
+  color:#bbbbbb;
+  font-size: 25px;
+  line-height: 2;
+  font-family:serif;
+}
+
+.sidebar-link {
+  color:#aaaaaa;
+  font-size: 15px;
+  line-height: 1.5;
+  font-family:serif;
+}
 /* Sidebar Styles */
 
 .sidebar-nav {
