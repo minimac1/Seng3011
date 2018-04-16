@@ -132,11 +132,13 @@ def asxCheckValid(thingToCheck):
         if thingToCheck.endswith(end):
             return any(removeExchangeCode(thingToCheck) == item["Symbol"].upper() for item in companyDict[end[1:]])
     # check all exchanges
-    if(not (" " in thingToCheck or "." in thingToCheck)):
-        return any(any(removeExchangeCode(thingToCheck) == item["Symbol"].upper() for item in companyDict[end]) for end in getExchanges(False))
-    # check all exchanges for name
-    else:
-        return any(any(thingToCheck == item["Company name"].upper() for item in companyDict[end]) for end in getExchanges(False))
+    for end in getExchanges(False):
+        for item in companyDict[end]:
+            if(thingToCheck.upper() == item["Company name"].upper()):
+                return True
+            if(removeExchangeCode(thingToCheck) == item["Symbol"].upper()):
+                return True
+    return False
 
 
 # a fuzzy checkIfValid function
@@ -148,11 +150,13 @@ def asxCheckValidFuzzy(thingToCheck):
         if thingToCheck.endswith(end):
             return any(removeExchangeCode(thingToCheck)in item["Symbol"].upper() for item in companyDict[end[1:]])
     # check all exchanges
-    if(not (" " in thingToCheck or "." in thingToCheck)):
-        return any(any(removeExchangeCode(thingToCheck) in item["Symbol"].upper() for item in companyDict[end]) for end in getExchanges(False))
-    # check all exchanges for name
-    else:
-        return any(any(thingToCheck in item["Company name"].upper() for item in companyDict[end]) for end in getExchanges(False))
+    for end in getExchanges(False):
+        for item in companyDict[end]:
+            if(thingToCheck.upper() in item["Company name"].upper()):
+                return True
+            if(removeExchangeCode(thingToCheck) in item["Symbol"].upper()):
+                return True
+    return False
 
 
 def fullName(thingToCheck):
@@ -358,6 +362,7 @@ class InputProcess(Resource):
         abbrevID = []
         for c in compId:
             if not asxCheckValid(c):
+                print(c)
                 return errorReturn(4, args)
 
         for idx, val in enumerate(compId):
