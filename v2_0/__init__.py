@@ -362,9 +362,15 @@ class InputProcess(Resource):
 
         for idx, val in enumerate(compId):
             compId[idx] = fullName(val)
+            abbrevID.append(removeExchangeCode(asxNameToCodeFuzzy(fullName(val))))
 
 
         for c in compId:
+            a = c.replace(" ", "%20")
+            a = '\"' + a + '\"'
+            compIdTemp.append(a)
+
+        for c in abbrevID:
             a = c.replace(" ", "%20")
             a = '\"' + a + '\"'
             compIdTemp.append(a)
