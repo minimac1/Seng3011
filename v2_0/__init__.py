@@ -45,7 +45,7 @@ def parseGuardian(jsonData, compNameList, params, execStartTime):
     newsData_fields['NewsText'] = fields.String
     #sets up the main field, which has the nested data
     output_fields = {}
-    output_fields['Log Output'] = fields.Nested(log_fields)
+    output_fields['Developer Notes'] = fields.Nested(log_fields)
     output_fields['NewsDataSet'] = fields.List(fields.Nested(newsData_fields))
 
     #parse the given json into a nested field, append to list
@@ -235,7 +235,7 @@ def errorReturn(errorCode,params):
     }
 
     output_fields = {}
-    output_fields['Log Output'] = fields.Nested(log_fields)
+    output_fields['Developer Notes'] = fields.Nested(log_fields)
 
     logOutput = {'Parameters passed' : str(params),
                 'Execution Result' :
