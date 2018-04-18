@@ -73,7 +73,7 @@ def parseGuardian(jsonData, compNameList, params, execStartTime):
                 }
 
 
-    data = {'Log Output' : logOutput,
+    data = {'Developer Notes' : logOutput,
             'NewsDataSet' : newsDataList}
 
     # marshal orders the data alphabetically. is this a problem?!
@@ -234,12 +234,17 @@ def errorReturn(errorCode,params):
         11 : "Please eneter date before or equal to current date"
     }
 
+    output_fields = {}
+    output_fields['Log Output'] = fields.Nested(log_fields)
+
     logOutput = {'Parameters passed' : str(params),
                 'Execution Result' :
                     ["Error", str(errorCase.get(errorCode, "Invalid Error Code"))]
                 }
 
-    return marshal(logOutput, log_fields)
+    data = {'Developer Notes' : logOutput}
+
+    return marshal(data, output_fields)
 
 # Given parsed params and a pageNumber, returns the json from Guardian Api
 # Used for recursive calling of the api when there is more than 1 page of data
