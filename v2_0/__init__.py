@@ -1,6 +1,7 @@
 from flask import Flask, render_template,Blueprint
 from flask_restful import Resource, Api, reqparse, fields, marshal
 from datetime import datetime
+from pytrends.request import TrendReq
 import csv
 import json
 import requests
@@ -9,9 +10,17 @@ import datetime
 application = Blueprint('api_v2', __name__)
 api = Api(application)
 currentVersion = 'v2.0'
-
+pytrends = TrendReq(hl='en-us', tz=360) #change when functioning
 defaultPageSize = 200
 api_url = "http://content.guardianapis.com/search"
+
+#PYTRENDS HERE
+kw_list = ["ANZ"]
+pytrends.build_payload(kw_list, cat=0, timeframe='now 1-d', geo='', gprop='')
+print("Pytrends: ANZ Check\n");
+print(pytrends.interest_over_time());
+print("Successful pytrends");
+
 
 # Log JSON fields
 log_fields = {}
