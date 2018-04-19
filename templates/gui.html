@@ -3,13 +3,62 @@
     <div class="container-fluid CL-container">
     <h1 class="page-title" >Api Gui</h1> 
     <div class="CL-heading">Enter valid parameters </div>
-    <form action="/newsapi/gui/go" method =GET|POST" >
-    Start date: <input type="date" name="startDate" placeholder="Start date" value = "{{sdate}}">
-    End date: <input type="date" name="endDate" placeholder="End date" value = "{{edate}}"><br>
-    Company names or Id: <input type="text" name="companyId" placeholder="Enter names or ids of companies" value = "{{names}}"><br>
-    Tags: <input type="text" name="topic" placeholder="Enter any tags you want to search for" value = "{{tags}}"><br>
-    <input type="submit" value="Submit">
-    </form>
+    <div class="CL-body">
+    
+    <table class="guiTable">
+        <tr>
+            <form action="/newsapi/gui/addC" method ="GET|POST" >
+            <td style="width:220px">Company names or Id: </td>
+            <td style="width:330px"><input class="enterWord" type="text" name="companyId" placeholder="Enter a name or id of a company"></td>
+            <td><input type="submit" value="Add" class="btn btn-secondary add"></form></td>
+            <td>Added Companies
+            </td>
+            <td>Added Topics
+            </td>
+        </tr>
+        <tr style="height:50px;overflow:auto;">
+            <form action="/newsapi/gui/addT" method ="GET|POST" >
+            <td>Tags: </td>
+            <td><input class="enterWord" type="text" name="topic" placeholder="Enter a topic"></td>
+            <td><input type="submit" value="Add" class="btn btn-secondary add"></form></td>
+            <td rowspan="3" ><div class="guiIn">
+                <ul style="list-style: none;">
+                    {% for name in names %}
+                    <form action="/newsapi/gui/remC" method = "GET|POST" >
+                    {{name}}<input type="radio" style="display:none;" name="companyId" value="{{name}}" checked>
+                    <input type="submit" value="X" class="btn btn-secondary remove">
+                    </form>
+                    {% endfor %}
+                </ul>
+                </div>
+            </td>
+            <td rowspan="3"><div class="guiIn">
+                <ul style="list-style: none;">
+                    {% for tag in tags %}
+                    <form action="/newsapi/gui/remT" method = "GET|POST" >
+                    {{tag}}<input type="radio" style="display:none;" name="topic" value="{{tag}}" checked>
+                    <input type="submit" value="X" class="btn btn-secondary remove">
+                    </form>
+                    {% endfor %}
+                </ul>
+            </div>
+            </td>
+        </tr>
+        <tr>
+            <form action="/newsapi/gui/addD" method ="GET|POST" >
+            <td>Start date: </td>
+            <td><input class="date" type="date" name="startDate" placeholder="Start date" value = "{{sdate}}"></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>End date: </td>
+            <td><input class="date" type="date" name="endDate" placeholder="End date" value = "{{edate}}"></td>
+            <td><input type="submit" value="Go" class="btn btn-secondary Go"></form></td>
+         </tr>
+    </table>
+    
+    
+    </div>
     {% block interface %}{% endblock %}
     
     </div>

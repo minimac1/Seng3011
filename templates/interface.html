@@ -1,8 +1,10 @@
 {% extends "gui.html" %}
 {% block interface %}
+    <!-- this is the only part not finished yet ( and a description but thats just text)-->
+    <!-- check the parameters passed, url includes the url and a note as to what happened, re includes the returned json (converted from json tho)-->
     <div class="container-fluid int-container">
     <h1 class="page-title" ></h1> 
-    <div class="CL-body">requested url {{url}}</div>
+    <div class="guinote">{{url|safe}}</div>
     <ul>
     {% for field in re %}
         <li>{{field}}</li>

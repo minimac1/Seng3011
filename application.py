@@ -2,8 +2,10 @@ from flask import Flask, render_template, Blueprint, session, request
 from flask_restful import Resource, Api, reqparse, fields, marshal
 from v1_0 import application as api_v1
 from v2_0 import application as api_v2
+
 import requests
 import os
+import re
 
 application = Flask(__name__)
 application.secret_key = os.urandom(24)
@@ -28,8 +30,11 @@ def apiHome():
 def gui():
     sDate = ""
     eDate = ""
-    names = ""
-    tags = ""
+    names = []
+    tags = []
+    response = ""
+    url = ""
+    
     if 'guisDate' in session:
         sDate = session['guisDate']
     if 'guieDate' in session:
@@ -38,35 +43,208 @@ def gui():
         names = session['guicId']
     if 'guitags' in session:
         tags = session['guitags']
-    return render_template('gui.html', sdate = sDate, edate = eDate, names = names, tags = tags)
+        
+    return render_template('interface.html', url = url, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
 
-@application.route('/newsapi/gui/go', methods=['GET','POST'])
-def gogui():
-    sDate = request.args.get('startDate')
-    session['guisDate'] = sDate
-    sDate +="T00:00:00.000Z"
-    eDate = request.args.get('endDate')
-    session['guieDate'] = eDate
-    eDate += "T00:00:00.000Z"
-    names = request.args.get('companyId')
-    tags = request.args.get('topic')
-    ourApiUrl= "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query"
-    url = (ourApiUrl
-    + '?startDate=' + sDate
-    + '&endDate=' + eDate )
-    if names is not "":
-        url += ('&companyId=' + names)
-    session['guicId'] = names
-    if tags is not "":
-        url += ('&topic=' + tags)
-    session['guitags'] = tags
+@application.route('/newsapi/gui/addD', methods=['GET','POST'])
+def addDate():
+    sDate = ""
+    eDate = ""
+    names = []
+    tags = []
+    response = ""
+    
+    if 'guinames' in session:
+        names = session['guinames']
+    if 'guitags' in session:
+        tags = session['guitags']
+        
+    new = request.args.get('startDate')
+    if new !=  "":
+        sDate = new
+        session['guisDate'] = sDate
+    
+    new = request.args.get('endDate')
+    if new != "":
+        eDate = new
+        session['guieDate'] = eDate
+    
+    url = getUrl()
+    
+    if "http:" in url:
+        response = requests.get(url).json()
+        url = "Requested Url = " + url
+     
+    return render_template('interface.html', url = url, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
+    
+@application.route('/newsapi/gui/addC', methods=['GET','POST'])
+def addName():
+    sDate = ""
+    eDate = ""
+    names = []
+    tags = []
+    response = ""
+    
     if 'guisDate' in session:
         sDate = session['guisDate']
     if 'guieDate' in session:
         eDate = session['guieDate']
-    response = requests.get(url).json()
-    return render_template('interface.html', url = url, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
+    if 'guinames' in session:
+        names = session['guinames']
+    if 'guitags' in session:
+        tags = session['guitags']
+    new = request.args.get('companyId')
+    
+    note = "No name/Id entered"
+    if new != "":
+        names.append(new)
+        session['guinames'] = names
+        note = "Company added"
+        
+    url = getUrl()
+    if "http:" in url:
+        response = requests.get(url).json()
+        note += "</div><div class=\"CL-body\">Requested Url = " + url
+    
+    return render_template('interface.html', url = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
 
+@application.route('/newsapi/gui/remC', methods=['GET','POST'])
+def remName():
+    sDate = ""
+    eDate = ""
+    names = []
+    tags = []
+    response = []
+    note = "Company removed"
+    if 'guisDate' in session:
+        sDate = session['guisDate']
+    if 'guieDate' in session:
+        eDate = session['guieDate']
+    if 'guinames' in session:
+        names = session['guinames']
+    if 'guitags' in session:
+        tags = session['guitags']
+
+    new = request.args.get('companyId')
+    
+    if new != "":
+        names.remove(new)
+        session['guinames'] = names
+        
+    url = getUrl()
+    if "http:" in url:
+        response = requests.get(url).json()
+        note += "</div><div class=\"CL-body\">Requested Url = " + url
+    
+    return render_template('interface.html', url = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
+    
+@application.route('/newsapi/gui/addT', methods=['GET','POST'])
+def addTopic():
+    sDate = ""
+    eDate = ""
+    names = []
+    tags = []
+    response = ""
+    
+    if 'guisDate' in session:
+        sDate = session['guisDate']
+    if 'guieDate' in session:
+        eDate = session['guieDate']
+    if 'guinames' in session:
+        names = session['guinames']
+    if 'guitags' in session:
+        tags = session['guitags']
+
+    new = request.args.get('topic')
+    
+    note = "No topic name entered"
+    if new != "":
+        tags.append(new)
+        session['guitags'] = tags
+        note = "Topic added"
+        
+    url = getUrl()
+    if "http:" in url:
+        response = requests.get(url).json()
+        note += "</div><div class=\"CL-body\">Requested Url = " + url
+    
+    return render_template('interface.html', url = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
+
+@application.route('/newsapi/gui/remT', methods=['GET','POST'])
+def remTopic():
+    sDate = ""
+    eDate = ""
+    names = []
+    tags = []
+    response = ""
+    note = "Topic removed"
+    if 'guisDate' in session:
+        sDate = session['guisDate']
+    if 'guieDate' in session:
+        eDate = session['guieDate']
+    if 'guinames' in session:
+        names = session['guinames']
+    if 'guitags' in session:
+        tags = session['guitags']
+
+    new = request.args.get('topic')
+    
+    if new != "":
+        tags.remove(new)
+        session['guitags'] = tags
+        
+    url = getUrl()
+    if "http:" in url:
+        response = requests.get(url).json()
+        note += "</div><div class=\"url\">Requested Url = " + url
+    
+    return render_template('interface.html', url = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
+    
+def getUrl():
+    sDate = ""
+    eDate = ""
+    names = []
+    tags = []
+    urlNames = ""
+    urlTags = ""
+    url = ""
+    ourApiUrl= "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query"
+    
+    if 'guisDate' in session:
+        sDate = session['guisDate']
+    if not sDate:
+        return "Please enter a start date"
+    if 'guieDate' in session:
+        eDate = session['guieDate']
+    if not eDate:
+        return "Please enter an end date"
+    if 'guinames' in session:
+        names = session['guinames']
+    if 'guitags' in session:
+        tags = session['guitags']
+    for name in names:
+        urlNames += name + "_"
+    if urlNames is not "":
+        urlNames = urlNames[:-1]
+    for tag in tags:
+        urlTags += tag + "_"
+    if urlTags is not "":
+        urlTags = urlTags[:-1]
+    sDate +="T00:00:00.000Z"
+    eDate +="T00:00:00.000Z"
+    
+    url = (ourApiUrl
+    + '?startDate=' + sDate
+    + '&endDate=' + eDate )
+    
+    if urlNames is not "":
+        url += ('&companyId=' + urlNames)
+
+    if urlTags is not "":
+        url += ('&topic=' + urlTags)
+    
+    return url
+     
 def start():
     return render_template('int.html')
 # change homepage to gui implementation

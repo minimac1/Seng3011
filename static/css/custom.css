@@ -8,6 +8,16 @@ body {
   font-family:"red serifs", serif;
 }
 
+.guiTable{
+  border:none;
+  height:30vh;
+  width:100%;
+  margin-bottom:2vh;
+}
+.guiIn{
+  height:25vh;
+  overflow:auto;
+}
 .inTable { 
   margin-top:5px;
   margin-bottom:5px;
@@ -40,6 +50,12 @@ body {
   overflow:auto;
 }
 
+.int-container{
+  border-style: solid;
+  border-width: 2px;
+  padding: 25px 30px 40px;
+  height:50vh;
+}
 .CL-heading{
   font-size: 30px;
   line-height: 3;
@@ -52,6 +68,44 @@ body {
   font-family:serif;
 }
 
+.guiurl{
+  font-size: 20px;
+  line-height: 1.5;
+  font-family:serif;
+}
+
+.guinote{
+  font-size: 20px;
+  line-height: 1.5;
+  font-family:serif;
+}
+.enterWord{
+  height:30px;
+  width:300px;
+  font-size:22px;
+}
+.date{
+  height:30px;
+  width:200px;
+  font-size:22px;
+}
+.add {
+  height:50px;
+  width:80px;
+  font-size:35px;
+  background-color: #666666;
+  text-align:center;
+  line-height:35px;
+}  
+.Go {
+  height:50px;
+  width:80px;
+  font-size:35px;
+  background-color: #444444;
+  text-align:center;
+  line-height:35px;
+  
+}  
 .CL-body pre {
     background: #f4f4f4;
     border: 1px solid #ddd;
