@@ -19,7 +19,7 @@ def base():
 
 def apiIndex():
     return render_template('homepage.html')
-    
+
 @application.route('/newsapi')
 def apiHome():
     return render_template('apiHome.html')
@@ -51,13 +51,13 @@ def gogui():
     names = request.args.get('companyId')
     tags = request.args.get('topic')
     ourApiUrl= "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query"
-    url = (ourApiUrl 
-    + '?startDate=' + sDate 
+    url = (ourApiUrl
+    + '?startDate=' + sDate
     + '&endDate=' + eDate )
     if names is not "":
         url += ('&companyId=' + names)
     session['guicId'] = names
-    if tags is not "":      
+    if tags is not "":
         url += ('&topic=' + tags)
     session['guitags'] = tags
     if 'guisDate' in session:
@@ -84,7 +84,7 @@ def featuresPage():
 @application.route('/newsapi/test')
 def testPage():
     return render_template('test.html')
-    
+
 
 #Temporary
 @application.route('/homepage')
@@ -106,12 +106,8 @@ def testPage1():
 
 # this will change with a gui
 application.add_url_rule('/', 'index', (lambda: base()))
-application.add_url_rule('/gui/', 'guiIndex', (lambda: gui()))
 application.add_url_rule('/newsapi/', 'apiIndex', (lambda: apiIndex()))
 
 
 if __name__ == '__main__':
     application.run(debug=True)
-    
-    
-    

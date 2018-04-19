@@ -16,8 +16,10 @@ api_url = "http://content.guardianapis.com/search"
 pytrendsUserList = []
 
 #PYTRENDS HERE
+# make a file with google trends data against company id
 #create an instance with the given inputs to the api
 pytrendsInstance = {}
+#pytrendsInstance['Time Range'] = fields.List(fields.String)
 pytrendsInstance['CompanyID'] = fields.String
 pytrendsInstance['Topic'] = fields.String
 pytrendsInstance['Current Hour Results'] = fields.Integer
@@ -54,6 +56,7 @@ def parseJSON(jsonData, compNameList, params, execStartTime):
 
     #sets up the nested fields
     newsData_fields = {}
+    newsData_fields['URL'] = fields.String
     newsData_fields['InstrumentIDs'] = fields.List(fields.String)
     newsData_fields['CompanyNames'] = fields.List(fields.String)
     newsData_fields['TimeStamp'] = fields.String
@@ -65,10 +68,12 @@ def parseJSON(jsonData, compNameList, params, execStartTime):
     output_fields['NewsDataSet'] = fields.List(fields.Nested(newsData_fields))
     output_fields['Google Trend Data'] = fields.List(fields.Nested(userPytrends))
 
+
     #parse the given json into a nested field, append to list
     newsDataList = []
     for x in jsonData:
-        newsData = {'InstrumentIDs': instrIdList,
+        newsData = {'URL' : webUrl,
+            'InstrumentIDs': instrIdList,
             'CompanyNames': compNameList,
             'TimeStamp': x["webPublicationDate"],
             'Headline': x["webTitle"],
@@ -98,7 +103,11 @@ def parseJSON(jsonData, compNameList, params, execStartTime):
     # return the json marshalled with the fields
     return marshal(data, output_fields)
 
+#def getGoogleTrends(cookie):
 
+#    return
+
+#timerange, cIDs, topics
 def googleTrends(cookieID):
     kw_list = ["ANZ", "Woolies"]
     pytrends.build_payload(kw_list, cat=0, timeframe='now 1-H', geo='', gprop='')
@@ -119,6 +128,20 @@ def googleTrends(cookieID):
         if (curUser['CookieID'] == cookieID):
             curUser['Hourly Trend Data'] = trendList
 
+def addGoogleTrendsUser(cookieID):
+    currUser = {'CookieID' : cookieID, 'Hourly Trend Data' : []}
+    pytrendsUserList.append(currUser)
+
+    #hardcoded example for more data
+    trendList = []
+    currHourInstance = {'CompanyID' : "topicIsMeantToBeBlank", 'Topic' : "",
+            'Current Hour Results' : 69, 'Hourly Change' : "+100%"}
+    trendList.append(currHourInstance)
+    currHourInstance = {'CompanyID' : "inveseter", 'Topic' : "business",
+            'Current Hour Results' : 2, 'Hourly Change' : "-200%"}
+    trendList.append(currHourInstance)
+    currUser = {'CookieID' : "thisUSERisHARDCODED", 'Hourly Trend Data' : trendList}
+    pytrendsUserList.append(currUser)
 
 
 def csvRemoveTails(companyName):
@@ -256,21 +279,6 @@ def asxNameToCodeFuzzy(thingToCheck):
             if(thingToCheck.upper() in company["Company name"].upper()):
                 return company["Symbol"]+"."+end
     return thingToCheck
-
-def addGoogleTrendsUser(cookieID):
-    currUser = {'CookieID' : cookieID, 'Hourly Trend Data' : []}
-    pytrendsUserList.append(currUser)
-
-    #hardcoded example for more data
-    trendList = []
-    currHourInstance = {'CompanyID' : "topicIsMeantToBeBlank", 'Topic' : "",
-            'Current Hour Results' : 69, 'Hourly Change' : "+100%"}
-    trendList.append(currHourInstance)
-    currHourInstance = {'CompanyID' : "inveseter", 'Topic' : "business",
-            'Current Hour Results' : 2, 'Hourly Change' : "-200%"}
-    trendList.append(currHourInstance)
-    currUser = {'CookieID' : "thisUSERisHARDCODED", 'Hourly Trend Data' : trendList}
-    pytrendsUserList.append(currUser)
 
 
 # Each entry in the dictionary corresponds to the error code required
