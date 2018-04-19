@@ -5,11 +5,11 @@
         <div class="CL-body">
             <div class="CL-heading">Endpoint URL</div>
             <ul>
-                <li>http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?</li>
+                <li>http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query?</li>
             </ul>
             <div class="CL-heading">Parameters</div>
             <div class="CL-body">
-                Example blank url: http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?startDate=BLANK&endDate=BLANK&companyId=BLANK&topic=BLANK
+                Example blank url: http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query?startDate=BLANK&endDate=BLANK&companyId=BLANK&topic=BLANK
                 <div>Replace each BLANK with an accepted value for the parameter.</div>
                 <table class="inTable">
                     <tr>
@@ -46,25 +46,25 @@
 
                     </tr>
                 </table>
-                <div style="display:block">Example valid URL: http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?startDate=2015-08-24T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=CBA.AX&topic="apple-pay"</div>
+                <div style="display:block">Example valid URL: http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query?startDate=2015-08-24T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=CBA.AX&topic="apple-pay"</div>
             </div>
             <div class="CL-heading">Example successful response</div>
 
                     Searching for articles about the new apple pay system so we decide to include apple-pay in the topic and a local bank, lets say Commonwealth Bank(CBA).
                     <pre><code>
-url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?startDate=2015-08-24T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=CBA.AX&topic="apple-pay""
+url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query?startDate=2015-08-24T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=CBA.AX&topic="apple-pay""
 
 
 result:
 {
-    "Log Output": {"Developer Team": "Team Turtle", "Module Name": "News API", "API Version": "v1.0", 
-    "Parameters passed": "{'startDate': '2015-08-24T09:45:31.235Z', 'endDate': '2017-09-24T09:45:31.235Z', 'companyId': 'CBA.AX', 'topic': '\"apple-pay\"'}", 
-    "Execution Result": ["Successful", "2018-03-30 10:29:00.112032", "2018-03-30 10:29:01.605245", "0:00:01.493213"]}, 
+    "Log Output": {"Developer Team": "Team Turtle", "Module Name": "News API", "API Version": "v2.0",
+    "Parameters passed": "{'startDate': '2015-08-24T09:45:31.235Z', 'endDate': '2017-09-24T09:45:31.235Z', 'companyId': 'CBA.AX', 'topic': '\"apple-pay\"'}",
+    "Execution Result": ["Successful", "2018-03-30 10:29:00.112032", "2018-03-30 10:29:01.605245", "0:00:01.493213"]},
     "NewsDataSet": [{
-        "InstrumentIDs": ["CBA"], 
-        "CompanyNames": ["COMMONWEALTH BANK OF AUSTRALIA."], 
-        "TimeStamp": "2017-03-31T01:28:26Z", 
-        "Headline": "Apple Pay: Australian banks not allowed to negotiate collectively", 
+        "InstrumentIDs": ["CBA"],
+        "CompanyNames": ["COMMONWEALTH BANK OF AUSTRALIA."],
+        "TimeStamp": "2017-03-31T01:28:26Z",
+        "Headline": "Apple Pay: Australian banks not allowed to negotiate collectively",
         "NewsText": "Australia\u2019s competition regulator has rejected a request by four banks that they be allowed to collectively bargain with Apple..."}]
 }
 
@@ -72,7 +72,7 @@ result:
 This is the only first article that is returned.
 (majority of the article, stored in NewsText, was left out for the sake keeping this short)
                     </code></pre>
-                
+
                 <div class="CL-heading">Output Semantics</div>
                 <table class="inTable">
                     <tr>
@@ -115,46 +115,46 @@ This is the only first article that is returned.
                 <div class="CL-heading">Other examples</div>
                 This example contains no parameters and should return an error
                 <pre><code>
-url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?"
+url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query?"
 
 result:
 {
-    "Developer Team": "Team Turtle", 
-    "Module Name": "News API", 
-    "API Version": "v1.0",
+    "Developer Team": "Team Turtle",
+    "Module Name": "News API",
+    "API Version": "v2.0",
     "Parameters passed": "{'startDate': None, 'endDate': None, 'companyId': None, 'topic': None}",
     "Execution Result": ["Error", "startDate is empty"]}
                 </code></pre>
                 We want to know everything that happened on a specific day, so we just include the date and nothing else. Be careful because broad requests will take a very long time.
                 <pre><code>
-url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?startDate=2015-08-24T09:45:31.235Z&endDate=2015-08-25T09:50:21.222Z"
+url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query?startDate=2015-08-24T09:45:31.235Z&endDate=2015-08-25T09:50:21.222Z"
 
 result:
 {
     "Log Output": {
-        "Developer Team": "Team Turtle", 
-        "Module Name": "News API version 1.0", 
-        "API Version": "v1.0", 
+        "Developer Team": "Team Turtle",
+        "Module Name": "News API version 1.0",
+        "API Version": "v2.0",
         "Parameters passed": "{'startDate': '2015-08-24T09:45:31.235Z', 'endDate': '2015-08-25T09:50:21.222Z', 'companyId': None, 'topic': None
-    }", 
+    }",
     "Execution Result": ["Successful", "2018-03-30 05:41:24.020809", "2018-03-30 05:41:30.520694", "0:00:06.499885"]},
     "NewsDataSet": [{
-        "InstrumentIDs": [], 
-        "CompanyNames": [], 
-        "TimeStamp": "2015-08-25T09:41:35Z", 
-        "Headline": "Citizenfour director to preview Assange documentary at New York film festival", 
+        "InstrumentIDs": [],
+        "CompanyNames": [],
+        "TimeStamp": "2015-08-25T09:41:35Z",
+        "Headline": "Citizenfour director to preview Assange documentary at New York film festival",
         "NewsText": "Oscar-winning director Laura Poitras is to focus on controversial WikiLeaks co-founder Julian Assange..."}]
     }
-                
-                </code></pre>    
+
+                </code></pre>
     <div class="CL-heading">Examples for Calling the API</div>
                 Python example API call.
                     <pre><code>
-                    
+
 import requests
 
 
-url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?"
+url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query?"
 startDate = "2017-08-24T09:45:31.233Z"
 endDate = "2017-09-24T09:45:31.233Z"
 companyID = "ANZ_Woolworths"
@@ -164,7 +164,7 @@ response = requests.get(url+"startDate="+startDate+"&endDate="+endDate+"&company
                     </code></pre>
                 JavaScript/jQuery example API call.
                     <pre><code>
-url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?"
+url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query?"
 startDate = "2017-08-24T09:45:31.233Z"
 endDate = "2017-09-24T09:45:31.233Z"
 companyID = "ANZ_Woolworths"
@@ -175,9 +175,9 @@ $.getJSON(url+"startDate="+startDate+"&endDate="+endDate+"&companyId="+companyID
 
                     curl example API call.
                         <pre><code>
-curl "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v1.0/query?startDate=2017-09-20T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=ANZ_Woolworths&topic=iphone"
+curl "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query?startDate=2017-09-20T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=ANZ_Woolworths&topic=iphone"
                         </code></pre>
-            
+
 
 </div>
 </div>
