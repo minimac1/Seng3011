@@ -13,6 +13,7 @@ currentVersion = 'v2.0'
 pytrends = TrendReq(hl='en-us', tz=-600) #change when functioning
 defaultPageSize = 200
 api_url = "http://content.guardianapis.com/search"
+pytrendsUserList = []
 
 #PYTRENDS HERE
 #create an instance with the given inputs to the api
@@ -23,16 +24,10 @@ pytrendsInstance['Current Hour Results'] = fields.Integer
 pytrendsInstance['Hourly Change'] = fields.String
 #create new user with cookie id upon new connection
 userPytrends = {}
-userPytrends['CookieID'] = fields.String(default='cookieID1')
+userPytrends['CookieID'] = fields.String
 userPytrends['Hourly Trend Data'] = fields.List(fields.Nested(pytrendsInstance))
 #Get users cookies!!
 # will need to create dictionary on python exec
-
-#pytrends example
-#kw_list = ["ANZ"]
-#pytrends.build_payload(kw_list, cat=0, timeframe='now 1-H', geo='', gprop='')
-#print("Pytrends: ANZ Check\n");
-#print(pytrends.interest_over_time());
 
 # Log JSON fields
 log_fields = {}
@@ -94,37 +89,36 @@ def parseJSON(jsonData, compNameList, params, execStartTime):
                     str(execEndTime),  str(execEndTime-execStartTime)]
                 }
 
+    googleTrends("thisismycookieID")
     data = {'Developer Notes' : logOutput,
             'NewsDataSet' : newsDataList,
-            'Google Trend Data' : googleTrends()}
+            'Google Trend Data' : pytrendsUserList}
 
     # marshal orders the data alphabetically. is this a problem?!
     # return the json marshalled with the fields
     return marshal(data, output_fields)
 
-#could change to have cookieID as input
-def googleTrends():
-    pytrendsUserList = []
-    trendList = []
-    currHourInstance = {'CompanyID' : "ANZ", 'Topic' : "Finance",
-            'Current Hour Results' : 50, 'Hourly Change' : "+10%"}
-    trendList.append(currHourInstance)
-    currHourInstance = {'CompanyID' : "Woolies", 'Topic' : "Finance",
-            'Current Hour Results' : 1, 'Hourly Change' : "-50%"}
-    trendList.append(currHourInstance)
-    currUser = {'CookieID' : "thisismycookieID", 'Hourly Trend Data' : trendList}
-    pytrendsUserList.append(currUser)
+
+def googleTrends(cookieID):
+    kw_list = ["ANZ", "Woolies"]
+    pytrends.build_payload(kw_list, cat=0, timeframe='now 1-H', geo='', gprop='')
+    df = pytrends.interest_over_time();
+    print(df);
 
     trendList = []
-    currHourInstance = {'CompanyID' : "somethingshit", 'Topic' : "toilets",
-            'Current Hour Results' : 69, 'Hourly Change' : "+100%"}
+    currHourInstance = {'CompanyID' : "ANZ", 'Topic' : "Finance",
+            'Current Hour Results' : df['ANZ'].sum(), 'Hourly Change' : "+10%"}
     trendList.append(currHourInstance)
-    currHourInstance = {'CompanyID' : "inveseter", 'Topic' : "business",
-            'Current Hour Results' : 2, 'Hourly Change' : "-200%"}
+    currHourInstance = {'CompanyID' : "Woolies", 'Topic' : "Finance",
+            'Current Hour Results' : df['Woolies'].sum(),
+            'Hourly Change' : "not implemented yet"}
     trendList.append(currHourInstance)
-    currUser = {'CookieID' : "iamanothercookie", 'Hourly Trend Data' : trendList}
-    pytrendsUserList.append(currUser)
-    return(pytrendsUserList)
+
+    #find user
+    for curUser in pytrendsUserList:
+        if (curUser['CookieID'] == cookieID):
+            curUser['Hourly Trend Data'] = trendList
+
 
 
 def csvRemoveTails(companyName):
@@ -262,6 +256,21 @@ def asxNameToCodeFuzzy(thingToCheck):
             if(thingToCheck.upper() in company["Company name"].upper()):
                 return company["Symbol"]+"."+end
     return thingToCheck
+
+def addGoogleTrendsUser(cookieID):
+    currUser = {'CookieID' : cookieID, 'Hourly Trend Data' : []}
+    pytrendsUserList.append(currUser)
+
+    #hardcoded example for more data
+    trendList = []
+    currHourInstance = {'CompanyID' : "topicIsMeantToBeBlank", 'Topic' : "",
+            'Current Hour Results' : 69, 'Hourly Change' : "+100%"}
+    trendList.append(currHourInstance)
+    currHourInstance = {'CompanyID' : "inveseter", 'Topic' : "business",
+            'Current Hour Results' : 2, 'Hourly Change' : "-200%"}
+    trendList.append(currHourInstance)
+    currUser = {'CookieID' : "thisUSERisHARDCODED", 'Hourly Trend Data' : trendList}
+    pytrendsUserList.append(currUser)
 
 
 # Each entry in the dictionary corresponds to the error code required
@@ -470,7 +479,7 @@ class InputProcess(Resource):
         #print statments for debugging please keep for future use
         #print(response.url) #to see the url call to the api to make sure its correct
         #print(response.text)
-
+        addGoogleTrendsUser("thisismycookieID")
         # if you get to this point, there should be no errors
         return parseJSON(resultsList, compId, args, execStartTime)
 
