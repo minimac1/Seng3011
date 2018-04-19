@@ -10,17 +10,29 @@ import datetime
 application = Blueprint('api_v2', __name__)
 api = Api(application)
 currentVersion = 'v2.0'
-pytrends = TrendReq(hl='en-us', tz=360) #change when functioning
+pytrends = TrendReq(hl='en-us', tz=-600) #change when functioning
 defaultPageSize = 200
 api_url = "http://content.guardianapis.com/search"
 
 #PYTRENDS HERE
-kw_list = ["ANZ"]
-pytrends.build_payload(kw_list, cat=0, timeframe='now 1-d', geo='', gprop='')
-print("Pytrends: ANZ Check\n");
-print(pytrends.interest_over_time());
-print("Successful pytrends");
+#create an instance with the given inputs to the api
+pytrendsInstance = {}
+pytrendsInstance['CompanyID'] = fields.String
+pytrendsInstance['Topic'] = fields.String
+pytrendsInstance['Current Hour Results'] = fields.Integer
+pytrendsInstance['Hourly Change'] = fields.String
+#create new user with cookie id upon new connection
+userPytrends = {}
+userPytrends['CookieID'] = fields.String(default='cookieID1')
+userPytrends['Hourly Trend Data'] = fields.List(fields.Nested(pytrendsInstance))
+#Get users cookies!!
+# will need to create dictionary on python exec
 
+#pytrends example
+#kw_list = ["ANZ"]
+#pytrends.build_payload(kw_list, cat=0, timeframe='now 1-H', geo='', gprop='')
+#print("Pytrends: ANZ Check\n");
+#print(pytrends.interest_over_time());
 
 # Log JSON fields
 log_fields = {}
@@ -32,7 +44,7 @@ log_fields['Parameters passed'] = fields.String
 #change exec result if error occurs
 log_fields['Execution Result'] = fields.List(fields.String)
 
-def parseGuardian(jsonData, compNameList, params, execStartTime):
+def parseJSON(jsonData, compNameList, params, execStartTime):
     #use compNameList to make a instrIdList
     instrIdList = []
     for c in range(0, len(compNameList)):
@@ -56,6 +68,7 @@ def parseGuardian(jsonData, compNameList, params, execStartTime):
     output_fields = {}
     output_fields['Developer Notes'] = fields.Nested(log_fields)
     output_fields['NewsDataSet'] = fields.List(fields.Nested(newsData_fields))
+    output_fields['Google Trend Data'] = fields.List(fields.Nested(userPytrends))
 
     #parse the given json into a nested field, append to list
     newsDataList = []
@@ -81,13 +94,37 @@ def parseGuardian(jsonData, compNameList, params, execStartTime):
                     str(execEndTime),  str(execEndTime-execStartTime)]
                 }
 
-
     data = {'Developer Notes' : logOutput,
-            'NewsDataSet' : newsDataList}
+            'NewsDataSet' : newsDataList,
+            'Google Trend Data' : googleTrends()}
 
     # marshal orders the data alphabetically. is this a problem?!
     # return the json marshalled with the fields
     return marshal(data, output_fields)
+
+#could change to have cookieID as input
+def googleTrends():
+    pytrendsUserList = []
+    trendList = []
+    currHourInstance = {'CompanyID' : "ANZ", 'Topic' : "Finance",
+            'Current Hour Results' : 50, 'Hourly Change' : "+10%"}
+    trendList.append(currHourInstance)
+    currHourInstance = {'CompanyID' : "Woolies", 'Topic' : "Finance",
+            'Current Hour Results' : 1, 'Hourly Change' : "-50%"}
+    trendList.append(currHourInstance)
+    currUser = {'CookieID' : "thisismycookieID", 'Hourly Trend Data' : trendList}
+    pytrendsUserList.append(currUser)
+
+    trendList = []
+    currHourInstance = {'CompanyID' : "somethingshit", 'Topic' : "toilets",
+            'Current Hour Results' : 69, 'Hourly Change' : "+100%"}
+    trendList.append(currHourInstance)
+    currHourInstance = {'CompanyID' : "inveseter", 'Topic' : "business",
+            'Current Hour Results' : 2, 'Hourly Change' : "-200%"}
+    trendList.append(currHourInstance)
+    currUser = {'CookieID' : "iamanothercookie", 'Hourly Trend Data' : trendList}
+    pytrendsUserList.append(currUser)
+    return(pytrendsUserList)
 
 
 def csvRemoveTails(companyName):
@@ -435,7 +472,7 @@ class InputProcess(Resource):
         #print(response.text)
 
         # if you get to this point, there should be no errors
-        return parseGuardian(resultsList, compId, args, execStartTime)
+        return parseJSON(resultsList, compId, args, execStartTime)
 
 # add a rule for the index page.
 #application.add_url_rule('/', 'index', (lambda: base()))
