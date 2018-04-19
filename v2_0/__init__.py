@@ -72,7 +72,7 @@ def parseJSON(jsonData, compNameList, params, execStartTime):
     #parse the given json into a nested field, append to list
     newsDataList = []
     for x in jsonData:
-        newsData = {'URL' : webUrl,
+        newsData = {'URL' : x["webUrl"],
             'InstrumentIDs': instrIdList,
             'CompanyNames': compNameList,
             'TimeStamp': x["webPublicationDate"],
