@@ -383,8 +383,7 @@ class InputProcess(Resource):
                 return errorReturn(4, args)
 
         for idx, val in enumerate(compId):
-            compId[idx] = fullName(val)
-            abbrevID.append(removeExchangeCode(asxNameToCodeFuzzy(fullName(val))))
+            abbrevID.append(removeExchangeCode(asxNameToCodeFuzzy(asxCodeToName(val))))
 
 
         for c in compId:
