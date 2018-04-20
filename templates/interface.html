@@ -4,11 +4,46 @@
     <!-- check the parameters passed, url includes the url and a note as to what happened, re includes the returned json (converted from json tho)-->
     <div class="container-fluid int-container">
     <h1 class="page-title" ></h1> 
-    <div class="guinote">{{url|safe}}</div>
-    <ul>
-    {% for field in re %}
-        <li>{{field}}</li>
-    {% endfor %}
-    </ul>
+    <div class="CL-body">
+    <table class="intTab">
+        <tr><td><div class="horizontal-scroll-wrapper"><div></div>
+        <div>
+            Notes: {{note}}<br>
+            Execution: {% if 'Developer Notes' in re %}
+                {{re['Developer Notes']['Execution Result'][0]}} 
+                {% if re['Developer Notes']['Execution Result'][0] == 'Error' %}
+                    , {{re['Developer Notes']['Execution Result'][1]}} 
+                {% endif %}
+            {% endif %}
+        </div>
+        {% for field in fav %}
+            <div>{{field['Headline']}}<br>
+            <a href="{{field['URL']}}"> Go to original article</a>
+            <form action="/newsapi/gui/remF" method = "GET|POST" >
+            <input type="radio" style="display:none;" name="article" value="{{field['URL']}}" checked>
+            <input type="submit" value="Remove Fav" class="btn btn-secondary remove">
+            </form>
+            </div>
+        
+        {% endfor %}
+        </div>
+        </td></tr>
+        <tr style="height:5vh;"><td>Requested Url: {{url}}</td></tr>
+        <tr><td>
+            <div class="horizontal-scroll-wrapper"> <div></div>
+            {% for field in re['NewsDataSet'] %}
+                <div>{{field['Headline']}}<br>
+                <a href="{{field['URL']}}"> Go to original article</a>
+                <form action="/newsapi/gui/addF" method = "GET|POST" >
+                <input type="radio" style="display:none;" name="article" value="{{field['URL']}}" checked>
+                <input type="submit" value="Add Fav" class="btn btn-secondary remove">
+                </form>
+                </div>
+                
+            {% endfor %}
+            </div>
+        </td></tr>
+    </table>
+    </div>
     </div>
 {% endblock %}

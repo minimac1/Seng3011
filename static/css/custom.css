@@ -8,15 +8,37 @@ body {
   font-family:"red serifs", serif;
 }
 
+.horizontal-scroll-wrapper {
+  width: 25vh;
+  height: 80vw;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transform: rotate(-90deg);
+  transform-origin: right top;
+  transform:rotate(-90deg) translateY(-25vh);
+}
+.horizontal-scroll-wrapper > div {
+  width: 21vh;
+  height: 200px;
+  transform: rotate(90deg);
+  transform-origin: right top;
+}
+
+.int-container{
+  border-style: solid;
+  border-width: 2px;
+  padding: 25px 30px 40px;
+  height:60vh;
+  overflow:auto;
+  margin-bottom:50px;
+}
 .guiTable{
   border:none;
   height:30vh;
   width:100%;
-  margin-bottom:2vh;
 }
 .guiIn{
-  height:25vh;
-  overflow:auto;
+  height:30vh;
 }
 .inTable { 
   margin-top:5px;
@@ -50,12 +72,7 @@ body {
   overflow:auto;
 }
 
-.int-container{
-  border-style: solid;
-  border-width: 2px;
-  padding: 25px 30px 40px;
-  height:50vh;
-}
+
 .CL-heading{
   font-size: 30px;
   line-height: 3;

@@ -34,7 +34,8 @@ def gui():
     tags = []
     response = ""
     url = ""
-    
+    note = ""
+    fav = []
     if 'guisDate' in session:
         sDate = session['guisDate']
     if 'guieDate' in session:
@@ -43,8 +44,9 @@ def gui():
         names = session['guicId']
     if 'guitags' in session:
         tags = session['guitags']
-        
-    return render_template('interface.html', url = url, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
+    if 'guifav' in session:
+        fav = session['guifav']
+    return render_template('interface.html', fav = fav, url = url, note=note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
 
 @application.route('/newsapi/gui/addD', methods=['GET','POST'])
 def addDate():
@@ -53,12 +55,14 @@ def addDate():
     names = []
     tags = []
     response = ""
-    
+    note = "Dates Added"
+    fav = []
     if 'guinames' in session:
         names = session['guinames']
     if 'guitags' in session:
         tags = session['guitags']
-        
+    if 'guifav' in session:
+        fav = session['guifav']
     new = request.args.get('startDate')
     if new !=  "":
         sDate = new
@@ -73,9 +77,10 @@ def addDate():
     
     if "http:" in url:
         response = requests.get(url).json()
-        url = "Requested Url = " + url
-     
-    return render_template('interface.html', url = url, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
+    else:
+        note = url
+        url = ""
+    return render_template('interface.html', fav = fav, url = url,note = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
     
 @application.route('/newsapi/gui/addC', methods=['GET','POST'])
 def addName():
@@ -84,7 +89,8 @@ def addName():
     names = []
     tags = []
     response = ""
-    
+    note = ""
+    fav = []
     if 'guisDate' in session:
         sDate = session['guisDate']
     if 'guieDate' in session:
@@ -93,21 +99,101 @@ def addName():
         names = session['guinames']
     if 'guitags' in session:
         tags = session['guitags']
+    if 'guifav' in session:
+        fav = session['guifav']
     new = request.args.get('companyId')
     
     note = "No name/Id entered"
     if new != "":
-        names.append(new)
-        session['guinames'] = names
-        note = "Company added"
+        new = new.rstrip().lstrip()
+        if re.match("[^\.\s\w]",new) or new.count('.')>1:
+            note = "Make sure you only enter characters or one '.' if you are using company Id's"
+        else:
+            names.append(new)
+            session['guinames'] = names
+            note = "Company added"
         
     url = getUrl()
     if "http:" in url:
         response = requests.get(url).json()
-        note += "</div><div class=\"CL-body\">Requested Url = " + url
+    else:
+        note = url
+        url = ""
+    return render_template('interface.html', url = url, fav = fav, note = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
     
-    return render_template('interface.html', url = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
+@application.route('/newsapi/gui/addF', methods=['GET','POST'])
+def addFav():
+    sDate = ""
+    eDate = ""
+    names = []
+    tags = []
+    response = ""
+    note = "Favourite added"
+    fav = []
+    if 'guisDate' in session:
+        sDate = session['guisDate']
+    if 'guieDate' in session:
+        eDate = session['guieDate']
+    if 'guinames' in session:
+        names = session['guinames']
+    if 'guitags' in session:
+        tags = session['guitags']
+    if 'guifav' in session:
+        fav = session['guifav']
+    new = request.args.get('article')
+    article={}
+        
+    url = getUrl()
+    if "http:" in url:
+        response = requests.get(url).json()
+    else:
+        note = url
+        url = ""
+    if new != "":
+        for art in response['NewsDataSet']:
+            if new in art['URL']:
+                article['URL'] = art['URL']
+                article['Headline'] = art['Headline']
+        fav.append(article)
+        session['guifav'] = fav
 
+    return render_template('interface.html', fav = fav, url = url, note = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
+
+@application.route('/newsapi/gui/remF', methods=['GET','POST'])
+def remFav():
+    sDate = ""
+    eDate = ""
+    names = []
+    tags = []
+    response = ""
+    note = "Favourite added"
+    fav = []
+    if 'guisDate' in session:
+        sDate = session['guisDate']
+    if 'guieDate' in session:
+        eDate = session['guieDate']
+    if 'guinames' in session:
+        names = session['guinames']
+    if 'guitags' in session:
+        tags = session['guitags']
+    if 'guifav' in session:
+        fav = session['guifav']
+    new = request.args.get('article')
+        
+    url = getUrl()
+    if "http:" in url:
+        response = requests.get(url).json()
+    else:
+        note = url
+        url = ""
+    if new != "":
+        for art in fav:
+            if new in art['URL']:
+                fav.remove(art)
+        session['guifav'] = fav
+
+    return render_template('interface.html', fav = fav, url = url, note = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
+    
 @application.route('/newsapi/gui/remC', methods=['GET','POST'])
 def remName():
     sDate = ""
@@ -115,6 +201,7 @@ def remName():
     names = []
     tags = []
     response = []
+    fav= []
     note = "Company removed"
     if 'guisDate' in session:
         sDate = session['guisDate']
@@ -124,7 +211,8 @@ def remName():
         names = session['guinames']
     if 'guitags' in session:
         tags = session['guitags']
-
+    if 'guifav' in session:
+        fav = session['guifav']
     new = request.args.get('companyId')
     
     if new != "":
@@ -134,9 +222,11 @@ def remName():
     url = getUrl()
     if "http:" in url:
         response = requests.get(url).json()
-        note += "</div><div class=\"CL-body\">Requested Url = " + url
+    else:
+        note = url
+        url = ""
     
-    return render_template('interface.html', url = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
+    return render_template('interface.html', url = url, fav = fav, note = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
     
 @application.route('/newsapi/gui/addT', methods=['GET','POST'])
 def addTopic():
@@ -145,6 +235,7 @@ def addTopic():
     names = []
     tags = []
     response = ""
+    fav = []
     
     if 'guisDate' in session:
         sDate = session['guisDate']
@@ -154,21 +245,29 @@ def addTopic():
         names = session['guinames']
     if 'guitags' in session:
         tags = session['guitags']
-
+    if 'guifav' in session:
+        fav = session['guifav']
+        
     new = request.args.get('topic')
     
     note = "No topic name entered"
     if new != "":
-        tags.append(new)
-        session['guitags'] = tags
-        note = "Topic added"
+        new = new.rstrip().lstrip() 
+        if re.match("[^\.\s\w]",new) or new.count('.')>1:
+            note= "Make sure you only enter characters for a topic"
+        else:
+            tags.append(new)
+            session['guitags'] = tags
+            note = "Topic added"
         
     url = getUrl()
     if "http:" in url:
         response = requests.get(url).json()
-        note += "</div><div class=\"CL-body\">Requested Url = " + url
+    else:
+        note = url
+        url = ""
     
-    return render_template('interface.html', url = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
+    return render_template('interface.html', fav = fav, url = url, note = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
 
 @application.route('/newsapi/gui/remT', methods=['GET','POST'])
 def remTopic():
@@ -177,6 +276,7 @@ def remTopic():
     names = []
     tags = []
     response = ""
+    fav = []
     note = "Topic removed"
     if 'guisDate' in session:
         sDate = session['guisDate']
@@ -186,7 +286,8 @@ def remTopic():
         names = session['guinames']
     if 'guitags' in session:
         tags = session['guitags']
-
+    if 'guifav' in session:
+        fav = session['guifav']
     new = request.args.get('topic')
     
     if new != "":
@@ -196,9 +297,11 @@ def remTopic():
     url = getUrl()
     if "http:" in url:
         response = requests.get(url).json()
-        note += "</div><div class=\"url\">Requested Url = " + url
+    else:
+        note = url
+        url = ""
     
-    return render_template('interface.html', url = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
+    return render_template('interface.html',fav = fav, url = url, note = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
     
 def getUrl():
     sDate = ""
@@ -223,10 +326,12 @@ def getUrl():
     if 'guitags' in session:
         tags = session['guitags']
     for name in names:
+        name = name.replace(" ","-")
         urlNames += name + "_"
     if urlNames is not "":
         urlNames = urlNames[:-1]
     for tag in tags:
+        tag = tag.replace(" ","-")
         urlTags += tag + "_"
     if urlTags is not "":
         urlTags = urlTags[:-1]
