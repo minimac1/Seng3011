@@ -3,35 +3,37 @@
     <div class="container-fluid CL-container">
     <h1 class="page-title" >Api Gui</h1> 
     <div class="CL-body">This gui has the ability to use all parameters of our Api. If you want to add any companies or topics to the parameters, 
-    you can do that by entering a single company or topic in the correlated textbox and clicking the "Add" button next to it. You must add dates and can
-     do that by selected a date for both start and end dates and then clicking "Go". The gui will then combine your parameters to create a valid api call 
-     and will return all the results below (Each article is represented as a headline and link the original article).<br></div>
+    you can do that by entering a single company or topic in the correlated textbox and clicking the "Add" button next to it. You can then remove any of them by clicking on the "X" button next to the name/topic in the added companies/topics list. You must add dates and can
+     do that by selected a date for both start and end dates and then clicking "Go". Our application will then combine your parameters (adding on "T00:00:00.000Z" to both dates) to create a valid api call 
+     and will return all the results (converted from JSON) below (Each article is represented as a headline and link the original article). For this gui you can also add/remove favourites which are stored in cookies.<br></div>
      <div style="margin-bottom:30px;"></div>
     <div class="CL-body">
     
     <table class="guiTable">
         <tr>
             <form action="/newsapi/gui/addC" method ="GET|POST" >
-            <td style="width:220px">Company names or Id: </td>
+            <td style="width:250px"><p style="font-size:25px;">Company names or Id: </p></td>
             <td style="width:330px"><input class="enterWord" type="text" name="companyId" placeholder="Enter a name or id of a company"></td>
             <td><input type="submit" value="Add" class="btn btn-secondary add"></form></td>
-            <td>Added Companies
+            <td><p style="font-size:25px;">Added Companies</p>
             </td>
-            <td>Added Topics
+            <td><p style="font-size:25px;">Added Topics<p>
             </td>
         </tr>
         <tr style="height:50px;overflow:auto;">
             <form action="/newsapi/gui/addT" method ="GET|POST" >
-            <td>Tags: </td>
+            <td><p style="font-size:25px;">Tags: </p></td>
             <td><input class="enterWord" type="text" name="topic" placeholder="Enter a topic"></td>
             <td><input type="submit" value="Add" class="btn btn-secondary add"></form></td>
             <td rowspan="3" ><div class="guiIn">
                 <ul style="list-style: none;">
                     {% for name in names %}
+                    <li style="margin: 10px 0;">
                     <form action="/newsapi/gui/remC" method = "GET|POST" >
                     {{name}}<input type="radio" style="display:none;" name="companyId" value="{{name}}" checked>
-                    <input type="submit" value="X" class="btn btn-secondary remove">
+                    <input type="submit" value="X" class="btn btn-secondary remove">                  
                     </form>
+                    </li>
                     {% endfor %}
                 </ul>
                 </div>
@@ -39,10 +41,12 @@
             <td rowspan="3"><div class="guiIn">
                 <ul style="list-style: none;">
                     {% for tag in tags %}
+                    <li style="margin: 10px 0;">
                     <form action="/newsapi/gui/remT" method = "GET|POST" >
                     {{tag}}<input type="radio" style="display:none;" name="topic" value="{{tag}}" checked>
                     <input type="submit" value="X" class="btn btn-secondary remove">
                     </form>
+                    </li>
                     {% endfor %}
                 </ul>
             </div>
@@ -50,12 +54,12 @@
         </tr>
         <tr>
             <form action="/newsapi/gui/addD" method ="GET|POST" >
-            <td>Start date: </td>
+            <td><p style="font-size:25px;">Start date: </p></td>
             <td><input class="date" type="date" name="startDate" placeholder="Start date" value = "{{sdate}}"></td>
             <td></td>
         </tr>
         <tr>
-            <td>End date: </td>
+            <td><p style="font-size:25px;">End date: </p></td>
             <td><input class="date" type="date" name="endDate" placeholder="End date" value = "{{edate}}"></td>
             <td><input type="submit" value="Go" class="btn btn-secondary Go"></form></td>
          </tr>

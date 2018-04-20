@@ -46,6 +46,8 @@ def gui():
         tags = session['guitags']
     if 'guifav' in session:
         fav = session['guifav']
+    if 'guinames' in session:
+        names = session['guinames']
     return render_template('interface.html', fav = fav, url = url, note=note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
 
 @application.route('/newsapi/gui/addD', methods=['GET','POST'])

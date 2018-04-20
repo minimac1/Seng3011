@@ -3,16 +3,15 @@
     <!-- this is the only part not finished yet ( and a description but thats just text)-->
     <!-- check the parameters passed, url includes the url and a note as to what happened, re includes the returned json (converted from json tho)-->
     <div class="container-fluid int-container">
-    <h1 class="page-title" ></h1> 
     <div class="CL-body">
-    <table class="intTab">
-        <tr><td><div class="horizontal-scroll-wrapper"><div></div>
+    <table>
+        <tr><td><div style="height:300px;"><div class="horizontal-scroll-wrapper squares">
         <div>
             Notes: {{note}}<br>
             Execution: {% if 'Developer Notes' in re %}
                 {{re['Developer Notes']['Execution Result'][0]}} 
-                {% if re['Developer Notes']['Execution Result'][0] == 'Error' %}
-                    , {{re['Developer Notes']['Execution Result'][1]}} 
+                {% if re['Developer Notes']['Execution Result'][0] == 'Error' %},
+                     {{re['Developer Notes']['Execution Result'][1]}} 
                 {% endif %}
             {% endif %}
         </div>
@@ -28,9 +27,9 @@
         {% endfor %}
         </div>
         </td></tr>
-        <tr style="height:5vh;"><td>Requested Url: {{url}}</td></tr>
-        <tr><td>
-            <div class="horizontal-scroll-wrapper"> <div></div>
+        <tr style="height:40px;width:100%;margin-bottom:30px;margin-top:10px;font-size:20px;border-width:1px 0px;border-style:dashed;"><td>Requested Url: {{url}}</td></tr>
+        <tr><td><div style="height:300px;">
+            <div class="horizontal-scroll-wrapper squares">
             {% for field in re['NewsDataSet'] %}
                 <div>{{field['Headline']}}<br>
                 <a href="{{field['URL']}}"> Go to original article</a>
@@ -41,7 +40,7 @@
                 </div>
                 
             {% endfor %}
-            </div>
+            </div></div>
         </td></tr>
     </table>
     </div>
