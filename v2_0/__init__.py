@@ -399,7 +399,7 @@ class InputProcess(Resource):
 
         for c in compCheck:
 
-            if not asxCheckValidFuzzy(c):
+            if not asxCheckValidFuzzy(c) or len(c) < 3:
                 return errorReturn(5, args)
 
             if checkIfCode(c):
