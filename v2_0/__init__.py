@@ -69,10 +69,20 @@ def parseJSON(jsonData, compNameList, params, execStartTime):
         devMessage = ": Guardian API returned no articles"
 
     execEndTime = datetime.datetime.now()
+    #re.sub(r'\.[0-9]+', '', args['startDate'] )
+    formatStartTime = re.sub(r'(\d{4}-\d{2}-\d{2})\s(\d{2}:\d{2}:\d{2}.\d{3})\d{3}',
+                      r'\1T\2Z',
+                      str(execStartTime))
+    formatEndTime = re.sub(r'(\d{4}-\d{2}-\d{2})\s(\d{2}:\d{2}:\d{2}.\d{3})\d{3}',
+                      r'\1T\2Z',
+                      str(execEndTime))
+    formatDifTime = re.sub(r'(\d+:\d{2}:\d{2}.\d{3})\d{3}',
+                      r'T\1Z',
+                      str(execEndTime-execStartTime))
     logOutput = {'Parameters passed' : str(params),
                 'Execution Result' :
-                    ["Successful" + devMessage, str(execStartTime),
-                    str(execEndTime),  str(execEndTime-execStartTime)]
+                    ["Successful" + devMessage, formatStartTime,
+                    formatEndTime, formatDifTime]
                 }
 
     data = {'Developer Notes' : logOutput,
