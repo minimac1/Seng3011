@@ -245,6 +245,20 @@ def asxNameToCodeFuzzy(thingToCheck):
                 return company["Symbol"]+"."+end
     return thingToCheck
 
+def codeToFullCode(input):
+    companyDict = openAllCompanyLists()
+    # check if it ends in an exchange code
+    for end in getExchanges(True):
+        if input.endswith(end):
+            for company in companyDict[end[1:]]:
+                if removeExchangeCode(input) == company["Symbol"].upper():
+                    return input
+    # check all exchanges
+    for end in getExchanges(False):
+        for item in companyDict[end]:
+            if(removeExchangeCode(input) == item["Symbol"].upper()):
+                return input + '.' + end
+    return input
 
 # Each entry in the dictionary corresponds to the error code required
 def errorReturn(errorCode,params):
@@ -389,7 +403,7 @@ class InputProcess(Resource):
                 return errorReturn(5, args)
 
             if checkIfCode(c):
-                print("hi")
+                compId.append(codeToFullCode(c))
             else:
                 compId.append(asxNameToCodeFuzzy(c))
                 print(asxNameToCodeFuzzy(c))
