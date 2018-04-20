@@ -251,13 +251,13 @@ def codeToFullCode(input):
     for end in getExchanges(True):
         if input.endswith(end):
             for company in companyDict[end[1:]]:
-                if removeExchangeCode(input) == company["Symbol"].upper():
-                    return input
+                if removeExchangeCode(input).upper() == company["Symbol"].upper():
+                    return input.upper()
     # check all exchanges
     for end in getExchanges(False):
         for item in companyDict[end]:
-            if(removeExchangeCode(input) == item["Symbol"].upper()):
-                return input + '.' + end
+            if(removeExchangeCode(input).upper() == item["Symbol"].upper()):
+                return input.upper() + '.' + end
     return input
 
 # Each entry in the dictionary corresponds to the error code required
@@ -392,7 +392,8 @@ class InputProcess(Resource):
 
         for c in comp:
             a = c.replace("-", " ")
-            compCheck.append(a)
+            b = a.upper()
+            compCheck.append(b)
 
         #converting InstrumentIDs to companyId
         #also checking for valid InstrumentIDs
