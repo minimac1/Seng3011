@@ -255,8 +255,8 @@ def addTopic():
     note = "No topic name entered"
     if new != "":
         new = new.rstrip().lstrip() 
-        if re.match("[^\.\s\w]",new) or new.count('.')>1:
-            note= "Make sure you only enter characters for a topic"
+        if re.match("[^\s\w\"]",new) or new.count('.')>1:
+            note= "Make sure you only enter characters for a topic or quotation marks for phrases"
         else:
             tags.append(new)
             session['guitags'] = tags

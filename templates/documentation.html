@@ -6,6 +6,7 @@
             <div class="CL-heading">Endpoint URL</div>
             <ul>
                 <li>http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query?</li>
+                <li>Change first version number to access older versions of our api</li>
             </ul>
             <div class="CL-heading">Parameters</div>
             <div class="CL-body">
@@ -35,37 +36,51 @@
                         <td>companyID</td>
                         <td>Company/ies of which you would like to search for related news. </td>
                         <td>String</td>
-                        <td>Either ASX ID e.g. WOW.AX or full name e.g. Woolworths. Note it is not necessary to add the suffix '.AX' to ASX ID's. Replace all spaces with '-' and seperate multiple companies with '_'. This field can be left blank. If you do not fully spell a companies name, we will guess a company that contains the same text.</td>
+                        <td>Either enter the full name of a company or its code followed by the relevant exchange*. Replace all spaces with '-' and seperate multiple companies with '_'. This field can be left blank. If you do not fully spell a companies name, we will guess a company that contains the same text.</td>
 
                     </tr>
                     <tr>
                         <td>topic</td>
                         <td>Topics of which you would like to search for related news. Can also enclose phrases in quotation marks to add articles that include that phrase</td>
                         <td>String</td>
-                        <td>Topic names or phrases as strings. Replace all spaces with '-' and seperate multiple topics with '_'. This field can be left blank.</td>
+                        <td>Topic names or phrases as strings. Replace all spaces with '-' and seperate multiple topics with '_'. Contain any phrases in quotation marks to make sure the phrase is in the article. This field can be left blank.</td>
 
                     </tr>
                 </table>
-                <div style="display:block">Example valid URL: http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query?startDate=2015-08-24T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=CBA.AX&topic="apple-pay"</div>
+                <div style="display:block">Currently accepted exchanges are:
+                    <ul style="list-style: none;">
+                        <li> Australian Stock Exchange 'AX'</li>
+                        <li> Euro Next Stock Exchange 'EUX'</li>
+                        <li> London Stock Exchange 'LSE'</li>
+                        <li> New York Stock Exchange 'NYSE'</li>
+                        <li> Shangehai Stock Exchange 'SSX'</li>
+                        </ul>
+                    </div>
+                <div style="display:block">Example valid URL: http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query?startDate=2015-08-24T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=CBA.AX&topic=apple-pay</div>
             </div>
             <div class="CL-heading">Example successful response</div>
 
                     Searching for articles about the new apple pay system so we decide to include apple-pay in the topic and a local bank, lets say Commonwealth Bank(CBA).
                     <pre><code>
-url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query?startDate=2015-08-24T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=CBA.AX&topic="apple-pay""
+url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query?startDate=2015-08-24T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=CBA.AX&topic=apple-pay"
 
 
 result:
 {
-    "Log Output": {"Developer Team": "Team Turtle", "Module Name": "News API", "API Version": "v2.0",
-    "Parameters passed": "{'startDate': '2015-08-24T09:45:31.235Z', 'endDate': '2017-09-24T09:45:31.235Z', 'companyId': 'CBA.AX', 'topic': '\"apple-pay\"'}",
-    "Execution Result": ["Successful", "2018-03-30T10:29:00.112Z", "2018-03-30T10:29:01.605Z", "T0:00:01.493Z"]},
+    
+    "Developer Notes": {
+        "Developer Team": "Team Turtle", 
+        "Module Name": "News API", 
+        "API Version": "v2.0", 
+        "Parameters passed": "{'startDate': '2015-08-24T09:45:31.235Z', 'endDate': '2017-09-24T09:45:31.235Z', 'companyId': 'CBA.AX', 'topic': 'apple-pay'}", 
+        "Execution Result": ["Successful", "2018-04-20T10:40:07.288Z", "2018-04-20T10:40:08.999Z", "T0:00:01.711Z"]},
     "NewsDataSet": [{
-        "InstrumentIDs": ["CBA"],
-        "CompanyNames": ["COMMONWEALTH BANK OF AUSTRALIA."],
-        "TimeStamp": "2017-03-31T01:28:26Z",
-        "Headline": "Apple Pay: Australian banks not allowed to negotiate collectively",
-        "NewsText": "Australia\u2019s competition regulator has rejected a request by four banks that they be allowed to collectively bargain with Apple..."}]
+        "URL": "https://www.theguardian.com/australia-news/2017/aug/08/commonwealth-bank-axes-executive-bonuses-over-money-laundering-scandal", 
+        "InstrumentIDs": ["CBA.AX"], 
+        "CompanyNames": ["COMMONWEALTH BANK OF AUSTRALIA."], 
+        "TimeStamp": "2017-08-08T02:17:51Z", 
+        "Headline": "Commonwealth Bank axes executive bonuses over money-laundering scandal", 
+        "NewsText": "The Commonwealth Bank has axed senior executive bonuses in response to a scandal around money laundering and a lawsuit by Australia..."}]
 }
 
 
@@ -79,7 +94,7 @@ This is the only first article that is returned.
                         <td>Field</td><td>Description</td><td>Type</td>
                     </tr>
                     <tr>
-                        <td>Log Output</td><td>Contains Developer Team, Module Name, API Version, Parameters Passed and Execution Result. Each field is written below. </td><td>Record</td>
+                        <td>Developer Notes</td><td>Contains Developer Team, Module Name, API Version, Parameters Passed and Execution Result. Each field is written below. </td><td>Record</td>
                     </tr>
                     <tr>
                         <td>Developer Team</td><td>Our team name.</td><td>String</td>
@@ -94,10 +109,13 @@ This is the only first article that is returned.
                         <td>Execution Result</td><td> Whether the API call was successful or not. If success, includes executation start and end times and elapsed time. If not includes the error that occured.</td><td>List of Strings</td>
                     </tr>
                     <tr>
-                        <td>NewsDataSet</td><td>contains InstrumentIDs, CompanyNames, TimeStamp, Headline and NewsText. Each field is written below</td><td>Record</td>
+                        <td>NewsDataSet</td><td>contains URL, InstrumentIDs, CompanyNames, TimeStamp, Headline and NewsText. Each field is written below</td><td>Record</td>
                     </tr>
                     <tr>
-                        <td>InstrumentIDs</td><td> InstrumentID (ASX code) of the companie/s for the matched article.</td><td>List of Strings</td>
+                        <td>URL</td><td>Contains a url for the original article</td><td>String</td>
+                    </tr>
+                    <tr>
+                        <td>InstrumentIDs</td><td> InstrumentID of the companie/s for the matched article.</td><td>List of Strings</td>
                     </tr>
                     <tr>
                         <td>CompanyNames</td><td> Name/s of the company/ies for the matched article.</td><td>List of Strings</td>
@@ -131,19 +149,19 @@ url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/q
 
 result:
 {
-    "Log Output": {
-        "Developer Team": "Team Turtle",
-        "Module Name": "News API version 1.0",
-        "API Version": "v2.0",
-        "Parameters passed": "{'startDate': '2015-08-24T09:45:31.235Z', 'endDate': '2015-08-25T09:50:21.222Z', 'companyId': None, 'topic': None
-    }",
-    "Execution Result": ["Successful", "2018-03-30T05:41:24.020Z", "2018-03-30T05:41:30.520Z", "T0:00:06.499Z"]},
+    "Developer Notes": {
+        "Developer Team": "Team Turtle", 
+        "Module Name": "News API", 
+        "API Version": "v2.0", 
+        "Parameters passed": "{'startDate': '2015-08-24T09:45:31.235Z', 'endDate': '2015-08-25T09:50:21.222Z', 'companyId': None, 'topic': None}", 
+        "Execution Result": ["Successful", "2018-04-20T10:41:05.224Z", "2018-04-20T10:41:13.553Z", "T0:00:08.329Z"]},
     "NewsDataSet": [{
-        "InstrumentIDs": [],
-        "CompanyNames": [],
-        "TimeStamp": "2015-08-25T09:41:35Z",
-        "Headline": "Citizenfour director to preview Assange documentary at New York film festival",
-        "NewsText": "Oscar-winning director Laura Poitras is to focus on controversial WikiLeaks co-founder Julian Assange..."}]
+        "URL": "https://www.theguardian.com/sport/live/2015/aug/24/county-cricket-live-blog-sussex-yorkshire-somerset-worcestershire", 
+        "InstrumentIDs": [], 
+        "CompanyNames": [], 
+        "TimeStamp": "2015-08-24T13:23:34Z", 
+        "Headline": "County cricket \u2013 as it didn't happen", 
+        "NewsText": "Somerset captain Marcus Trescothick was in a resigned mood after the match against Worcestershire was abandoned as a draw without a ball bowled on the final day. He said: \u201cGaining points..."}]
     }
 
                 </code></pre>
