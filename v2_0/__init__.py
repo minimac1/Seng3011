@@ -199,6 +199,22 @@ def asxCodeToName(thingToCheck):
                     return company["Company name"]
     return thingToCheck
 
+def checkIfCode(thingToCheck):
+    companyDict = openAllCompanyLists()
+    # check if it ends in an exchange code
+    for end in getExchanges(True):
+        if thingToCheck.endswith(end):
+            for company in companyDict[end[1:]]:
+                if removeExchangeCode(thingToCheck) == company["Symbol"].upper():
+                    return True
+
+    # check all exchanges
+    if(not (" " in thingToCheck or "." in thingToCheck)):
+        for end in getExchanges(False):
+            for company in companyDict[end]:
+                if removeExchangeCode(thingToCheck) == company["Symbol"].upper():
+                    return True
+    return False
 
 # Returns the ASX code of a company from its full name, if not in our database then returns the input given
 def asxNameToCode(thingToCheck):
@@ -358,33 +374,39 @@ class InputProcess(Resource):
         compId = []
         compIdTemp = []
         topicTemp = []
+        compCheck = []
 
         for c in comp:
             a = c.replace("-", " ")
-            compId.append(a)
+            compCheck.append(a)
 
         #converting InstrumentIDs to companyId
         #also checking for valid InstrumentIDs
-        i = 0;
-        while i < len(compId):
-            if (re.match(r'.*\.AX$',compId[i])): # JUST WANT TO ASK, SHUD THIS BE .AX$ SO THAT IT MAKES SURE THERE IS NOTHING AFTER
-                print(compId[i])
-                if not asxCheckValid(compId[i]):
-                    return errorReturn(5, args)
-                compId[i] = asxCodeToName(compId[i])
 
-            i=i+1
+        for c in compCheck:
+
+            if not asxCheckValidFuzzy(c):
+                return errorReturn(5, args)
+
+            if checkIfCode(c):
+                print("hi")
+            else:
+                compId.append(asxNameToCodeFuzzy(c))
+                print(asxNameToCodeFuzzy(c))
+
 
         #check if company exists
         abbrevID = []
-        for c in compId:
-            if not asxCheckValid(c):
-                print(c)
-                return errorReturn(4, args)
+        compName = []
 
         for idx, val in enumerate(compId):
             abbrevID.append(removeExchangeCode(asxNameToCodeFuzzy(asxCodeToName(val))))
+            compName.append(csvRemoveTails(asxCodeToName(val)))
 
+        for c in compName:
+            a = c.replace(" ", "%20")
+            a = '\"' + a + '\"'
+            compIdTemp.append(a)
 
         for c in compId:
             a = c.replace(" ", "%20")
@@ -436,7 +458,7 @@ class InputProcess(Resource):
         #print(response.url) #to see the url call to the api to make sure its correct
         #print(response.text)
         # if you get to this point, there should be no errors
-        return parseJSON(resultsList, compId, args, execStartTime)
+        return parseJSON(resultsList, compName, args, execStartTime)
 
 # add a rule for the index page.
 #application.add_url_rule('/', 'index', (lambda: base()))
