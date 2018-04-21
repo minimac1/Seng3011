@@ -396,7 +396,7 @@ class InputProcess(Resource):
         for c in comp:
             c = c.rstrip('-')
             c = c.lstrip('-')
-            if re.search("[^\.\-\w]",c) is not None or c.count('.')>1 or "--" in c:
+            if re.search("[^\.\-\w]",c) is not None or c.count('.')>1 or "--" in c or c is "":
                 return errorReturn(12,args)
             a = c.replace("-", " ")
             b = a.upper()
@@ -443,7 +443,7 @@ class InputProcess(Resource):
         for c in topics:
             c = c.rstrip('-')
             c = c.lstrip('-')
-            if re.search("[^\"\-\w]",c) is not None or c.count('\"')==1 or c.count('\"') > 2 or c is "\"\"" or "--" in c:
+            if re.search("[^\"\-\w]",c) is not None or c.count('\"')==1 or c.count('\"') > 2 or c is "\"\"" or "--" in c or c is "":
                 return errorReturn(13,args)
             a = c.replace("-", "%20")
             topicTemp.append(a)
