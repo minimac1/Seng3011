@@ -274,6 +274,8 @@ def errorReturn(errorCode,params):
         9 : "startDate is invalid format",
         10 : "endDate is invalid format",
         11 : "Please eneter date before or equal to current date"
+        12 : "Invalid character in companyId"
+        13 : "Invalid character in topics"
     }
 
     output_fields = {}
@@ -389,8 +391,11 @@ class InputProcess(Resource):
         compIdTemp = []
         topicTemp = []
         compCheck = []
+        
 
         for c in comp:
+            if re.search("[^\.\s\w]",c) is not None or c.count('.')>1:
+                return errorReturn(12,args)
             a = c.replace("-", " ")
             b = a.upper()
             compCheck.append(b)
@@ -434,6 +439,8 @@ class InputProcess(Resource):
             compIdTemp.append(a)
 
         for c in topics:
+            if re.search("[^\"\s\w]",c) is not None or c.count('\"')==1 or c.count('\"') > 2 or c is "\"\"":
+                return errorReturn(13,args)
             a = c.replace("-", "%20")
             topicTemp.append(a)
 
