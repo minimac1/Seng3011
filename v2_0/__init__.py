@@ -394,6 +394,8 @@ class InputProcess(Resource):
         
 
         for c in comp:
+            c = c.rstrip()
+            c = c.lstrip()
             if re.search("[^\.\s\w]",c) is not None or c.count('.')>1:
                 return errorReturn(12,args)
             a = c.replace("-", " ")
@@ -439,6 +441,8 @@ class InputProcess(Resource):
             compIdTemp.append(a)
 
         for c in topics:
+            c = c.rstrip()
+            c = c.lstrip()
             if re.search("[^\"\s\w]",c) is not None or c.count('\"')==1 or c.count('\"') > 2 or c is "\"\"":
                 return errorReturn(13,args)
             a = c.replace("-", "%20")
