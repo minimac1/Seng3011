@@ -273,8 +273,8 @@ def errorReturn(errorCode,params):
         8 : "You entered an invalid character", #not used atm
         9 : "startDate is invalid format",
         10 : "endDate is invalid format",
-        11 : "Please eneter date before or equal to current date"
-        12 : "Invalid character in companyId"
+        11 : "Please eneter date before or equal to current date",
+        12 : "Invalid character in companyId",
         13 : "Invalid character in topics"
     }
 
@@ -394,9 +394,9 @@ class InputProcess(Resource):
         
 
         for c in comp:
-            c = c.rstrip()
-            c = c.lstrip()
-            if re.search("[^\.\-\w]",c) is not None or c.count('.')>1:
+            c = c.rstrip('-')
+            c = c.lstrip('-')
+            if re.search("[^\.\-\w]",c) is not None or c.count('.')>1 or "--" in c:
                 return errorReturn(12,args)
             a = c.replace("-", " ")
             b = a.upper()
@@ -441,9 +441,9 @@ class InputProcess(Resource):
             compIdTemp.append(a)
 
         for c in topics:
-            c = c.rstrip()
-            c = c.lstrip()
-            if re.search("[^\"\-\w]",c) is not None or c.count('\"')==1 or c.count('\"') > 2 or c is "\"\"":
+            c = c.rstrip('-')
+            c = c.lstrip('-')
+            if re.search("[^\"\-\w]",c) is not None or c.count('\"')==1 or c.count('\"') > 2 or c is "\"\"" or "--" in c:
                 return errorReturn(13,args)
             a = c.replace("-", "%20")
             topicTemp.append(a)
