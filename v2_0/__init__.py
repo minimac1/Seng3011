@@ -275,7 +275,9 @@ def errorReturn(errorCode,params):
         10 : "endDate is invalid format",
         11 : "Please eneter date before or equal to current date",
         12 : "Invalid character in companyId",
-        13 : "Invalid character in topics"
+        13 : "Invalid character in topics",
+        14 : "You have entered an empty companyId",
+        15 : "You have entered an empty topic"
     }
 
     output_fields = {}
@@ -398,6 +400,8 @@ class InputProcess(Resource):
             c = c.lstrip('-')
             if re.search("[^\.\-\w]",c) is not None or c.count('.')>1 or "--" in c or c is "":
                 return errorReturn(12,args)
+            if c is "":
+                return errorReturn(14,args)
             a = c.replace("-", " ")
             b = a.upper()
             compCheck.append(b)
@@ -443,8 +447,10 @@ class InputProcess(Resource):
         for c in topics:
             c = c.rstrip('-')
             c = c.lstrip('-')
-            if re.search("[^\"\-\w]",c) is not None or c.count('\"')==1 or c.count('\"') > 2 or c is "\"\"" or "--" in c or c is "":
+            if re.search("[^\"\-\w]",c) is not None or c.count('\"')==1 or c.count('\"') > 2 or c is "\"\"" or "--" in c:
                 return errorReturn(13,args)
+            if c is "":
+                return errorReturn(15,args)
             a = c.replace("-", "%20")
             topicTemp.append(a)
 
