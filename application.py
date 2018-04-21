@@ -108,8 +108,10 @@ def addName():
     note = "No name/Id entered"
     if new != "":
         new = new.rstrip().lstrip()
-        if re.match("[^\.\s\w]",new) or new.count('.')>1:
+        if re.search("[^\.\s\w]",new) is not None:
             note = "Make sure you only enter characters or one '.' if you are using company Id's"
+        elif new.count('.')>1:
+            note = "Make sure you only enter one '.'"
         else:
             names.append(new)
             session['guinames'] = names
@@ -119,7 +121,7 @@ def addName():
     if "http:" in url:
         response = requests.get(url).json()
     else:
-        note = url
+        #note = url
         url = ""
     return render_template('interface.html', url = url, fav = fav, note = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
     
@@ -149,7 +151,6 @@ def addFav():
     if "http:" in url:
         response = requests.get(url).json()
     else:
-        note = url
         url = ""
     if new != "":
         for art in response['NewsDataSet']:
@@ -186,7 +187,6 @@ def remFav():
     if "http:" in url:
         response = requests.get(url).json()
     else:
-        note = url
         url = ""
     if new != "":
         for art in fav:
@@ -225,7 +225,6 @@ def remName():
     if "http:" in url:
         response = requests.get(url).json()
     else:
-        note = url
         url = ""
     
     return render_template('interface.html', url = url, fav = fav, note = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
@@ -255,8 +254,12 @@ def addTopic():
     note = "No topic name entered"
     if new != "":
         new = new.rstrip().lstrip() 
-        if re.match("[^\s\w\"]",new) or new.count('.')>1:
+        if re.search("[^\s\w\"]",new) is not None:
             note= "Make sure you only enter characters for a topic or quotation marks for phrases"
+        elif new.count('\"') == 1:
+            note= "You may missed a quotation mark"
+        elif new.count('\"') > 2:
+            note= "You may more quotation marks than intended"
         else:
             tags.append(new)
             session['guitags'] = tags
@@ -266,7 +269,6 @@ def addTopic():
     if "http:" in url:
         response = requests.get(url).json()
     else:
-        note = url
         url = ""
     
     return render_template('interface.html', fav = fav, url = url, note = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
@@ -300,7 +302,6 @@ def remTopic():
     if "http:" in url:
         response = requests.get(url).json()
     else:
-        note = url
         url = ""
     
     return render_template('interface.html',fav = fav, url = url, note = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
