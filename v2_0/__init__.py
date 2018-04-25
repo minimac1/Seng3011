@@ -273,7 +273,7 @@ def errorReturn(errorCode,params):
         8 : "You entered an invalid character", #not used atm
         9 : "startDate is invalid format",
         10 : "endDate is invalid format",
-        11 : "Please eneter date before or equal to current date",
+        11 : "Please enter date before or equal to current date",
         12 : "Invalid character in companyId",
         13 : "Invalid character in topics",
         14 : "You have entered an empty companyId",
