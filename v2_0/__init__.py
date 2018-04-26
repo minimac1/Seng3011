@@ -412,7 +412,10 @@ class InputProcess(Resource):
         for c in compCheck:
 
             if not asxCheckValidFuzzy(c) or len(c) < 3:
-                return errorReturn(5, args)
+                if re.search(r'.AX|.NASDAQ|.EUX|.LSE|.NYSE|.SSX',c):
+                    return errorReturn(5, args)
+                else:
+                    return errorReturn(4, args)
 
             ch = removeExchangeCode(c);
             if len(ch) < 3:
