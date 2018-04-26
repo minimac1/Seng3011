@@ -1,0 +1,44 @@
+TestID,Description,startDate,endDate,companyID,topic,expected return
+0,Just date,2018-04-18T00:00:00.000Z,2018-04-18T05:00:00.000Z,,,successful API call
+1,1 company name,2017-11-24T09:45:31.235Z,2018-04-19T00:00:00.000Z,WOOLWORTHS-GROUP-LIMITED,,successful API call
+2,2 company names,2017-11-24T09:45:31.235Z,2018-04-19T00:00:00.000Z,WOOLWORTHS-GROUP-LIMITED_COMMONWEALTH-BANK-OF-AUSTRALIA,,successful API call
+3,1 company id,2018-02-24T09:45:31.235Z,2018-04-19T00:00:00.000Z,ANZ.AX,,successful API call
+4,2 company id,2018-02-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,ANZ.AX_CBA.AX,,successful API call
+5,1 company name & 1 company id,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,ANZ.AX_COMMONWEALTH-BANK-OF-AUSTRALIA,,successful API call
+6,same company name and Id,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,CBA.AX_COMMONWEALTH-BANK-OF-AUSTRALIA,,successful API call
+7,abreviation of company name,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,ANZ,,successful API call
+8,abreviation of company name2,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,NAB,,successful API call
+9,Empty start date,,2018-04-19T00:00:00.000Z,,,invalid Date
+10,Empty end date,2018-04-19T00:00:00.000Z,,,,invalid Date
+11,Date from long time ago,0001-03-18T00:00:00.000Z,0001-04-19T00:00:00.000Z,,,successful API call
+12,Date in the future,2118-03-18T00:00:00.000Z,2118-04-19T00:00:00.000Z,,,invalid Date
+13,Start date after end date,2118-04-20T00:00:00.000Z,2118-04-19T00:00:00.000Z,,,invalid Date
+14,Invalid company name1,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,This_Doesn't_Exist,,invalid Company
+15,Invalid company name2,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,asdasfasdad,,invalid Company
+16,Invalid company name 3,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,COMMMONWEALTH-BANK-OF-AUSTRALIE,,invalid Company
+17,Invalid id1,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,TDE.AX,,invalid Company
+18,Invalid id2,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,AN.AX,,invalid Company
+19,Invalid id3,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,CTASGA.AX,,invalid Company
+20,Invalid date format,09/04/2018T00:00:00.000Z,10/04/2018T00:00:00.000Z,,,invalid Date
+21,Invalid date format2,2017-13-05T00:00:00.000Z,2017-14-05T00:00:00.000Z,,,invalid Date
+22,Invalid date format3,2018-03-05L00:00:00.000Z,2018-03-06T00:00:00.000Z,,,invalid Date
+23,Invalid date format4,2018-03-05T00:00:00.000Z,2018-03-06T00:00:00.000u,,,invalid Date
+24,Invalid date format5,2018-03-05L00:00:00.000Z,2018-03-06T99:00:00.000Z,,,invalid Date
+25,Invalid date format6,2018-03-05L00:00:00.000Z,2018-03-06T09:00:00.123123Z,,,invalid Date
+26,Invalid character name1,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,W00LWORTHS-GR0UP-LIMITED,,invalid Company
+27,Invalid character name2,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,WOOLWORTHS/GROUP-LIMITED,,invalid Company
+28,Invalid character name3,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,WOOLWORTHS-GROUP-LIMITE?,,invalid Company
+29,Invalid id4,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,ANZ..AX,,invalid Company
+30,Invalid id5,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,"ANZ,AX",,invalid Company
+31,Invalid id6,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,ANZ.XX,,invalid Company
+32,1 topic 1 id,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,ANZ.AX,Money,successful API call
+33,1 topic 1 id 1 name,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,ANZ.AX_COMMONWEALTH-BANK-OF-AUSTRALIA,Money,successful API call
+34,2 topic 1 id 1 name,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,ANZ.AX_COMMONWEALTH-BANK-OF-AUSTRALIA,Money_Banks,successful API call
+35,1 topic,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,,Money,successful API call
+36,1 topic,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,,Money,successful API call
+37,1 topic multiple words,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,,Apple-Pay,successful API call
+38,2 topic,2018-04-15T00:00:00.000Z,2018-04-19T00:00:00.000Z,,Money_Banks,successful API call
+39,Instrument Id lower case,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,nab.ax,,successful API call
+40,Instrument Id lower case2,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,anz.ax_COMMONWEALTH-BANK-OF-AUSTRALIA,,successful API call
+41,lower case company name,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,commonwealth-bank-of-australia,,successful API call
+42,lower case company name2,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,qantas,,successful API call
