@@ -5,13 +5,13 @@
         <div class="CL-body">
             <div class="CL-heading">Endpoint URL</div>
             <ul>
-                <li>http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query?</li>
+                <li>http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?</li>
                 <li>Change first version number to access older versions of our api</li>
                 <li>Latest is currently 3.0 (so far only includes bug fixes, documentation same as 2.0)</li>
             </ul>
             <div class="CL-heading">Parameters</div>
             <div class="CL-body">
-                Example blank url: http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query?startDate=BLANK&endDate=BLANK&companyId=BLANK&topic=BLANK
+                Example blank url: http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=BLANK&endDate=BLANK&companyId=BLANK&topic=BLANK
                 <div>Replace each BLANK with an accepted value for the parameter.</div>
                 <table class="inTable">
                     <tr>
@@ -57,30 +57,30 @@
                         <li> Shangehai Stock Exchange 'SSX'</li>
                         </ul>
                     </div>
-                <div style="display:block">Example valid URL: http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query?startDate=2015-08-24T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=CBA.AX&topic=apple-pay</div>
+                <div style="display:block">Example valid URL: http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=2015-08-24T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=CBA.AX&topic=apple-pay</div>
             </div>
             <div class="CL-heading">Example successful response</div>
 
                     Searching for articles about the new apple pay system so we decide to include apple-pay in the topic and a local bank, lets say Commonwealth Bank(CBA).
                     <pre><code>
-url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query?startDate=2015-08-24T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=CBA.AX&topic=apple-pay"
+url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=2015-08-24T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=CBA.AX&topic=apple-pay"
 
 
 result:
 {
-    
+
     "Developer Notes": {
-        "Developer Team": "Team Turtle", 
-        "Module Name": "News API", 
-        "API Version": "v2.0", 
-        "Parameters passed": "{'startDate': '2015-08-24T09:45:31.235Z', 'endDate': '2017-09-24T09:45:31.235Z', 'companyId': 'CBA.AX', 'topic': 'apple-pay'}", 
+        "Developer Team": "Team Turtle",
+        "Module Name": "News API",
+        "API Version": "v3.0",
+        "Parameters passed": "{'startDate': '2015-08-24T09:45:31.235Z', 'endDate': '2017-09-24T09:45:31.235Z', 'companyId': 'CBA.AX', 'topic': 'apple-pay'}",
         "Execution Result": ["Successful", "2018-04-20T10:40:07.288Z", "2018-04-20T10:40:08.999Z", "T0:00:01.711Z"]},
     "NewsDataSet": [{
-        "URL": "https://www.theguardian.com/australia-news/2017/aug/08/commonwealth-bank-axes-executive-bonuses-over-money-laundering-scandal", 
-        "InstrumentIDs": ["CBA.AX"], 
-        "CompanyNames": ["COMMONWEALTH BANK OF AUSTRALIA."], 
-        "TimeStamp": "2017-08-08T02:17:51Z", 
-        "Headline": "Commonwealth Bank axes executive bonuses over money-laundering scandal", 
+        "URL": "https://www.theguardian.com/australia-news/2017/aug/08/commonwealth-bank-axes-executive-bonuses-over-money-laundering-scandal",
+        "InstrumentIDs": ["CBA.AX"],
+        "CompanyNames": ["COMMONWEALTH BANK OF AUSTRALIA."],
+        "TimeStamp": "2017-08-08T02:17:51Z",
+        "Headline": "Commonwealth Bank axes executive bonuses over money-laundering scandal",
         "NewsText": "The Commonwealth Bank has axed senior executive bonuses in response to a scandal around money laundering and a lawsuit by Australia..."}]
 }
 
@@ -134,36 +134,36 @@ This is the only first article that is returned.
                 <div class="CL-heading">Other examples</div>
                 This example contains no parameters and should return an error
                 <pre><code>
-url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query?"
+url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?"
 
 result:
 {
     "Developer Notes": {
         "Developer Team": "Team Turtle",
         "Module Name": "News API",
-        "API Version": "v2.0",
+        "API Version": "v3.0",
         "Parameters passed": "{'startDate': None, 'endDate': None, 'companyId': None, 'topic': None}",
         "Execution Result": ["Error", "startDate is empty"]}
 }
                 </code></pre>
                 We want to know everything that happened on a specific day, so we just include the date and nothing else. Be careful because broad requests will take a very long time.
                 <pre><code>
-url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query?startDate=2015-08-24T09:45:31.235Z&endDate=2015-08-25T09:50:21.222Z"
+url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=2015-08-24T09:45:31.235Z&endDate=2015-08-25T09:50:21.222Z"
 
 result:
 {
     "Developer Notes": {
-        "Developer Team": "Team Turtle", 
-        "Module Name": "News API", 
-        "API Version": "v2.0", 
-        "Parameters passed": "{'startDate': '2015-08-24T09:45:31.235Z', 'endDate': '2015-08-25T09:50:21.222Z', 'companyId': None, 'topic': None}", 
+        "Developer Team": "Team Turtle",
+        "Module Name": "News API",
+        "API Version": "v3.0",
+        "Parameters passed": "{'startDate': '2015-08-24T09:45:31.235Z', 'endDate': '2015-08-25T09:50:21.222Z', 'companyId': None, 'topic': None}",
         "Execution Result": ["Successful", "2018-04-20T10:41:05.224Z", "2018-04-20T10:41:13.553Z", "T0:00:08.329Z"]},
     "NewsDataSet": [{
-        "URL": "https://www.theguardian.com/sport/live/2015/aug/24/county-cricket-live-blog-sussex-yorkshire-somerset-worcestershire", 
-        "InstrumentIDs": [], 
-        "CompanyNames": [], 
-        "TimeStamp": "2015-08-24T13:23:34Z", 
-        "Headline": "County cricket \u2013 as it didn't happen", 
+        "URL": "https://www.theguardian.com/sport/live/2015/aug/24/county-cricket-live-blog-sussex-yorkshire-somerset-worcestershire",
+        "InstrumentIDs": [],
+        "CompanyNames": [],
+        "TimeStamp": "2015-08-24T13:23:34Z",
+        "Headline": "County cricket \u2013 as it didn't happen",
         "NewsText": "Somerset captain Marcus Trescothick was in a resigned mood after the match against Worcestershire was abandoned as a draw without a ball bowled on the final day. He said: \u201cGaining points..."}]
     }
 
@@ -175,7 +175,7 @@ result:
 import requests
 
 
-url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query?"
+url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?"
 startDate = "2017-08-24T09:45:31.233Z"
 endDate = "2017-09-24T09:45:31.233Z"
 companyID = "ANZ_Woolworths"
@@ -185,7 +185,7 @@ response = requests.get(url+"startDate="+startDate+"&endDate="+endDate+"&company
                     </code></pre>
                 JavaScript/jQuery example API call.
                     <pre><code>
-url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query?"
+url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?"
 startDate = "2017-08-24T09:45:31.233Z"
 endDate = "2017-09-24T09:45:31.233Z"
 companyID = "ANZ_Woolworths"
@@ -196,7 +196,7 @@ $.getJSON(url+"startDate="+startDate+"&endDate="+endDate+"&companyId="+companyID
 
                     curl example API call.
                         <pre><code>
-curl "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query?startDate=2017-09-20T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=ANZ_Woolworths&topic=iphone"
+curl "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=2017-09-20T09:45:31.235Z&endDate=2017-09-24T09:45:31.235Z&companyId=ANZ_Woolworths&topic=iphone"
                         </code></pre>
 
 

@@ -2,6 +2,7 @@ from flask import Flask, render_template, Blueprint, session, request
 from flask_restful import Resource, Api, reqparse, fields, marshal
 from v1_0 import application as api_v1
 from v2_0 import application as api_v2
+from v3_0 import application as api_v3
 
 import requests
 import os
@@ -12,6 +13,7 @@ application.secret_key = os.urandom(24)
 
 application.register_blueprint(api_v1, url_prefix='/newsapi/v1.0')
 application.register_blueprint(api_v2, url_prefix='/newsapi/v2.0')
+application.register_blueprint(api_v3, url_prefix='/newsapi/v3.0')
 
 
 @application.route('/')
@@ -69,21 +71,21 @@ def addDate():
     if new !=  "":
         sDate = new
         session['guisDate'] = sDate
-    
+
     new = request.args.get('endDate')
     if new != "":
         eDate = new
         session['guieDate'] = eDate
-    
+
     url = getUrl()
-    
+
     if "http:" in url:
         response = requests.get(url).json()
     else:
         note = url
         url = ""
     return render_template('interface.html', fav = fav, url = url,note = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
-    
+
 @application.route('/newsapi/gui/addC', methods=['GET','POST'])
 def addName():
     sDate = ""
@@ -104,7 +106,7 @@ def addName():
     if 'guifav' in session:
         fav = session['guifav']
     new = request.args.get('companyId')
-    
+
     note = "No name/Id entered"
     if new != "":
         new = new.rstrip().lstrip()
@@ -116,7 +118,7 @@ def addName():
             names.append(new)
             session['guinames'] = names
             note = "Company added"
-        
+
     url = getUrl()
     if "http:" in url:
         response = requests.get(url).json()
@@ -124,7 +126,7 @@ def addName():
         #note = url
         url = ""
     return render_template('interface.html', url = url, fav = fav, note = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
-    
+
 @application.route('/newsapi/gui/addF', methods=['GET','POST'])
 def addFav():
     sDate = ""
@@ -146,7 +148,7 @@ def addFav():
         fav = session['guifav']
     new = request.args.get('article')
     article={}
-        
+
     url = getUrl()
     if "http:" in url:
         response = requests.get(url).json()
@@ -182,7 +184,7 @@ def remFav():
     if 'guifav' in session:
         fav = session['guifav']
     new = request.args.get('article')
-        
+
     url = getUrl()
     if "http:" in url:
         response = requests.get(url).json()
@@ -195,7 +197,7 @@ def remFav():
         session['guifav'] = fav
 
     return render_template('interface.html', fav = fav, url = url, note = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
-    
+
 @application.route('/newsapi/gui/remC', methods=['GET','POST'])
 def remName():
     sDate = ""
@@ -216,19 +218,19 @@ def remName():
     if 'guifav' in session:
         fav = session['guifav']
     new = request.args.get('companyId')
-    
+
     if new != "":
         names.remove(new)
         session['guinames'] = names
-        
+
     url = getUrl()
     if "http:" in url:
         response = requests.get(url).json()
     else:
         url = ""
-    
+
     return render_template('interface.html', url = url, fav = fav, note = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
-    
+
 @application.route('/newsapi/gui/addT', methods=['GET','POST'])
 def addTopic():
     sDate = ""
@@ -237,7 +239,7 @@ def addTopic():
     tags = []
     response = ""
     fav = []
-    
+
     if 'guisDate' in session:
         sDate = session['guisDate']
     if 'guieDate' in session:
@@ -248,12 +250,12 @@ def addTopic():
         tags = session['guitags']
     if 'guifav' in session:
         fav = session['guifav']
-        
+
     new = request.args.get('topic')
-    
+
     note = "No topic name entered"
     if new != "":
-        new = new.rstrip().lstrip() 
+        new = new.rstrip().lstrip()
         if re.search("[^\s\w\"]",new) is not None:
             note= "Make sure you only enter characters for a topic or quotation marks for phrases"
         elif new.count('\"') == 1:
@@ -264,13 +266,13 @@ def addTopic():
             tags.append(new)
             session['guitags'] = tags
             note = "Topic added"
-        
+
     url = getUrl()
     if "http:" in url:
         response = requests.get(url).json()
     else:
         url = ""
-    
+
     return render_template('interface.html', fav = fav, url = url, note = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
 
 @application.route('/newsapi/gui/remT', methods=['GET','POST'])
@@ -293,19 +295,19 @@ def remTopic():
     if 'guifav' in session:
         fav = session['guifav']
     new = request.args.get('topic')
-    
+
     if new != "":
         tags.remove(new)
         session['guitags'] = tags
-        
+
     url = getUrl()
     if "http:" in url:
         response = requests.get(url).json()
     else:
         url = ""
-    
+
     return render_template('interface.html',fav = fav, url = url, note = note, re = response, sdate = sDate, edate = eDate, names = names, tags = tags)
-    
+
 def getUrl():
     sDate = ""
     eDate = ""
@@ -314,8 +316,8 @@ def getUrl():
     urlNames = ""
     urlTags = ""
     url = ""
-    ourApiUrl= "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query"
-    
+    ourApiUrl= "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query"
+
     if 'guisDate' in session:
         sDate = session['guisDate']
     if not sDate:
@@ -340,19 +342,19 @@ def getUrl():
         urlTags = urlTags[:-1]
     sDate +="T00:00:00.000Z"
     eDate +="T00:00:00.000Z"
-    
+
     url = (ourApiUrl
     + '?startDate=' + sDate
     + '&endDate=' + eDate )
-    
+
     if urlNames is not "":
         url += ('&companyId=' + urlNames)
 
     if urlTags is not "":
         url += ('&topic=' + urlTags)
-    
+
     return url
-     
+
 def start():
     return render_template('int.html')
 # change homepage to gui implementation
