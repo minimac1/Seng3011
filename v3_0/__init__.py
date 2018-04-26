@@ -6,9 +6,9 @@ import json
 import requests
 import re
 import datetime
-application = Blueprint('api_v2', __name__)
+application = Blueprint('api_v3', __name__)
 api = Api(application)
-currentVersion = 'v2.0'
+currentVersion = 'v3.0'
 defaultPageSize = 200
 api_url = "http://content.guardianapis.com/search"
 
