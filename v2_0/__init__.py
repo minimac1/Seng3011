@@ -393,7 +393,7 @@ class InputProcess(Resource):
         compIdTemp = []
         topicTemp = []
         compCheck = []
-        
+
 
         for c in comp:
             c = c.rstrip('-')
@@ -401,7 +401,7 @@ class InputProcess(Resource):
             if c is "":
                 return errorReturn(14,args)
             if re.search("[^\.\-\w]",c) is not None or c.count('.')>1 or "--" in c:
-                return errorReturn(12,args)            
+                return errorReturn(12,args)
             a = c.replace("-", " ")
             b = a.upper()
             compCheck.append(b)
@@ -414,7 +414,12 @@ class InputProcess(Resource):
             if not asxCheckValidFuzzy(c) or len(c) < 3:
                 return errorReturn(5, args)
 
+            ch = removeExchangeCode(c);
+            if len(ch) < 3:
+                return errorReturn(5, args)
+
             if checkIfCode(c):
+
                 compId.append(codeToFullCode(c))
             else:
                 compId.append(asxNameToCodeFuzzy(c))
