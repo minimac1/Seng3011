@@ -1,4 +1,3 @@
-
 [00] Just date                     : ! ! ! Test Failed. Expected "successful API call" got "Error: specify at least one company of interest" [http://seng3011-penguin.herokuapp.com/api2?start_date=2018-04-18T00:00:00.000Z&end_date=2018-04-18T05:00:00.000Z]
 [01] 1 company name                : Test Passed. Expected "successful API call" got "successful API call" [http://seng3011-penguin.herokuapp.com/api2?start_date=2017-11-24T09:45:31.235Z&end_date=2018-04-19T00:00:00.000Z&company_id=WOOLWORTHS%20GROUP%20LIMITED]
 [02] 2 company names               : Test Passed. Expected "successful API call" got "successful API call" [http://seng3011-penguin.herokuapp.com/api2?start_date=2017-11-24T09:45:31.235Z&end_date=2018-04-19T00:00:00.000Z&company_id=WOOLWORTHS%20GROUP%20LIMITED,COMMONWEALTH%20BANK%20OF%20AUSTRALIA]
@@ -43,3 +42,6 @@
 [40] Instrument Id lower case2     : ! ! ! Test Failed. Expected "successful API call" got "invalid Company" [http://seng3011-penguin.herokuapp.com/api2?start_date=2017-11-24T09:45:31.235Z&end_date=2018-03-24T09:45:31.235Z&company_id=anz.ax,COMMONWEALTH%20BANK%20OF%20AUSTRALIA]
 [41] lower case company name       : Test Passed. Expected "successful API call" got "successful API call" [http://seng3011-penguin.herokuapp.com/api2?start_date=2017-11-24T09:45:31.235Z&end_date=2018-03-24T09:45:31.235Z&company_id=commonwealth%20bank%20of%20australia]
 [42] lower case company name2      : ! ! ! Test Failed. Expected "successful API call" got "invalid Company" [http://seng3011-penguin.herokuapp.com/api2?start_date=2017-11-24T09:45:31.235Z&end_date=2018-03-24T09:45:31.235Z&company_id=qantas]
+
+
+Summary: 33/44 passed, 0 skipped

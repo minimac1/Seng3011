@@ -33,13 +33,13 @@ TestID,Description,startDate,endDate,companyID,topic,expected return
 31,Invalid id6,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,ANZ.XX,,invalid Company
 32,1 topic 1 id,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,ANZ.AX,Money,successful API call
 33,1 topic 1 name,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,COMMONWEALTH-BANK-OF-AUSTRALIA,Money,successful API call
-33,1 topic 1 id 1 name,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,ANZ.AX_COMMONWEALTH-BANK-OF-AUSTRALIA,Money,successful API call
-34,2 topic 1 id 1 name,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,ANZ.AX_COMMONWEALTH-BANK-OF-AUSTRALIA,Money_Banks,successful API call
-35,1 topic,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,,Money,successful API call
+34,1 topic 1 id 1 name,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,ANZ.AX_COMMONWEALTH-BANK-OF-AUSTRALIA,Money,successful API call
+35,2 topic 1 id 1 name,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,ANZ.AX_COMMONWEALTH-BANK-OF-AUSTRALIA,Money_Banks,successful API call
 36,1 topic,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,,Money,successful API call
-37,1 topic multiple words,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,,Apple-Pay,successful API call
-38,2 topic,2018-04-15T00:00:00.000Z,2018-04-19T00:00:00.000Z,,Money_Banks,successful API call
-39,Instrument Id lower case,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,nab.ax,,successful API call
-40,Instrument Id lower case2,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,anz.ax_COMMONWEALTH-BANK-OF-AUSTRALIA,,successful API call
-41,lower case company name,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,commonwealth-bank-of-australia,,successful API call
-42,lower case company name2,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,qantas,,successful API call
+37,1 topic,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,,Money,successful API call
+38,1 topic multiple words,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,,Apple-Pay,successful API call
+39,2 topic,2018-04-15T00:00:00.000Z,2018-04-19T00:00:00.000Z,,Money_Banks,successful API call
+40,Instrument Id lower case,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,nab.ax,,successful API call
+41,Instrument Id lower case2,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,anz.ax_COMMONWEALTH-BANK-OF-AUSTRALIA,,successful API call
+42,lower case company name,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,commonwealth-bank-of-australia,,successful API call
+43,lower case company name2,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,qantas,,successful API call

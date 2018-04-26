@@ -13,7 +13,7 @@ def readTestDataCSV():
 
 def getJSON(url):
     r = requests.get(url)
-    if(r.status_code == 200):
+    if(r.status_code == 200 or r.status_code == 400):
         return r.json()
     else:
         return {"errorCode": r.status_code}
@@ -70,13 +70,13 @@ class turtleTesting:
     def runTest(self, test):
         url = self.getURL(test["startDate"], test["endDate"], test["companyID"], test["topic"])
         res = self.getResult(url)
-        bool = self.checkCorrect(res, test["expected return"])
-        retString = "Test Passed"
+        passed = self.checkCorrect(res, test["expected return"])
+        retString     = "      Test Passed"
         if(not bool):
             retString = "! ! ! Test Failed"
 
-        retString += ". Expected \""+test["expected return"]+"\" got \""+res+"\""
-        return (retString, bool)
+        retString += ". Expected \""+test["expected return"]+"\" got \""+res+"\" ["+url+"]"
+        return (retString, passed, False)
 
 
 class penguinTesting:
@@ -132,10 +132,75 @@ class penguinTesting:
     def runTest(self, test):
         url = self.getURL(test["startDate"], test["endDate"], test["companyID"], test["topic"])
         res = self.getResult(url)
-        bool = self.checkCorrect(res, test["expected return"])
-        retString = "Test Passed"
+        passed = self.checkCorrect(res, test["expected return"])
+        retString     = "      Test Passed"
         if(not bool):
             retString = "! ! ! Test Failed"
 
         retString += ". Expected \""+test["expected return"]+"\" got \""+res+"\" ["+url+"]"
-        return (retString, bool)
+        return (retString, passed, False)
+
+
+class hawkTesting:
+    name = "Rooster Hawk"
+    tests = []
+    output = ""
+    longestTestName = 0
+
+    def __init__(self):
+        self.tests = readTestDataCSV()
+        self.longestTestName = max(len(k["Description"]) for k in self.tests)
+
+    def getURL(self, startDate, endDate, companyID, topic):
+        newCompanyID = companyID.replace('-', "%20").replace('_', ',')
+        newTopic = topic.replace('-', "%20").replace('_', ',')
+        url = "http://seng.fmap.today/v2/news?"
+        url += "start_date="+startDate
+        url += "&end_date="+endDate
+        if(companyID != ""):
+            if(companyID == "-"):
+                url += "&company="
+            else:
+                url += "&company="+newCompanyID
+        if(topic != ""):
+            if(topic == "-"):
+                url += "&topic="
+            else:
+                url += "&topic="+newTopic
+        return (url)
+
+    def getResult(self, url):
+        json = getJSON(url)
+        if("eventDetails" in json.keys() and "details" in json["eventDetails"]):
+            details = json["eventDetails"]["details"]
+            if("errorName" in details.keys()):
+                return details["errorName"]
+        if("status" in json.keys()):
+            if(json["status"] == "ok"):
+                return "successful API call"
+        if("errorCode" in json.keys()):
+            return str(json["errorCode"])
+        return "fail"
+
+    def checkCorrect(self, out, correct):
+        if(correct == out):
+            return True
+        if(out == "ParametersMissing"):
+            if(correct == "invalid Company" or correct == "invalid Date"):
+                return True
+        return False
+
+    def runTest(self, test):
+        url = self.getURL(test["startDate"], test["endDate"], test["companyID"], test["topic"])
+        if(test["expected return"] == "invalid Company"):
+            retString = "   ! Test Skipped. Rooster does not reject incorrect companies ["+url+"]"
+            return (retString, False, True)
+        else:
+            res = self.getResult(url)
+            passed = self.checkCorrect(res, test["expected return"])
+            retString = "      Test Passed"
+            if(not passed):
+                retString = "! ! ! Test Failed"
+
+            retString += ". Expected \""+test["expected return"]+"\" got \""+res+"\" ["+url+"]"
+            return (retString, passed, False)
