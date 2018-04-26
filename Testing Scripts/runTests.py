@@ -1,82 +1,4 @@
-import requests
-import csv
-
-
-def readTestDataCSV():
-        with open("testData.csv", newline='') as csvfile:
-            testList = csv.DictReader(csvfile, delimiter=',', quotechar='"')
-            newlist = []
-            for row in testList:
-                newlist.append(row)
-        return newlist
-
-
-def getJSON(url):
-    r = requests.get(url)
-    if(r.status_code == 200):
-        return r.json()
-    else:
-        return {"errorCode": r.status_code}
-
-
-class TurtleTesting:
-    name = "Turtle"
-    tests = []
-    output = ""
-    longestTestName = 0
-
-    def __init__(self):
-        self.tests = readTestDataCSV()
-        self.longestTestName = max(len(k["Description"]) for k in self.tests)
-
-    def getURL(self, startDate, endDate, companyID, topic):
-        url = "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v2.0/query?"
-        url += "startDate="+startDate
-        url += "&endDate="+endDate
-        if(companyID != ""):
-            if(companyID == "-"):
-                url += "&companyId="
-            else:
-                url += "&companyId="+companyID
-        if(topic != ""):
-            if(topic == "-"):
-                url += "&topic="
-            else:
-                url += "&topic="+topic
-        return (url)
-
-    def getResult(self, url):
-        json = getJSON(url)
-        if("Developer Notes" in json.keys() and "Execution Result" in json["Developer Notes"]):
-            exeRes = json["Developer Notes"]["Execution Result"]
-            if(exeRes[0].startswith("Successful")):
-                return "successful API call"
-            else:
-                if ("date" in exeRes[1].lower()):
-                    return "invalid Date"
-                if ("companyid" in exeRes[1].lower()):
-                    return "invalid Company"
-                if ("instrument id" in exeRes[1].lower()):
-                    return "invalid Company"
-        if("errorCode" in json.keys()):
-            return str(json["errorCode"])
-        return "fail"
-
-    def checkCorrect(self, out, correct):
-        if(correct == out):
-            return True
-        return False
-
-    def runTest(self, test):
-        url = self.getURL(test["startDate"], test["endDate"], test["companyID"], test["topic"])
-        res = self.getResult(url)
-        bool = self.checkCorrect(res, test["expected return"])
-        retString = "Test Passed"
-        if(not bool):
-            retString = "! ! ! Test Failed"
-
-        retString += ". Expected \""+test["expected return"]+"\" got \""+res+"\""
-        return (retString, bool)
+from APIClasses import turtleTesting, penguinTesting
 
 
 class GUILine:
@@ -116,7 +38,7 @@ def testAPI(api):
     for test in api.tests:
         gui.update(("Running Test: " + test["Description"]).ljust(api.longestTestName+15))
         # add description to start of line
-        api.output += '\n['+test["TestID"].rjust(2,'0')+"] "+test["Description"].ljust(api.longestTestName)+" : "
+        api.output += '\n['+test["TestID"].rjust(2, '0')+"] "+test["Description"].ljust(api.longestTestName)+" : "
 
         # run the test and get a pass or error
         (testOutput, res) = api.runTest(test)
@@ -134,8 +56,11 @@ def testAPI(api):
 
 
 def runTests():
-    turt = TurtleTesting()
-    testAPI(turt)
+    apiList = []
+    # apiList.append(turtleTesting())
+    apiList.append(penguinTesting())
+    for api in apiList:
+        testAPI(api)
 
 
 runTests()
