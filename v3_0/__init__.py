@@ -1,35 +1,17 @@
 from flask import Flask, render_template,Blueprint
 from flask_restful import Resource, Api, reqparse, fields, marshal
 from datetime import datetime
-from pytrends.request import TrendReq
 import csv
 import json
 import requests
 import re
 import datetime
-application = Blueprint('api_v3', __name__)
+application = Blueprint('api_v2', __name__)
 api = Api(application)
-currentVersion = 'v3.0'
-pytrends = TrendReq(hl='en-us', tz=-600) #change when functioning
+currentVersion = 'v2.0'
 defaultPageSize = 200
 api_url = "http://content.guardianapis.com/search"
-pytrendsUserList = []
 
-#PYTRENDS HERE
-# make a file with google trends data against company id
-#create an instance with the given inputs to the api
-pytrendsInstance = {}
-#pytrendsInstance['Time Range'] = fields.List(fields.String)
-pytrendsInstance['CompanyID'] = fields.String
-pytrendsInstance['Topic'] = fields.String
-pytrendsInstance['Current Hour Results'] = fields.Integer
-pytrendsInstance['Hourly Change'] = fields.String
-#create new user with cookie id upon new connection
-userPytrends = {}
-userPytrends['CookieID'] = fields.String
-userPytrends['Hourly Trend Data'] = fields.List(fields.Nested(pytrendsInstance))
-#Get users cookies!!
-# will need to create dictionary on python exec
 
 # Log JSON fields
 log_fields = {}
@@ -66,7 +48,6 @@ def parseJSON(jsonData, compNameList, params, execStartTime):
     output_fields = {}
     output_fields['Developer Notes'] = fields.Nested(log_fields)
     output_fields['NewsDataSet'] = fields.List(fields.Nested(newsData_fields))
-    output_fields['Google Trend Data'] = fields.List(fields.Nested(userPytrends))
 
 
     #parse the given json into a nested field, append to list
@@ -88,60 +69,28 @@ def parseJSON(jsonData, compNameList, params, execStartTime):
         devMessage = ": Guardian API returned no articles"
 
     execEndTime = datetime.datetime.now()
+    #re.sub(r'\.[0-9]+', '', args['startDate'] )
+    formatStartTime = re.sub(r'(\d{4}-\d{2}-\d{2})\s(\d{2}:\d{2}:\d{2}.\d{3})\d{3}',
+                      r'\1T\2Z',
+                      str(execStartTime))
+    formatEndTime = re.sub(r'(\d{4}-\d{2}-\d{2})\s(\d{2}:\d{2}:\d{2}.\d{3})\d{3}',
+                      r'\1T\2Z',
+                      str(execEndTime))
+    formatDifTime = re.sub(r'(\d+:\d{2}:\d{2}.\d{3})\d{3}',
+                      r'T\1Z',
+                      str(execEndTime-execStartTime))
     logOutput = {'Parameters passed' : str(params),
                 'Execution Result' :
-                    ["Successful" + devMessage, str(execStartTime),
-                    str(execEndTime),  str(execEndTime-execStartTime)]
+                    ["Successful" + devMessage, formatStartTime,
+                    formatEndTime, formatDifTime]
                 }
 
-    googleTrends("thisismycookieID")
     data = {'Developer Notes' : logOutput,
-            'NewsDataSet' : newsDataList,
-            'Google Trend Data' : pytrendsUserList}
+            'NewsDataSet' : newsDataList}
 
     # marshal orders the data alphabetically. is this a problem?!
     # return the json marshalled with the fields
     return marshal(data, output_fields)
-
-#def getGoogleTrends(cookie):
-
-#    return
-
-#timerange, cIDs, topics
-def googleTrends(cookieID):
-    kw_list = ["ANZ", "Woolies"]
-    pytrends.build_payload(kw_list, cat=0, timeframe='now 1-H', geo='', gprop='')
-    df = pytrends.interest_over_time();
-    print(df);
-
-    trendList = []
-    currHourInstance = {'CompanyID' : "ANZ", 'Topic' : "Finance",
-            'Current Hour Results' : df['ANZ'].sum(), 'Hourly Change' : "+10%"}
-    trendList.append(currHourInstance)
-    currHourInstance = {'CompanyID' : "Woolies", 'Topic' : "Finance",
-            'Current Hour Results' : df['Woolies'].sum(),
-            'Hourly Change' : "not implemented yet"}
-    trendList.append(currHourInstance)
-
-    #find user
-    for curUser in pytrendsUserList:
-        if (curUser['CookieID'] == cookieID):
-            curUser['Hourly Trend Data'] = trendList
-
-def addGoogleTrendsUser(cookieID):
-    currUser = {'CookieID' : cookieID, 'Hourly Trend Data' : []}
-    pytrendsUserList.append(currUser)
-
-    #hardcoded example for more data
-    trendList = []
-    currHourInstance = {'CompanyID' : "topicIsMeantToBeBlank", 'Topic' : "",
-            'Current Hour Results' : 69, 'Hourly Change' : "+100%"}
-    trendList.append(currHourInstance)
-    currHourInstance = {'CompanyID' : "inveseter", 'Topic' : "business",
-            'Current Hour Results' : 2, 'Hourly Change' : "-200%"}
-    trendList.append(currHourInstance)
-    currUser = {'CookieID' : "thisUSERisHARDCODED", 'Hourly Trend Data' : trendList}
-    pytrendsUserList.append(currUser)
 
 
 def csvRemoveTails(companyName):
@@ -250,6 +199,22 @@ def asxCodeToName(thingToCheck):
                     return company["Company name"]
     return thingToCheck
 
+def checkIfCode(thingToCheck):
+    companyDict = openAllCompanyLists()
+    # check if it ends in an exchange code
+    for end in getExchanges(True):
+        if thingToCheck.endswith(end):
+            for company in companyDict[end[1:]]:
+                if removeExchangeCode(thingToCheck) == company["Symbol"].upper():
+                    return True
+
+    # check all exchanges
+    if(not (" " in thingToCheck or "." in thingToCheck)):
+        for end in getExchanges(False):
+            for company in companyDict[end]:
+                if removeExchangeCode(thingToCheck) == company["Symbol"].upper():
+                    return True
+    return False
 
 # Returns the ASX code of a company from its full name, if not in our database then returns the input given
 def asxNameToCode(thingToCheck):
@@ -280,6 +245,20 @@ def asxNameToCodeFuzzy(thingToCheck):
                 return company["Symbol"]+"."+end
     return thingToCheck
 
+def codeToFullCode(input):
+    companyDict = openAllCompanyLists()
+    # check if it ends in an exchange code
+    for end in getExchanges(True):
+        if input.endswith(end):
+            for company in companyDict[end[1:]]:
+                if removeExchangeCode(input).upper() == company["Symbol"].upper():
+                    return input.upper()
+    # check all exchanges
+    for end in getExchanges(False):
+        for item in companyDict[end]:
+            if(removeExchangeCode(input).upper() == item["Symbol"].upper()):
+                return input.upper() + '.' + end
+    return input
 
 # Each entry in the dictionary corresponds to the error code required
 def errorReturn(errorCode,params):
@@ -294,7 +273,11 @@ def errorReturn(errorCode,params):
         8 : "You entered an invalid character", #not used atm
         9 : "startDate is invalid format",
         10 : "endDate is invalid format",
-        11 : "Please eneter date before or equal to current date"
+        11 : "Please enter date before or equal to current date",
+        12 : "Invalid character in companyId",
+        13 : "Invalid character in topics",
+        14 : "You have entered an empty companyId",
+        15 : "You have entered an empty topic"
     }
 
     output_fields = {}
@@ -409,34 +392,55 @@ class InputProcess(Resource):
         compId = []
         compIdTemp = []
         topicTemp = []
+        compCheck = []
+
 
         for c in comp:
+            c = c.rstrip('-')
+            c = c.lstrip('-')
+            if c is "":
+                return errorReturn(14,args)
+            if re.search("[^\.\-\w]",c) is not None or c.count('.')>1 or "--" in c:
+                return errorReturn(12,args)
             a = c.replace("-", " ")
-            compId.append(a)
+            b = a.upper()
+            compCheck.append(b)
 
         #converting InstrumentIDs to companyId
         #also checking for valid InstrumentIDs
-        i = 0;
-        while i < len(compId):
-            if (re.match(r'.*\.AX$',compId[i])): # JUST WANT TO ASK, SHUD THIS BE .AX$ SO THAT IT MAKES SURE THERE IS NOTHING AFTER
-                print(compId[i])
-                if not asxCheckValid(compId[i]):
-                    return errorReturn(5, args)
-                compId[i] = asxCodeToName(compId[i])
 
-            i=i+1
+        for c in compCheck:
+
+            if not asxCheckValidFuzzy(c) or len(c) < 3:
+                if re.search(r'.AX|.NASDAQ|.EUX|.LSE|.NYSE|.SSX',c):
+                    return errorReturn(5, args)
+                else:
+                    return errorReturn(4, args)
+
+            ch = removeExchangeCode(c);
+            if len(ch) < 3:
+                return errorReturn(5, args)
+
+            if checkIfCode(c):
+
+                compId.append(codeToFullCode(c))
+            else:
+                compId.append(asxNameToCodeFuzzy(c))
+                print(asxNameToCodeFuzzy(c))
+
 
         #check if company exists
         abbrevID = []
-        for c in compId:
-            if not asxCheckValid(c):
-                print(c)
-                return errorReturn(4, args)
+        compName = []
 
         for idx, val in enumerate(compId):
-            compId[idx] = fullName(val)
-            abbrevID.append(removeExchangeCode(asxNameToCodeFuzzy(fullName(val))))
+            abbrevID.append(removeExchangeCode(asxNameToCodeFuzzy(asxCodeToName(val))))
+            compName.append(csvRemoveTails(asxCodeToName(val)))
 
+        for c in compName:
+            a = c.replace(" ", "%20")
+            a = '\"' + a + '\"'
+            compIdTemp.append(a)
 
         for c in compId:
             a = c.replace(" ", "%20")
@@ -449,6 +453,12 @@ class InputProcess(Resource):
             compIdTemp.append(a)
 
         for c in topics:
+            c = c.rstrip('-')
+            c = c.lstrip('-')
+            if c is "":
+                return errorReturn(15,args)
+            if re.search("[^\"\-\w]",c) is not None or c.count('\"')==1 or c.count('\"') > 2 or c is "\"\"" or "--" in c:
+                return errorReturn(13,args)
             a = c.replace("-", "%20")
             topicTemp.append(a)
 
@@ -487,9 +497,8 @@ class InputProcess(Resource):
         #print statments for debugging please keep for future use
         #print(response.url) #to see the url call to the api to make sure its correct
         #print(response.text)
-        addGoogleTrendsUser("thisismycookieID")
         # if you get to this point, there should be no errors
-        return parseJSON(resultsList, compId, args, execStartTime)
+        return parseJSON(resultsList, compName, args, execStartTime)
 
 # add a rule for the index page.
 #application.add_url_rule('/', 'index', (lambda: base()))
