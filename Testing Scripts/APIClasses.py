@@ -72,7 +72,7 @@ class turtleTesting:
         res = self.getResult(url)
         passed = self.checkCorrect(res, test["expected return"])
         retString     = "      Test Passed"
-        if(not bool):
+        if(not passed):
             retString = "! ! ! Test Failed"
 
         retString += ". Expected \""+test["expected return"]+"\" got \""+res+"\" ["+url+"]"
@@ -134,7 +134,7 @@ class penguinTesting:
         res = self.getResult(url)
         passed = self.checkCorrect(res, test["expected return"])
         retString     = "      Test Passed"
-        if(not bool):
+        if(not passed):
             retString = "! ! ! Test Failed"
 
         retString += ". Expected \""+test["expected return"]+"\" got \""+res+"\" ["+url+"]"
@@ -194,6 +194,66 @@ class hawkTesting:
         url = self.getURL(test["startDate"], test["endDate"], test["companyID"], test["topic"])
         if(test["expected return"] == "invalid Company"):
             retString = "   ! Test Skipped. Rooster does not reject incorrect companies ["+url+"]"
+            return (retString, False, True)
+        else:
+            res = self.getResult(url)
+            passed = self.checkCorrect(res, test["expected return"])
+            retString = "      Test Passed"
+            if(not passed):
+                retString = "! ! ! Test Failed"
+
+            retString += ". Expected \""+test["expected return"]+"\" got \""+res+"\" ["+url+"]"
+            return (retString, passed, False)
+
+
+class lionTesting:
+    name = "Lion"
+    tests = []
+    output = ""
+    longestTestName = 0
+
+    def __init__(self):
+        self.tests = readTestDataCSV()
+        self.longestTestName = max(len(k["Description"]) for k in self.tests)
+
+    def getURL(self, startDate, endDate, companyID, topic):
+        url = "http://api.lionnews.net/news?"
+        url += "start_date="+startDate
+        url += "&end_date="+endDate
+        if(companyID != ""):
+            if(companyID == "-"):
+                url += "&companynames="
+            else:
+                url += "&companynames="+companyID
+        if(topic != ""):
+            if(topic == "-"):
+                url += "&topic="
+            else:
+                url += "&topic="+topic
+        return (url)
+
+    def getResult(self, url):
+        json = getJSON(url)
+        if("response" in json.keys() and "status" in json["response"]):
+            status = json["response"]["status"]
+            if(status == "ok"):
+                return "successful API call"
+            elif(status == "error"):
+                if ("date" in json["response"]["message"].lower()):
+                    return "invalid Date"
+        if("errorCode" in json.keys()):
+            return str(json["errorCode"])
+        return "fail"
+
+    def checkCorrect(self, out, correct):
+        if(correct == out):
+            return True
+        return False
+
+    def runTest(self, test):
+        url = self.getURL(test["startDate"], test["endDate"], test["companyID"], test["topic"])
+        if(test["expected return"] == "invalid Company"):
+            retString = "   ! Test Skipped. Lion does not reject incorrect companies ["+url+"]"
             return (retString, False, True)
         else:
             res = self.getResult(url)

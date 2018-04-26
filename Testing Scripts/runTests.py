@@ -1,4 +1,4 @@
-from APIClasses import turtleTesting, penguinTesting, hawkTesting
+from APIClasses import turtleTesting, penguinTesting, hawkTesting, lionTesting
 
 
 class GUILine:
@@ -75,7 +75,9 @@ def runTests():
     apiList.append(turtleTesting())
     apiList.append(penguinTesting())
     apiList.append(hawkTesting())
+    apiList.append(lionTesting())
     chosenAPIs = []
+
     for api in apiList:
         choice = input("Do you want to run the tests on team "+api.name+"'s API? (y/n)").lower()
         while(choice != "y" and choice != "n"):
