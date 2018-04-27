@@ -3,7 +3,7 @@ import csv
 
 
 def readTestDataCSV():
-        with open("testData2.csv", newline='') as csvfile:
+        with open("testData.csv", newline='') as csvfile:
             testList = csv.DictReader(csvfile, delimiter=',', quotechar='"')
             newlist = []
             for row in testList:
@@ -19,8 +19,68 @@ def getJSON(url):
         return {"errorCode": r.status_code}
 
 
-class turtleTesting:
-    name = "Turtle"
+class turtleTestingLocal:
+    name = "Turtle Local"
+    tests = []
+    output = ""
+    longestTestName = 0
+
+    def __init__(self):
+        self.tests = readTestDataCSV()
+        self.longestTestName = max(len(k["Description"]) for k in self.tests)
+
+    def getURL(self, startDate, endDate, companyID, topic):
+        url = "http://127.0.0.1:5000/newsapi/v3.0/query?"
+        url += "startDate="+startDate
+        url += "&endDate="+endDate
+        if(companyID != ""):
+            if(companyID == "-"):
+                url += "&companyId="
+            else:
+                url += "&companyId="+companyID
+        if(topic != ""):
+            if(topic == "-"):
+                url += "&topic="
+            else:
+                url += "&topic="+topic
+        return (url)
+
+    def getResult(self, url):
+        json = getJSON(url)
+        if("Developer Notes" in json.keys() and "Execution Result" in json["Developer Notes"]):
+            exeRes = json["Developer Notes"]["Execution Result"]
+            if(exeRes[0].startswith("Successful")):
+                return "successful API call"
+            else:
+                if ("date" in exeRes[1].lower()):
+                    return "invalid Date"
+                if ("company" in exeRes[1].lower()):
+                    return "invalid Company"
+                if ("instrument id" in exeRes[1].lower()):
+                    return "invalid Company"
+        if("errorCode" in json.keys()):
+            return str(json["errorCode"])
+        return "fail"
+
+    def checkCorrect(self, out, correct):
+        if(correct == out):
+            return True
+        return False
+
+    def runTest(self, test):
+        url = self.getURL(test["startDate"], test["endDate"], test["companyID"], test["topic"])
+        res = self.getResult(url)
+        passed = self.checkCorrect(res, test["expected return"])
+        retString     = "      Test Passed"
+        if(not passed):
+            retString = "! ! ! Test Failed"
+
+        retString += ". Expected \""+test["expected return"]+"\" got \""+res+"\" ["+url+"]"
+        return (retString, passed, False)
+
+
+class turtleTestingOnline:
+    name = "Turtle Online"
     tests = []
     output = ""
     longestTestName = 0
@@ -77,7 +137,6 @@ class turtleTesting:
 
         retString += ". Expected \""+test["expected return"]+"\" got \""+res+"\" ["+url+"]"
         return (retString, passed, False)
-
 
 class penguinTesting:
     name = "Penguin"
