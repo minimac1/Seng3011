@@ -52,6 +52,10 @@ class turtleTestingLocal:
             if(exeRes[0].startswith("Successful")):
                 return "successful API call"
             else:
+                if ("empty topic" in exeRes[1].lower()):
+                    return "empty Topic"
+                if ("empty companyid" in exeRes[1].lower()):
+                    return "empty Company"
                 if ("date" in exeRes[1].lower()):
                     return "invalid Date"
                 if ("company" in exeRes[1].lower()):
@@ -64,6 +68,8 @@ class turtleTestingLocal:
 
     def checkCorrect(self, out, correct):
         if(correct == out):
+            return True
+        if(correct == "quote Success" and out == "successful API call"):
             return True
         return False
 
@@ -112,6 +118,10 @@ class turtleTestingOnline:
             if(exeRes[0].startswith("Successful")):
                 return "successful API call"
             else:
+                if ("empty topic" in exeRes[1].lower()):
+                    return "empty Topic"
+                if ("empty companyid" in exeRes[1].lower()):
+                    return "empty Company"
                 if ("date" in exeRes[1].lower()):
                     return "invalid Date"
                 if ("company" in exeRes[1].lower()):
@@ -124,6 +134,8 @@ class turtleTestingOnline:
 
     def checkCorrect(self, out, correct):
         if(correct == out):
+            return True
+        if(correct == "quote Success" and out == "successful API call"):
             return True
         return False
 
@@ -192,14 +204,18 @@ class penguinTesting:
 
     def runTest(self, test):
         url = self.getURL(test["startDate"], test["endDate"], test["companyID"], test["topic"])
-        res = self.getResult(url)
-        passed = self.checkCorrect(res, test["expected return"])
-        retString     = "      Test Passed"
-        if(not passed):
-            retString = "! ! ! Test Failed"
+        if(test["expected return"] in ["invalid Company", "empty Company", "empty Topic", "quote Success"]):
+            retString = "   ! Test Skipped."
+            return (retString, False, True)
+        else:
+            res = self.getResult(url)
+            passed = self.checkCorrect(res, test["expected return"])
+            retString     = "      Test Passed"
+            if(not passed):
+                retString = "! ! ! Test Failed"
 
-        retString += ". Expected \""+test["expected return"]+"\" got \""+res+"\" ["+url+"]"
-        return (retString, passed, False)
+            retString += ". Expected \""+test["expected return"]+"\" got \""+res+"\" ["+url+"]"
+            return (retString, passed, False)
 
 
 class hawkTesting:
@@ -253,8 +269,8 @@ class hawkTesting:
 
     def runTest(self, test):
         url = self.getURL(test["startDate"], test["endDate"], test["companyID"], test["topic"])
-        if(test["expected return"] == "invalid Company"):
-            retString = "   ! Test Skipped. Rooster does not reject incorrect companies ["+url+"]"
+        if(test["expected return"] in ["invalid Company", "empty Company", "empty Topic", "quote Success"]):
+            retString = "   ! Test Skipped."
             return (retString, False, True)
         else:
             res = self.getResult(url)
@@ -313,8 +329,8 @@ class lionTesting:
 
     def runTest(self, test):
         url = self.getURL(test["startDate"], test["endDate"], test["companyID"], test["topic"])
-        if(test["expected return"] == "invalid Company"):
-            retString = "   ! Test Skipped. Lion does not reject incorrect companies ["+url+"]"
+        if(test["expected return"] in ["invalid Company", "empty Company", "empty Topic", "quote Success"]):
+            retString = "   ! Test Skipped."
             return (retString, False, True)
         else:
             res = self.getResult(url)

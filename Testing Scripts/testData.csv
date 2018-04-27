@@ -43,3 +43,8 @@ TestID,Description,startDate,endDate,companyID,topic,expected return
 41,Instrument Id lower case2,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,anz.ax_COMMONWEALTH-BANK-OF-AUSTRALIA,,successful API call
 42,lower case company name,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,commonwealth-bank-of-australia,,successful API call
 43,lower case company name2,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,qantas,,successful API call
+44,Empty name,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,-,,empty Company
+45,Empty id,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,-,,empty Company
+46,1 topic with quotes,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,,"""apple-pay""",quote Success
+47,2 topics with quotes,2017-11-24T09:45:31.235Z,2018-03-24T09:45:31.235Z,,"""apple-pay""_""company-tax""",quote Success
+48,Empty topic,2018-04-18T00:00:00.000Z,2018-04-19T00:00:00.000Z,,-,empty Topic
