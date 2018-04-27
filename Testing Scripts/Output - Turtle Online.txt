@@ -1,8 +1,8 @@
 Summary:
-	44/44 passed, 0 skipped
-	Tests started (27 Apr 2018 13:45:46)   
-	Tests ended   (27 Apr 2018 13:47:02)   
-	Duration      (1 minutes, 16 seconds)  
+	49/49 passed, 0 skipped
+	Tests started (27 Apr 2018 15:05:46)   
+	Tests ended   (27 Apr 2018 15:07:06)   
+	Duration      (1 minutes, 19 seconds)  
 
 
 [00] Just date                     : 	      Test Passed. Expected "successful API call" got "successful API call" [http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=2018-04-18T00:00:00.000Z&endDate=2018-04-18T05:00:00.000Z]
@@ -49,3 +49,8 @@ Summary:
 [41] Instrument Id lower case2     : 	      Test Passed. Expected "successful API call" got "successful API call" [http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=2017-11-24T09:45:31.235Z&endDate=2018-03-24T09:45:31.235Z&companyId=anz.ax_COMMONWEALTH-BANK-OF-AUSTRALIA]
 [42] lower case company name       : 	      Test Passed. Expected "successful API call" got "successful API call" [http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=2017-11-24T09:45:31.235Z&endDate=2018-03-24T09:45:31.235Z&companyId=commonwealth-bank-of-australia]
 [43] lower case company name2      : 	      Test Passed. Expected "successful API call" got "successful API call" [http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=2017-11-24T09:45:31.235Z&endDate=2018-03-24T09:45:31.235Z&companyId=qantas]
+[44] Empty name                    : 	      Test Passed. Expected "empty Company" got "empty Company" [http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=2018-04-18T00:00:00.000Z&endDate=2018-04-19T00:00:00.000Z&companyId=]
+[45] Empty id                      : 	      Test Passed. Expected "empty Company" got "empty Company" [http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=2018-04-18T00:00:00.000Z&endDate=2018-04-19T00:00:00.000Z&companyId=]
+[46] 1 topic with quotes           : 	      Test Passed. Expected "quote Success" got "successful API call" [http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=2017-11-24T09:45:31.235Z&endDate=2018-03-24T09:45:31.235Z&topic="apple-pay"]
+[47] 2 topics with quotes          : 	      Test Passed. Expected "quote Success" got "successful API call" [http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=2017-11-24T09:45:31.235Z&endDate=2018-03-24T09:45:31.235Z&topic="apple-pay"_"company-tax"]
+[48] Empty topic                   : 	      Test Passed. Expected "empty Topic" got "empty Topic" [http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=2018-04-18T00:00:00.000Z&endDate=2018-04-19T00:00:00.000Z&topic=]
