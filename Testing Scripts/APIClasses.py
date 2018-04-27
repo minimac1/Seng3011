@@ -204,7 +204,7 @@ class penguinTesting:
 
     def runTest(self, test):
         url = self.getURL(test["startDate"], test["endDate"], test["companyID"], test["topic"])
-        if(test["expected return"] in ["invalid Company", "empty Company", "empty Topic", "quote Success"]):
+        if(test["expected return"] in ["empty Company", "empty Topic", "quote Success"]):
             retString = "   ! Test Skipped."
             return (retString, False, True)
         else:

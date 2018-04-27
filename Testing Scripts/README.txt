@@ -12,11 +12,23 @@
      At the end it will tell you how many tests were passed, failed, and skipped.
 
   ### List of Testable APIs
-   * Turtle Online: The current version of our API run on our AWS server. Does not skip any tests.
-   * Turtle Local:  The current version of our API run locally on your own computer. To correctly run this test you must make sure our API is running locally on the same device.
-   * Penguin:       The current version of team Penguin's API. Does not skip any tests.
-   * Rooster Hawk:  The current version of team Rooster Hawk's API. Skips any tests checking if incorrect company names are rejected, since Rooster does not reject invalid company names.
-   * Lion:          The current version of team Lion's API. Skips any tests checking if incorrect company names are rejected, since Lion does not reject invalid company names.
+   * Turtle Online: The current version of our API run on our AWS server.
+                    Does not skip any tests.
+
+   * Turtle Local:  The current version of our API run locally on your own computer.
+                    Does not skip any tests.
+                    To correctly run this test you must make sure our API is running locally on the same device.
+
+   * Penguin:       The current version of team Penguin's API.
+                    Skips the tests only relevant to out API
+
+   * Rooster Hawk:  The current version of team Rooster Hawk's API.
+                    Skips the tests only relevant to out API.
+                    Skips any tests checking if incorrect company names are rejected, since Rooster does not reject invalid company names.
+
+   * Lion:          The current version of team Lion's API.
+                    Skips the tests only relevant to out API.
+                    Skips any tests checking if incorrect company names are rejected, since Lion does not reject invalid company names.
 
 ## Output
 
