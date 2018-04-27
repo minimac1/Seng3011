@@ -175,13 +175,15 @@ class penguinTesting:
             return "successful API call"
         if("specify at least one company of interest" in json["log"]):
             return "Error: specify at least one company of interest"
-        if("Error occured. The following company does not exist in our records" in json["log"]):
+        if("Error occurred. The following company" in json["log"]):
             return "invalid Company"
-        if("Error occured. " in json["log"] and "_date" in json["log"].split("Error occured. ", 1)[1]):
+        if("Error occurred. " in json["log"] and "_date" in json["log"].split("Error occurred. ", 1)[1]):
             return "invalid Date"
         if("errorCode" in json.keys()):
             return str(json["errorCode"])
-        return "fail"
+        if("Error occurred. " in json["log"]):
+            return json["log"].split("Error occurred. ", 1)[1]
+        return "Log: "+json["log"]
 
     def checkCorrect(self, out, correct):
         if(correct == out):

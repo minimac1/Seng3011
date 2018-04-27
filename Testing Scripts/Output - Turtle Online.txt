@@ -1,5 +1,9 @@
+Summary:
+	44/44 passed, 0 skipped
+	Tests started (27 Apr 2018 13:45:46)   
+	Tests ended   (27 Apr 2018 13:47:02)   
+	Duration      (1 minutes, 16 seconds)  
 
-Summary: 44/44 passed, 0 skipped
 
 [00] Just date                     : 	      Test Passed. Expected "successful API call" got "successful API call" [http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=2018-04-18T00:00:00.000Z&endDate=2018-04-18T05:00:00.000Z]
 [01] 1 company name                : 	      Test Passed. Expected "successful API call" got "successful API call" [http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=2017-11-24T09:45:31.235Z&endDate=2018-04-19T00:00:00.000Z&companyId=WOOLWORTHS-GROUP-LIMITED]

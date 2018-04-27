@@ -1,5 +1,9 @@
+Summary:
+	26/32 passed, 12 skipped
+	Tests started (27 Apr 2018 13:30:02)   
+	Tests ended   (27 Apr 2018 13:30:26)   
+	Duration      (0 minutes, 24 seconds)  
 
-Summary: 26/32 passed, 12 skipped
 
 [00] Just date                     : 	! ! ! Test Failed. Expected "successful API call" got "ParametersMissing" [http://seng.fmap.today/v2/news?start_date=2018-04-18T00:00:00.000Z&end_date=2018-04-18T05:00:00.000Z]
 [01] 1 company name                : 	      Test Passed. Expected "successful API call" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2017-11-24T09:45:31.235Z&end_date=2018-04-19T00:00:00.000Z&company=WOOLWORTHS%20GROUP%20LIMITED]

@@ -1,3 +1,10 @@
+Summary:
+	30/32 passed, 12 skipped
+	Tests started (27 Apr 2018 13:30:26)   
+	Tests ended   (27 Apr 2018 13:31:14)   
+	Duration      (0 minutes, 48 seconds)  
+
+
 [00] Just date                     : 	      Test Passed. Expected "successful API call" got "successful API call" [http://api.lionnews.net/news?start_date=2018-04-18T00:00:00.000Z&end_date=2018-04-18T05:00:00.000Z]
 [01] 1 company name                : 	      Test Passed. Expected "successful API call" got "successful API call" [http://api.lionnews.net/news?start_date=2017-11-24T09:45:31.235Z&end_date=2018-04-19T00:00:00.000Z&companynames=WOOLWORTHS-GROUP-LIMITED]
 [02] 2 company names               : 	      Test Passed. Expected "successful API call" got "successful API call" [http://api.lionnews.net/news?start_date=2017-11-24T09:45:31.235Z&end_date=2018-04-19T00:00:00.000Z&companynames=WOOLWORTHS-GROUP-LIMITED_COMMONWEALTH-BANK-OF-AUSTRALIA]
@@ -42,6 +49,3 @@
 [41] Instrument Id lower case2     : 	      Test Passed. Expected "successful API call" got "successful API call" [http://api.lionnews.net/news?start_date=2017-11-24T09:45:31.235Z&end_date=2018-03-24T09:45:31.235Z&companynames=anz.ax_COMMONWEALTH-BANK-OF-AUSTRALIA]
 [42] lower case company name       : 	      Test Passed. Expected "successful API call" got "successful API call" [http://api.lionnews.net/news?start_date=2017-11-24T09:45:31.235Z&end_date=2018-03-24T09:45:31.235Z&companynames=commonwealth-bank-of-australia]
 [43] lower case company name2      : 	      Test Passed. Expected "successful API call" got "successful API call" [http://api.lionnews.net/news?start_date=2017-11-24T09:45:31.235Z&end_date=2018-03-24T09:45:31.235Z&companynames=qantas]
-
-
-Summary: 30/32 passed, 12 skipped
