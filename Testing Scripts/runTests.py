@@ -1,4 +1,5 @@
-from APIClasses import turtleTesting, penguinTesting, hawkTesting, lionTesting
+from APIClasses import turtleTestingOnline, turtleTestingLocal, penguinTesting, hawkTesting, lionTesting
+import datetime
 
 
 class GUILine:
@@ -25,14 +26,21 @@ class GUILine:
         print(newLine, end='')
 
 
-def getSummary(passed, total, skipped):
-    retString = "\n\nSummary: "
-    retString += str(passed)+"/"+str(total)+" passed, "+str(skipped)+" skipped"
+def getSummary(passed, total, skipped, startTime, endTime):
+    difTime = endTime-startTime
+    (minDif, secDif) = divmod(difTime.days * 86400 + difTime.seconds, 60)
+
+    retString = "Summary:\n"
+    retString += "\t"+str(passed)+"/"+str(total)+" passed, "+str(skipped)+" skipped\n"
+    retString += "\tTests started "+("("+startTime.strftime("%d %b %Y %H:%M:%S")+")").ljust(25)+"\n"
+    retString += "\tTests ended   "+("("+endTime.strftime("%d %b %Y %H:%M:%S")+")").ljust(25)+"\n"
+    retString += "\tDuration      "+("("+str(minDif)+" minutes, "+str(secDif)+" seconds)").ljust(25)+"\n"
+    retString += "\n\n"
     return retString
 
 
 def writeOutput(name, text):
-    with open(name+"Out.txt", 'w+') as outfile:
+    with open("Output - "+name+".txt", 'w+') as outfile:
         outfile.write(text)
 
 
@@ -41,6 +49,7 @@ def testAPI(api):
     gui = GUILine(len(api.tests))
     passed = 0
     skipped = 0
+    startTime = datetime.datetime.now()
 
     for test in api.tests:
         gui.update(("Running Test: " + test["Description"]).ljust(api.longestTestName+15))
@@ -58,6 +67,7 @@ def testAPI(api):
 
         gui.increment()
 
+    endTime = datetime.datetime.now()
     gui.update("Finished Tests".ljust(api.longestTestName+15))
     print("\n\tPassed "+str(passed)+" of "+str(len(api.tests)-skipped), end='')
 
@@ -66,13 +76,14 @@ def testAPI(api):
 
     print("")
 
-    api.output += getSummary(passed, len(api.tests)-skipped, skipped)
+    api.output = getSummary(passed, len(api.tests)-skipped, skipped, startTime, endTime) + api.output
     writeOutput(api.name, api.output)
 
 
 def runTests():
     apiList = []
-    apiList.append(turtleTesting())
+    apiList.append(turtleTestingOnline())
+    apiList.append(turtleTestingLocal())
     apiList.append(penguinTesting())
     apiList.append(hawkTesting())
     apiList.append(lionTesting())

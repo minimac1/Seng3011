@@ -1,3 +1,6 @@
+
+Summary: 26/32 passed, 12 skipped
+
 [00] Just date                     : 	! ! ! Test Failed. Expected "successful API call" got "ParametersMissing" [http://seng.fmap.today/v2/news?start_date=2018-04-18T00:00:00.000Z&end_date=2018-04-18T05:00:00.000Z]
 [01] 1 company name                : 	      Test Passed. Expected "successful API call" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2017-11-24T09:45:31.235Z&end_date=2018-04-19T00:00:00.000Z&company=WOOLWORTHS%20GROUP%20LIMITED]
 [02] 2 company names               : 	      Test Passed. Expected "successful API call" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2017-11-24T09:45:31.235Z&end_date=2018-04-19T00:00:00.000Z&company=WOOLWORTHS%20GROUP%20LIMITED,COMMONWEALTH%20BANK%20OF%20AUSTRALIA]
@@ -42,6 +45,3 @@
 [41] Instrument Id lower case2     : 	      Test Passed. Expected "successful API call" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2017-11-24T09:45:31.235Z&end_date=2018-03-24T09:45:31.235Z&company=anz.ax,COMMONWEALTH%20BANK%20OF%20AUSTRALIA]
 [42] lower case company name       : 	      Test Passed. Expected "successful API call" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2017-11-24T09:45:31.235Z&end_date=2018-03-24T09:45:31.235Z&company=commonwealth%20bank%20of%20australia]
 [43] lower case company name2      : 	      Test Passed. Expected "successful API call" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2017-11-24T09:45:31.235Z&end_date=2018-03-24T09:45:31.235Z&company=qantas]
-
-
-Summary: 26/32 passed, 12 skipped
