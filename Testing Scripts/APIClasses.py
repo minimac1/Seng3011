@@ -205,7 +205,7 @@ class penguinTesting:
     def runTest(self, test):
         url = self.getURL(test["startDate"], test["endDate"], test["companyID"], test["topic"])
         if(test["expected return"] in ["empty Company", "empty Topic", "quote Success"]):
-            retString = "   ! Test Skipped."
+            retString = "   ! Test Skipped. ["+url+"]"
             return (retString, False, True)
         else:
             res = self.getResult(url)
@@ -269,8 +269,8 @@ class hawkTesting:
 
     def runTest(self, test):
         url = self.getURL(test["startDate"], test["endDate"], test["companyID"], test["topic"])
-        if(test["expected return"] in ["invalid Company", "empty Company", "empty Topic", "quote Success"]):
-            retString = "   ! Test Skipped."
+        if(test["expected return"] in ["empty Company", "empty Topic", "quote Success"]):
+            retString = "   ! Test Skipped. ["+url+"]"
             return (retString, False, True)
         else:
             res = self.getResult(url)
@@ -329,8 +329,8 @@ class lionTesting:
 
     def runTest(self, test):
         url = self.getURL(test["startDate"], test["endDate"], test["companyID"], test["topic"])
-        if(test["expected return"] in ["invalid Company", "empty Company", "empty Topic", "quote Success"]):
-            retString = "   ! Test Skipped."
+        if(test["expected return"] in ["empty Company", "empty Topic", "quote Success"]):
+            retString = "   ! Test Skipped. ["+url+"]"
             return (retString, False, True)
         else:
             res = self.getResult(url)

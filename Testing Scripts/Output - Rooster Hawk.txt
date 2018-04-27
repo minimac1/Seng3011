@@ -1,8 +1,8 @@
 Summary:
-	24/32 passed, 17 skipped
-	Tests started (27 Apr 2018 15:09:18)   
-	Tests ended   (27 Apr 2018 15:13:40)   
-	Duration      (4 minutes, 22 seconds)  
+	26/44 passed, 5 skipped
+	Tests started (27 Apr 2018 16:19:02)   
+	Tests ended   (27 Apr 2018 16:19:44)   
+	Duration      (0 minutes, 41 seconds)  
 
 
 [00] Just date                     : 	! ! ! Test Failed. Expected "successful API call" got "ParametersMissing" [http://seng.fmap.today/v2/news?start_date=2018-04-18T00:00:00.000Z&end_date=2018-04-18T05:00:00.000Z]
@@ -19,24 +19,24 @@ Summary:
 [11] Date from long time ago       : 	! ! ! Test Failed. Expected "successful API call" got "ParametersMissing" [http://seng.fmap.today/v2/news?start_date=0001-03-18T00:00:00.000Z&end_date=0001-04-19T00:00:00.000Z]
 [12] Date in the future            : 	      Test Passed. Expected "invalid Date" got "ParametersMissing" [http://seng.fmap.today/v2/news?start_date=2118-03-18T00:00:00.000Z&end_date=2118-04-19T00:00:00.000Z]
 [13] Start date after end date     : 	      Test Passed. Expected "invalid Date" got "ParametersMissing" [http://seng.fmap.today/v2/news?start_date=2118-04-20T00:00:00.000Z&end_date=2118-04-19T00:00:00.000Z]
-[14] Invalid company name1         : 	   ! Test Skipped.
-[15] Invalid company name2         : 	   ! Test Skipped.
-[16] Invalid company name 3        : 	   ! Test Skipped.
-[17] Invalid id1                   : 	   ! Test Skipped.
-[18] Invalid id2                   : 	   ! Test Skipped.
-[19] Invalid id3                   : 	   ! Test Skipped.
+[14] Invalid company name1         : 	! ! ! Test Failed. Expected "invalid Company" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2018-04-18T00:00:00.000Z&end_date=2018-04-19T00:00:00.000Z&company=This,Doesn't,Exist]
+[15] Invalid company name2         : 	! ! ! Test Failed. Expected "invalid Company" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2017-11-24T09:45:31.235Z&end_date=2018-03-24T09:45:31.235Z&company=asdasfasdad]
+[16] Invalid company name 3        : 	! ! ! Test Failed. Expected "invalid Company" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2017-11-24T09:45:31.235Z&end_date=2018-03-24T09:45:31.235Z&company=COMMMONWEALTH%20BANK%20OF%20AUSTRALIE]
+[17] Invalid id1                   : 	! ! ! Test Failed. Expected "invalid Company" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2018-04-18T00:00:00.000Z&end_date=2018-04-19T00:00:00.000Z&company=TDE.AX]
+[18] Invalid id2                   : 	! ! ! Test Failed. Expected "invalid Company" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2018-04-18T00:00:00.000Z&end_date=2018-04-19T00:00:00.000Z&company=AN.AX]
+[19] Invalid id3                   : 	! ! ! Test Failed. Expected "invalid Company" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2017-11-24T09:45:31.235Z&end_date=2018-03-24T09:45:31.235Z&company=CTASGA.AX]
 [20] Invalid date format           : 	      Test Passed. Expected "invalid Date" got "ParametersMissing" [http://seng.fmap.today/v2/news?start_date=09/04/2018T00:00:00.000Z&end_date=10/04/2018T00:00:00.000Z]
 [21] Invalid date format2          : 	      Test Passed. Expected "invalid Date" got "ParametersMissing" [http://seng.fmap.today/v2/news?start_date=2017-13-05T00:00:00.000Z&end_date=2017-14-05T00:00:00.000Z]
 [22] Invalid date format3          : 	      Test Passed. Expected "invalid Date" got "ParametersMissing" [http://seng.fmap.today/v2/news?start_date=2018-03-05L00:00:00.000Z&end_date=2018-03-06T00:00:00.000Z]
 [23] Invalid date format4          : 	      Test Passed. Expected "invalid Date" got "ParametersMissing" [http://seng.fmap.today/v2/news?start_date=2018-03-05T00:00:00.000Z&end_date=2018-03-06T00:00:00.000u]
 [24] Invalid date format5          : 	      Test Passed. Expected "invalid Date" got "ParametersMissing" [http://seng.fmap.today/v2/news?start_date=2018-03-05L00:00:00.000Z&end_date=2018-03-06T99:00:00.000Z]
 [25] Invalid date format6          : 	      Test Passed. Expected "invalid Date" got "ParametersMissing" [http://seng.fmap.today/v2/news?start_date=2018-03-05L00:00:00.000Z&end_date=2018-03-06T09:00:00.123123Z]
-[26] Invalid character name1       : 	   ! Test Skipped.
-[27] Invalid character name2       : 	   ! Test Skipped.
-[28] Invalid character name3       : 	   ! Test Skipped.
-[29] Invalid id4                   : 	   ! Test Skipped.
-[30] Invalid id5                   : 	   ! Test Skipped.
-[31] Invalid id6                   : 	   ! Test Skipped.
+[26] Invalid character name1       : 	! ! ! Test Failed. Expected "invalid Company" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2018-04-18T00:00:00.000Z&end_date=2018-04-19T00:00:00.000Z&company=W00LWORTHS%20GR0UP%20LIMITED]
+[27] Invalid character name2       : 	! ! ! Test Failed. Expected "invalid Company" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2018-04-18T00:00:00.000Z&end_date=2018-04-19T00:00:00.000Z&company=WOOLWORTHS/GROUP%20LIMITED]
+[28] Invalid character name3       : 	! ! ! Test Failed. Expected "invalid Company" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2018-04-18T00:00:00.000Z&end_date=2018-04-19T00:00:00.000Z&company=WOOLWORTHS%20GROUP%20LIMITE?]
+[29] Invalid id4                   : 	! ! ! Test Failed. Expected "invalid Company" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2018-04-18T00:00:00.000Z&end_date=2018-04-19T00:00:00.000Z&company=ANZ..AX]
+[30] Invalid id5                   : 	! ! ! Test Failed. Expected "invalid Company" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2018-04-18T00:00:00.000Z&end_date=2018-04-19T00:00:00.000Z&company=ANZ,AX]
+[31] Invalid id6                   : 	! ! ! Test Failed. Expected "invalid Company" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2018-04-18T00:00:00.000Z&end_date=2018-04-19T00:00:00.000Z&company=ANZ.XX]
 [32] 1 topic 1 id                  : 	      Test Passed. Expected "successful API call" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2018-04-18T00:00:00.000Z&end_date=2018-04-19T00:00:00.000Z&company=ANZ.AX&topic=Money]
 [33] 1 topic 1 name                : 	      Test Passed. Expected "successful API call" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2018-04-18T00:00:00.000Z&end_date=2018-04-19T00:00:00.000Z&company=COMMONWEALTH%20BANK%20OF%20AUSTRALIA&topic=Money]
 [34] 1 topic 1 id 1 name           : 	      Test Passed. Expected "successful API call" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2018-04-18T00:00:00.000Z&end_date=2018-04-19T00:00:00.000Z&company=ANZ.AX,COMMONWEALTH%20BANK%20OF%20AUSTRALIA&topic=Money]
@@ -47,10 +47,10 @@ Summary:
 [39] 2 topic                       : 	! ! ! Test Failed. Expected "successful API call" got "ParametersMissing" [http://seng.fmap.today/v2/news?start_date=2018-04-15T00:00:00.000Z&end_date=2018-04-19T00:00:00.000Z&topic=Money,Banks]
 [40] Instrument Id lower case      : 	      Test Passed. Expected "successful API call" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2017-11-24T09:45:31.235Z&end_date=2018-03-24T09:45:31.235Z&company=nab.ax]
 [41] Instrument Id lower case2     : 	      Test Passed. Expected "successful API call" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2017-11-24T09:45:31.235Z&end_date=2018-03-24T09:45:31.235Z&company=anz.ax,COMMONWEALTH%20BANK%20OF%20AUSTRALIA]
-[42] lower case company name       : 	! ! ! Test Failed. Expected "successful API call" got "503" [http://seng.fmap.today/v2/news?start_date=2017-11-24T09:45:31.235Z&end_date=2018-03-24T09:45:31.235Z&company=commonwealth%20bank%20of%20australia]
-[43] lower case company name2      : 	! ! ! Test Failed. Expected "successful API call" got "503" [http://seng.fmap.today/v2/news?start_date=2017-11-24T09:45:31.235Z&end_date=2018-03-24T09:45:31.235Z&company=qantas]
-[44] Empty name                    : 	   ! Test Skipped.
-[45] Empty id                      : 	   ! Test Skipped.
-[46] 1 topic with quotes           : 	   ! Test Skipped.
-[47] 2 topics with quotes          : 	   ! Test Skipped.
-[48] Empty topic                   : 	   ! Test Skipped.
+[42] lower case company name       : 	      Test Passed. Expected "successful API call" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2017-11-24T09:45:31.235Z&end_date=2018-03-24T09:45:31.235Z&company=commonwealth%20bank%20of%20australia]
+[43] lower case company name2      : 	      Test Passed. Expected "successful API call" got "successful API call" [http://seng.fmap.today/v2/news?start_date=2017-11-24T09:45:31.235Z&end_date=2018-03-24T09:45:31.235Z&company=qantas]
+[44] Empty name                    : 	   ! Test Skipped. [http://seng.fmap.today/v2/news?start_date=2018-04-18T00:00:00.000Z&end_date=2018-04-19T00:00:00.000Z&company=]
+[45] Empty id                      : 	   ! Test Skipped. [http://seng.fmap.today/v2/news?start_date=2018-04-18T00:00:00.000Z&end_date=2018-04-19T00:00:00.000Z&company=]
+[46] 1 topic with quotes           : 	   ! Test Skipped. [http://seng.fmap.today/v2/news?start_date=2017-11-24T09:45:31.235Z&end_date=2018-03-24T09:45:31.235Z&topic="apple%20pay"]
+[47] 2 topics with quotes          : 	   ! Test Skipped. [http://seng.fmap.today/v2/news?start_date=2017-11-24T09:45:31.235Z&end_date=2018-03-24T09:45:31.235Z&topic="apple%20pay","company%20tax"]
+[48] Empty topic                   : 	   ! Test Skipped. [http://seng.fmap.today/v2/news?start_date=2018-04-18T00:00:00.000Z&end_date=2018-04-19T00:00:00.000Z&topic=]
