@@ -6,6 +6,7 @@ import json
 import requests
 import re
 import datetime
+import indicoio
 application = Blueprint('api_v4', __name__)
 api = Api(application)
 currentVersion = 'v4.0'
@@ -92,26 +93,23 @@ def parseJSON(jsonData, compNameList, params, execStartTime):
     # return the json marshalled with the fields
     return marshal(data, output_fields)
 
-
+#takes in an array of news articles
+#and returns an array of scores eg. [o.96, 0.3]
+#The score is from 0-1 and where 0.5 is netural
+# 1 is super duper positive and 0 is fully negative
 def sentiment(newsText):
+    indicoio.config.api_key = 'd1d92c5989dc9a21f0ed2f4e6c21f46e'
 
-    headers= {
-        "X-Mashape-Key": "oB6NtkRNKmmshc50XSjjzDhwpjL1p1cKXLbjsnfLOL4H5NIrqI",
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Accept": "application/json"
-    }
+    # single example
+    #indicoio.sentiment("I love writing code!")
 
-    params= {
-        "language": "english",
-        "text": ""
-    }
+    s = newsText
+    print(s)
 
-    params['text'] = newsText
+    ar = indicoio.sentiment(s)
 
-    response = requests.post("https://japerk-text-processing.p.mashape.com/sentiment/",
-    headers = headers, data = params)
-    print(response.text)
-    return
+    print(ar)
+    return ar
 
 def csvRemoveTails(companyName):
     nameEndings = [" Group Limited", " Limited", " LTD"]
@@ -519,7 +517,10 @@ class InputProcess(Resource):
         #print(response.url) #to see the url call to the api to make sure its correct
         #print(response.text)
         # if you get to this point, there should be no errors
-        sentiment("Movie is great and cool.")
+        sentiment([
+        "I love writing code!",
+        "Alexander and the Terrible, Horrible, No Good, Very Bad Day"
+        ])
         return parseJSON(resultsList, compName, args, execStartTime)
 
 # add a rule for the index page.
