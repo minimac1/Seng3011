@@ -99,6 +99,7 @@ def parseJSON(jsonData, compNameList, params, execStartTime):
 # 1 is super duper positive and 0 is fully negative
 def sentiment(newsText):
     indicoio.config.api_key = 'd1d92c5989dc9a21f0ed2f4e6c21f46e'
+    #indicoio.config.api_key = '5c28eab27da67528360f23ca9db6e3ea'
 
     # single example
     #indicoio.sentiment("I love writing code!")
@@ -514,7 +515,7 @@ class InputProcess(Resource):
             print("\nYou shouldn't be here!!!!\n")
 
         #below function call used for sentiment testingself
-        
+
         #sentiment([
         #"I love writing code!",
         #"Alexander and the Terrible, Horrible, No Good, Very Bad Day"
