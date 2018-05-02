@@ -1,7 +1,6 @@
 from flask import Flask, render_template,Blueprint
 from flask_restful import Resource, Api, reqparse, fields, marshal
 from datetime import datetime
-from pytrends.request import TrendReq
 import csv
 import json
 import requests
@@ -10,26 +9,9 @@ import datetime
 application = Blueprint('api_v4.0', __name__)
 api = Api(application)
 currentVersion = 'v4.0'
-pytrends = TrendReq(hl='en-us', tz=-600) #change when functioning
 defaultPageSize = 200
 api_url = "http://content.guardianapis.com/search"
-pytrendsUserList = []
 
-#PYTRENDS HERE
-# make a file with google trends data against company id
-#create an instance with the given inputs to the api
-pytrendsInstance = {}
-#pytrendsInstance['Time Range'] = fields.List(fields.String)
-pytrendsInstance['CompanyID'] = fields.String
-pytrendsInstance['Topic'] = fields.String
-pytrendsInstance['Current Hour Results'] = fields.Integer
-pytrendsInstance['Hourly Change'] = fields.String
-#create new user with cookie id upon new connection
-userPytrends = {}
-userPytrends['CookieID'] = fields.String
-userPytrends['Hourly Trend Data'] = fields.List(fields.Nested(pytrendsInstance))
-#Get users cookies!!
-# will need to create dictionary on python exec
 
 # Log JSON fields
 log_fields = {}
@@ -66,7 +48,6 @@ def parseJSON(jsonData, compNameList, params, execStartTime):
     output_fields = {}
     output_fields['Developer Notes'] = fields.Nested(log_fields)
     output_fields['NewsDataSet'] = fields.List(fields.Nested(newsData_fields))
-    output_fields['Google Trend Data'] = fields.List(fields.Nested(userPytrends))
 
 
     #parse the given json into a nested field, append to list
@@ -94,54 +75,13 @@ def parseJSON(jsonData, compNameList, params, execStartTime):
                     str(execEndTime),  str(execEndTime-execStartTime)]
                 }
 
-    googleTrends("thisismycookieID")
+
     data = {'Developer Notes' : logOutput,
-            'NewsDataSet' : newsDataList,
-            'Google Trend Data' : pytrendsUserList}
+            'NewsDataSet' : newsDataList}
 
     # marshal orders the data alphabetically. is this a problem?!
     # return the json marshalled with the fields
     return marshal(data, output_fields)
-
-#def getGoogleTrends(cookie):
-
-#    return
-
-#timerange, cIDs, topics
-def googleTrends(cookieID):
-    kw_list = ["ANZ", "Woolies"]
-    pytrends.build_payload(kw_list, cat=0, timeframe='now 1-H', geo='', gprop='')
-    df = pytrends.interest_over_time();
-    print(df);
-
-    trendList = []
-    currHourInstance = {'CompanyID' : "ANZ", 'Topic' : "Finance",
-            'Current Hour Results' : df['ANZ'].sum(), 'Hourly Change' : "+10%"}
-    trendList.append(currHourInstance)
-    currHourInstance = {'CompanyID' : "Woolies", 'Topic' : "Finance",
-            'Current Hour Results' : df['Woolies'].sum(),
-            'Hourly Change' : "not implemented yet"}
-    trendList.append(currHourInstance)
-
-    #find user
-    for curUser in pytrendsUserList:
-        if (curUser['CookieID'] == cookieID):
-            curUser['Hourly Trend Data'] = trendList
-
-def addGoogleTrendsUser(cookieID):
-    currUser = {'CookieID' : cookieID, 'Hourly Trend Data' : []}
-    pytrendsUserList.append(currUser)
-
-    #hardcoded example for more data
-    trendList = []
-    currHourInstance = {'CompanyID' : "topicIsMeantToBeBlank", 'Topic' : "",
-            'Current Hour Results' : 69, 'Hourly Change' : "+100%"}
-    trendList.append(currHourInstance)
-    currHourInstance = {'CompanyID' : "inveseter", 'Topic' : "business",
-            'Current Hour Results' : 2, 'Hourly Change' : "-200%"}
-    trendList.append(currHourInstance)
-    currUser = {'CookieID' : "thisUSERisHARDCODED", 'Hourly Trend Data' : trendList}
-    pytrendsUserList.append(currUser)
 
 
 def csvRemoveTails(companyName):
@@ -487,7 +427,6 @@ class InputProcess(Resource):
         #print statments for debugging please keep for future use
         #print(response.url) #to see the url call to the api to make sure its correct
         #print(response.text)
-        addGoogleTrendsUser("thisismycookieID")
         # if you get to this point, there should be no errors
         return parseJSON(resultsList, compId, args, execStartTime)
 

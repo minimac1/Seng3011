@@ -1,0 +1,81 @@
+from flask import Flask, render_template,Blueprint
+from flask_restful import Resource, Api, reqparse, fields, marshal
+from datetime import datetime
+import csv
+import json
+import requests
+import re
+import datetime
+from pytrends.request import TrendReq
+pytrends = TrendReq(hl='en-us', tz=-600) #change when functioning
+
+
+pytrendsUserList = []
+pytrendsCompanyList = []
+# make a file with google trends data against company id
+#create an instance with the given inputs to the api
+pytrendsInstance = {}
+pytrendsInstance['CompanyID'] = fields.String
+pytrendsInstance['Current Hour Results'] = fields.Integer
+pytrendsInstance['Hourly Change (%)'] = fields.String
+#Store each user, with their set of company ids (no duplicates)
+userPytrends = {}
+userPytrends['UserID'] = fields.String
+userPytrends['CompanyIDList'] = fields.List(fields.String)
+
+
+def trendsAsJson():
+    output_fields = {}
+    output_fields['Google Trends Users'] = fields.List(fields.Nested(userPytrends))
+    output_fields['Google Trends Companies'] = fields.List(fields.Nested(pytrendsInstance))
+
+    data = {'Google Trends Users' : pytrendsUserList,
+        'Google Trends Companies' : pytrendsCompanyList}
+
+    return marshal(data, output_fields)
+
+#update CompanyID with alias to google
+def updateGoogleTrends(companyID, alias):
+    kw_list = [alias]
+    pytrends.build_payload(kw_list, cat=0, timeframe='now 1-H', geo='', gprop='')
+    df = pytrends.interest_over_time();
+    #print(df);
+
+    found = False
+    newRes = df[alias].sum()
+    for currCID in pytrendsCompanyList:
+        if (currCID['CompanyID'] == companyID):
+            found = True
+            prevRes = currCID['Current Hour Results']
+            change = newRes - prevRes
+            percentChange = (change/prevRes)*100
+            currCID['Current Hour Results'] = newRes
+            currCID['Hourly Change (%)'] = round(percentChange,2)
+
+    #If not found, create
+    if not found:
+        newCID = {'CompanyID' : companyID,
+                'Current Hour Results' : newRes,
+                'Hourly Change (%)' : "0"}
+        pytrendsCompanyList.append(newCID)
+
+#add user with provided set of CIDs
+def addGoogleTrendsUser(userID, listOfIds):
+    currUser = {'UserID' : userID, 'CompanyIDList' : listOfIds}
+    pytrendsUserList.append(currUser)
+
+#assumes user exists
+def addIDsToGoogleTrendsUser(userID, newId):
+    for currUser in pytrendsUserList:
+        if (currUser['UserID'] == userID):
+            currUser['CompanyIDList'].append(newId)
+
+
+addGoogleTrendsUser('thisismycookieID', ['ANZ.ax', 'WOW.ax'])
+updateGoogleTrends('ANZ.ax', 'ANZ')
+updateGoogleTrends('WOW.ax', 'Woolworths')
+print(trendsAsJson())
+print("\n.....Assume 1 hour later.....\n")
+updateGoogleTrends('ANZ.ax', 'ANZ')
+updateGoogleTrends('WOW.ax', 'Woolworths')
+print(trendsAsJson())
