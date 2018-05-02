@@ -7,9 +7,9 @@ import json
 import requests
 import re
 import datetime
-application = Blueprint('api_v3.1', __name__)
+application = Blueprint('api_v4.0', __name__)
 api = Api(application)
-currentVersion = 'v3.1'
+currentVersion = 'v4.0'
 pytrends = TrendReq(hl='en-us', tz=-600) #change when functioning
 defaultPageSize = 200
 api_url = "http://content.guardianapis.com/search"

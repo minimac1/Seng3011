@@ -3,6 +3,7 @@ from flask_restful import Resource, Api, reqparse, fields, marshal
 from v1_0 import application as api_v1
 from v2_0 import application as api_v2
 from v3_0 import application as api_v3
+from v4_0 import application as api_v4
 
 import requests
 import os
@@ -14,6 +15,7 @@ application.secret_key = os.urandom(24)
 application.register_blueprint(api_v1, url_prefix='/newsapi/v1.0')
 application.register_blueprint(api_v2, url_prefix='/newsapi/v2.0')
 application.register_blueprint(api_v3, url_prefix='/newsapi/v3.0')
+application.register_blueprint(api_v4, url_prefix='/newsapi/v4.0')
 
 
 @application.route('/')
