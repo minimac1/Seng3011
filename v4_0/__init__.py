@@ -513,14 +513,17 @@ class InputProcess(Resource):
         else:
             print("\nYou shouldn't be here!!!!\n")
 
+        #below function call used for sentiment testingself
+        
+        #sentiment([
+        #"I love writing code!",
+        #"Alexander and the Terrible, Horrible, No Good, Very Bad Day"
+        #])
+
         #print statments for debugging please keep for future use
         #print(response.url) #to see the url call to the api to make sure its correct
         #print(response.text)
         # if you get to this point, there should be no errors
-        sentiment([
-        "I love writing code!",
-        "Alexander and the Terrible, Horrible, No Good, Very Bad Day"
-        ])
         return parseJSON(resultsList, compName, args, execStartTime)
 
 # add a rule for the index page.
