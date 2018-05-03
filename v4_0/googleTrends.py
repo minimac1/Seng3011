@@ -12,8 +12,6 @@ pytrends = TrendReq(hl='en-us', tz=-600) #change when functioning
 
 pytrendsUserList = []
 pytrendsCompanyList = []
-# make a file with google trends data against company id
-#create an instance with the given inputs to the api
 pytrendsInstance = {}
 pytrendsInstance['CompanyID'] = fields.String
 pytrendsInstance['Current Hour Results'] = fields.Integer
@@ -24,14 +22,16 @@ userPytrends['UserID'] = fields.String
 userPytrends['CompanyIDList'] = fields.List(fields.String)
 
 
-def trendsAsJson():
+def userListAsJson():
     output_fields = {}
     output_fields['Google Trends Users'] = fields.List(fields.Nested(userPytrends))
+    data = {'Google Trends Users' : pytrendsUserList}
+    return marshal(data, output_fields)
+
+def companyListAsJson():
+    output_fields = {}
     output_fields['Google Trends Companies'] = fields.List(fields.Nested(pytrendsInstance))
-
-    data = {'Google Trends Users' : pytrendsUserList,
-        'Google Trends Companies' : pytrendsCompanyList}
-
+    data = {'Google Trends Companies' : pytrendsCompanyList}
     return marshal(data, output_fields)
 
 #update CompanyID with alias to google
@@ -39,7 +39,6 @@ def updateGoogleTrends(companyID, alias):
     kw_list = [alias]
     pytrends.build_payload(kw_list, cat=0, timeframe='now 1-H', geo='', gprop='')
     df = pytrends.interest_over_time();
-    #print(df);
 
     found = False
     newRes = df[alias].sum()
@@ -68,14 +67,23 @@ def addGoogleTrendsUser(userID, listOfIds):
 def addIDsToGoogleTrendsUser(userID, newId):
     for currUser in pytrendsUserList:
         if (currUser['UserID'] == userID):
-            currUser['CompanyIDList'].append(newId)
+            if (not newId in currUser['CompanyIDList']):
+                currUser['CompanyIDList'].append(newId)
+
+def removeIDfromGoogleTrendsUser(userID, idToRemove):
+    for currUser in pytrendsUserList:
+        if (currUser['UserID'] == userID):
+            currUser['CompanyIDList'].remove(idToRemove)
 
 
 addGoogleTrendsUser('thisismycookieID', ['ANZ.ax', 'WOW.ax'])
 updateGoogleTrends('ANZ.ax', 'ANZ')
 updateGoogleTrends('WOW.ax', 'Woolworths')
-print(trendsAsJson())
-print("\n.....Assume 1 hour later.....\n")
+print("\n.....Printing Company List ['ANZ.ax', 'WOW.ax'].....\n")
+print(companyListAsJson())
+print("\n.....Call update again to show change.....\n")
 updateGoogleTrends('ANZ.ax', 'ANZ')
 updateGoogleTrends('WOW.ax', 'Woolworths')
-print(trendsAsJson())
+print(companyListAsJson())
+print("\n.....Now printinging user database.....\n")
+print(userListAsJson())
