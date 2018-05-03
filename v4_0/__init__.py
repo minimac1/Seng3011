@@ -6,7 +6,8 @@ import json
 import requests
 import re
 import datetime
-application = Blueprint('api_v4.0', __name__)
+import indicoio
+application = Blueprint('api_v4', __name__)
 api = Api(application)
 currentVersion = 'v4.0'
 defaultPageSize = 200
@@ -69,12 +70,21 @@ def parseJSON(jsonData, compNameList, params, execStartTime):
         devMessage = ": Guardian API returned no articles"
 
     execEndTime = datetime.datetime.now()
+    #re.sub(r'\.[0-9]+', '', args['startDate'] )
+    formatStartTime = re.sub(r'(\d{4}-\d{2}-\d{2})\s(\d{2}:\d{2}:\d{2}.\d{3})\d{3}',
+                      r'\1T\2Z',
+                      str(execStartTime))
+    formatEndTime = re.sub(r'(\d{4}-\d{2}-\d{2})\s(\d{2}:\d{2}:\d{2}.\d{3})\d{3}',
+                      r'\1T\2Z',
+                      str(execEndTime))
+    formatDifTime = re.sub(r'(\d+:\d{2}:\d{2}.\d{3})\d{3}',
+                      r'T\1Z',
+                      str(execEndTime-execStartTime))
     logOutput = {'Parameters passed' : str(params),
                 'Execution Result' :
-                    ["Successful" + devMessage, str(execStartTime),
-                    str(execEndTime),  str(execEndTime-execStartTime)]
+                    ["Successful" + devMessage, formatStartTime,
+                    formatEndTime, formatDifTime]
                 }
-
 
     data = {'Developer Notes' : logOutput,
             'NewsDataSet' : newsDataList}
@@ -83,6 +93,24 @@ def parseJSON(jsonData, compNameList, params, execStartTime):
     # return the json marshalled with the fields
     return marshal(data, output_fields)
 
+#takes in an array of news articles
+#and returns an array of scores eg. [o.96, 0.3]
+#The score is from 0-1 and where 0.5 is netural
+# 1 is super duper positive and 0 is fully negative
+def sentiment(newsText):
+    indicoio.config.api_key = 'd1d92c5989dc9a21f0ed2f4e6c21f46e'
+    #indicoio.config.api_key = '5c28eab27da67528360f23ca9db6e3ea'
+
+    # single example
+    #indicoio.sentiment("I love writing code!")
+
+    s = newsText
+    print(s)
+
+    ar = indicoio.sentiment(s)
+
+    print(ar)
+    return ar
 
 def csvRemoveTails(companyName):
     nameEndings = [" Group Limited", " Limited", " LTD"]
@@ -190,6 +218,22 @@ def asxCodeToName(thingToCheck):
                     return company["Company name"]
     return thingToCheck
 
+def checkIfCode(thingToCheck):
+    companyDict = openAllCompanyLists()
+    # check if it ends in an exchange code
+    for end in getExchanges(True):
+        if thingToCheck.endswith(end):
+            for company in companyDict[end[1:]]:
+                if removeExchangeCode(thingToCheck) == company["Symbol"].upper():
+                    return True
+
+    # check all exchanges
+    if(not (" " in thingToCheck or "." in thingToCheck)):
+        for end in getExchanges(False):
+            for company in companyDict[end]:
+                if removeExchangeCode(thingToCheck) == company["Symbol"].upper():
+                    return True
+    return False
 
 # Returns the ASX code of a company from its full name, if not in our database then returns the input given
 def asxNameToCode(thingToCheck):
@@ -220,6 +264,20 @@ def asxNameToCodeFuzzy(thingToCheck):
                 return company["Symbol"]+"."+end
     return thingToCheck
 
+def codeToFullCode(input):
+    companyDict = openAllCompanyLists()
+    # check if it ends in an exchange code
+    for end in getExchanges(True):
+        if input.endswith(end):
+            for company in companyDict[end[1:]]:
+                if removeExchangeCode(input).upper() == company["Symbol"].upper():
+                    return input.upper()
+    # check all exchanges
+    for end in getExchanges(False):
+        for item in companyDict[end]:
+            if(removeExchangeCode(input).upper() == item["Symbol"].upper()):
+                return input.upper() + '.' + end
+    return input
 
 # Each entry in the dictionary corresponds to the error code required
 def errorReturn(errorCode,params):
@@ -234,7 +292,11 @@ def errorReturn(errorCode,params):
         8 : "You entered an invalid character", #not used atm
         9 : "startDate is invalid format",
         10 : "endDate is invalid format",
-        11 : "Please eneter date before or equal to current date"
+        11 : "Please enter date before or equal to current date",
+        12 : "Invalid character in companyId",
+        13 : "Invalid character in topics",
+        14 : "You have entered an empty companyId",
+        15 : "You have entered an empty topic"
     }
 
     output_fields = {}
@@ -276,7 +338,8 @@ class InputProcess(Resource):
             'to-date': "",
             'order-by': "relevance",
             'show-fields': 'body-text',
-            'api-key':"6a81a5ed-2739-409d-8ada-059c122c8b43"
+            #'api-key':"6a81a5ed-2739-409d-8ada-059c122c8b43"
+            'api-key':"37148dbf-d836-435b-8383-4e3367ce6a5a"
         }
 
         #extracting arguments from url
@@ -349,34 +412,55 @@ class InputProcess(Resource):
         compId = []
         compIdTemp = []
         topicTemp = []
+        compCheck = []
+
 
         for c in comp:
+            c = c.rstrip('-')
+            c = c.lstrip('-')
+            if c is "":
+                return errorReturn(14,args)
+            if re.search("[^\.\-\w]",c) is not None or c.count('.')>1 or "--" in c:
+                return errorReturn(12,args)
             a = c.replace("-", " ")
-            compId.append(a)
+            b = a.upper()
+            compCheck.append(b)
 
         #converting InstrumentIDs to companyId
         #also checking for valid InstrumentIDs
-        i = 0;
-        while i < len(compId):
-            if (re.match(r'.*\.AX$',compId[i])): # JUST WANT TO ASK, SHUD THIS BE .AX$ SO THAT IT MAKES SURE THERE IS NOTHING AFTER
-                print(compId[i])
-                if not asxCheckValid(compId[i]):
-                    return errorReturn(5, args)
-                compId[i] = asxCodeToName(compId[i])
 
-            i=i+1
+        for c in compCheck:
+
+            if not asxCheckValidFuzzy(c) or len(c) < 3:
+                if re.search(r'.AX|.NASDAQ|.EUX|.LSE|.NYSE|.SSX',c):
+                    return errorReturn(5, args)
+                else:
+                    return errorReturn(4, args)
+
+            ch = removeExchangeCode(c);
+            if len(ch) < 3:
+                return errorReturn(5, args)
+
+            if checkIfCode(c):
+
+                compId.append(codeToFullCode(c))
+            else:
+                compId.append(asxNameToCodeFuzzy(c))
+                print(asxNameToCodeFuzzy(c))
+
 
         #check if company exists
         abbrevID = []
-        for c in compId:
-            if not asxCheckValid(c):
-                print(c)
-                return errorReturn(4, args)
+        compName = []
 
         for idx, val in enumerate(compId):
-            compId[idx] = fullName(val)
-            abbrevID.append(removeExchangeCode(asxNameToCodeFuzzy(fullName(val))))
+            abbrevID.append(removeExchangeCode(asxNameToCodeFuzzy(asxCodeToName(val))))
+            compName.append(csvRemoveTails(asxCodeToName(val)))
 
+        for c in compName:
+            a = c.replace(" ", "%20")
+            a = '\"' + a + '\"'
+            compIdTemp.append(a)
 
         for c in compId:
             a = c.replace(" ", "%20")
@@ -389,6 +473,12 @@ class InputProcess(Resource):
             compIdTemp.append(a)
 
         for c in topics:
+            c = c.rstrip('-')
+            c = c.lstrip('-')
+            if c is "":
+                return errorReturn(15,args)
+            if re.search("[^\"\-\w]",c) is not None or c.count('\"')==1 or c.count('\"') > 2 or c is "\"\"" or "--" in c:
+                return errorReturn(13,args)
             a = c.replace("-", "%20")
             topicTemp.append(a)
 
@@ -424,11 +514,18 @@ class InputProcess(Resource):
         else:
             print("\nYou shouldn't be here!!!!\n")
 
+        #below function call used for sentiment testingself
+
+        #sentiment([
+        #"I love writing code!",
+        #"Alexander and the Terrible, Horrible, No Good, Very Bad Day"
+        #])
+
         #print statments for debugging please keep for future use
         #print(response.url) #to see the url call to the api to make sure its correct
         #print(response.text)
         # if you get to this point, there should be no errors
-        return parseJSON(resultsList, compId, args, execStartTime)
+        return parseJSON(resultsList, compName, args, execStartTime)
 
 # add a rule for the index page.
 #application.add_url_rule('/', 'index', (lambda: base()))
