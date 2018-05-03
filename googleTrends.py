@@ -8,10 +8,10 @@ import re
 import datetime
 from pytrends.request import TrendReq
 pytrends = TrendReq(hl='en-us', tz=-600) #change when functioning
-
-
 pytrendsUserList = []
 pytrendsCompanyList = []
+
+
 pytrendsInstance = {}
 pytrendsInstance['CompanyID'] = fields.String
 pytrendsInstance['Current Hour Results'] = fields.Integer
