@@ -7,9 +7,29 @@ body {
   font-size: 50px;
   font-family:"red serifs", serif;
 }
+.dbTable{
+  position:absolute;
+  left:0;
+  padding-left:30px;
+}
 
+.headL{
+  left:0;
+  padding-left:30px;
+  position:absolute;
+}
+.headM{
+  
+}
 
+.headR{
+  right:0;
+  padding-right:30px;
+  position:absolute;
+}
+.profileC{ /* for the table in profile*/
 
+}
 .horizontal-scroll-wrapper {
   display:block;
   margin:0;

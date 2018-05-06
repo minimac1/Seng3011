@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container-fluid CL-container">
+        <div class="page-title">{{user}}</div> 
+        <div class="CL-heading"> </div>
+        <form action="/profile" method ="GET|POST" >
+            <table> <tr>
+            <td style="width:250px"><p style="font-size:25px;">Add Company</p></td>
+            <td style="width:330px"><input class="enterWord" type="text" name="added" placeholder="Enter a name or id of a company"></td>
+            <td><input type="submit" value="Add" class="btn btn-secondary add"></form></td>
+            </tr> </table>
+        <table class="profileC">
+            <tr>
+                <td>Company name</td>
+                <td>Change in Google activity</td>
+                <td>Recent Sentiment</td>
+                <td>Change in returns</td>
+                <td>Change in stock price</td>
+                <td></td>
+            </tr>
+            {% for company in companies %}
+                <tr>
+                    <td><form action="/db" method = "GET|POST" >
+                    <input type="radio" style="display:none;" name="company" value="{{company['name']}}" checked>
+                    <input type="submit" value="{{company['name']}}" class="btn btn-secondary remove"> 
+                    </form>
+                    </td>
+                    <td style="color:{{company['changec']}}"> {{company['change']}}</td>
+                    <td style="color:{{company['recSc']}}"> {{company['recS']}}</td>
+                    <td style="color:{{company['returnsc']}}"> {{company['returns']}}%</td>
+                    <td style="color:{{company['stockc']}}"> {{company['stock']}}%</td>
+                    <td>
+                    <form action="/profile" method = "GET|POST" >
+                    <input type="radio" style="display:none;" name="removed" value="{{company['name']}}" checked>
+                    <input type="submit" value="X" class="btn btn-secondary remove">                  
+                    </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <script>
+    function dropList() {
+        //for later if we change search bar to include droplist
+    }
+    </script>
+{% endblock %}
