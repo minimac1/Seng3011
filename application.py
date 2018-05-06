@@ -26,6 +26,14 @@ def base():
 def apiIndex():
     return render_template('homepage.html')
 
+@application.route('/signin')
+def signIn():
+    return render_template('signin.html')
+
+@application.route('/google6ba7dcd540cdf4c2.html')
+def googleVerification():
+    return render_template('googleVerification.html')
+
 @application.route('/newsapi')
 def apiHome():
     return render_template('apiHome.html')
