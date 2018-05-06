@@ -1,3 +1,5 @@
+EnvironmentConfigurationMetadata:
+  DateModified: '1525611927920'
 branch-defaults:
   default:
     environment: seng3011-turtle
@@ -22,7 +24,9 @@ global:
   repository: null
   sc: git
   workspace_type: Application
-
 packages:
   yum:
-    libjpeg-devel: '6b'
+    freetype-devel: []
+    libjpeg-devel: 6b
+    libjpeg-turbo-devel: []
+    zlib-devel: []
