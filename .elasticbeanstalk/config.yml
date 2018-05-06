@@ -22,3 +22,7 @@ global:
   repository: null
   sc: git
   workspace_type: Application
+
+packages:
+  yum:
+    libjpeg-devel: '6b'
