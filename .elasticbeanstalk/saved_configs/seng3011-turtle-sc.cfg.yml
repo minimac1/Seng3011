@@ -1,58 +1,58 @@
+AWSConfigurationTemplateVersion: 1.1.0.0
 EnvironmentConfigurationMetadata:
-  Description: Configuration created from the EB CLI using "eb config save".
   DateCreated: '1525611855000'
-  DateModified: '1525611855000'
-Platform:
-  PlatformArn: arn:aws:elasticbeanstalk:ap-southeast-2::platform/Python 3.6 running on 64bit Amazon Linux/2.6.5
+  DateModified: '1525612636669'
+  Description: Configuration created from the EB CLI using "eb config save".
+EnvironmentTier:
+  Name: WebServer
+  Type: Standard
 OptionSettings:
-  aws:elasticbeanstalk:command:
-    BatchSize: '30'
-    BatchSizeType: Percentage
-  aws:autoscaling:trigger:
-    BreachDuration: '3'
-    UpperBreachScaleIncrement: '2'
-    Statistic: Sum
-    LowerThreshold: '5'
-    MeasureName: RequestCount
-    Period: '1'
-    Unit: Count
+  AWSEBAutoScalingGroup.aws:autoscaling:asg:
+    Cooldown: '60'
   AWSEBAutoScalingLaunchConfiguration.aws:autoscaling:launchconfiguration:
     MonitoringInterval: 5 minute
+  AWSEBCloudwatchAlarmHigh.aws:autoscaling:trigger:
+    UpperThreshold: '150'
   aws:autoscaling:asg:
     Custom Availability Zones: ap-southeast-2c
     MaxSize: '5'
-  aws:elasticbeanstalk:managedactions:
-    ManagedActionsEnabled: true
-    PreferredStartTime: FRI:06:00
-  aws:autoscaling:updatepolicy:rollingupdate:
-    RollingUpdateType: Health
-    RollingUpdateEnabled: true
-  aws:elasticbeanstalk:managedactions:platformupdate:
-    UpdateLevel: minor
-    InstanceRefreshEnabled: true
-  AWSEBCloudwatchAlarmHigh.aws:autoscaling:trigger:
-    UpperThreshold: '150'
-  aws:elasticbeanstalk:sns:topics:
-    Notification Endpoint: jhamann42@gmail.com
-  AWSEBAutoScalingGroup.aws:autoscaling:asg:
-    Cooldown: '60'
-  aws:elasticbeanstalk:environment:
-    ServiceRole: aws-elasticbeanstalk-service-role
-    EnvironmentType: LoadBalanced
-    LoadBalancerType: classic
-  aws:elasticbeanstalk:healthreporting:system:
-    SystemType: enhanced
   aws:autoscaling:launchconfiguration:
     IamInstanceProfile: aws-elasticbeanstalk-ec2-role
     InstanceType: t2.micro
-EnvironmentTier:
-  Type: Standard
-  Name: WebServer
-AWSConfigurationTemplateVersion: 1.1.0.0
-
+  aws:autoscaling:trigger:
+    BreachDuration: '3'
+    LowerThreshold: '5'
+    MeasureName: RequestCount
+    Period: '1'
+    Statistic: Sum
+    Unit: Count
+    UpperBreachScaleIncrement: '2'
+  aws:autoscaling:updatepolicy:rollingupdate:
+    RollingUpdateEnabled: true
+    RollingUpdateType: Health
+  aws:elasticbeanstalk:command:
+    BatchSize: '30'
+    BatchSizeType: Percentage
+  aws:elasticbeanstalk:environment:
+    EnvironmentType: LoadBalanced
+    LoadBalancerType: classic
+    ServiceRole: aws-elasticbeanstalk-service-role
+  aws:elasticbeanstalk:healthreporting:system:
+    SystemType: enhanced
+  aws:elasticbeanstalk:managedactions:
+    ManagedActionsEnabled: true
+    PreferredStartTime: FRI:06:00
+  aws:elasticbeanstalk:managedactions:platformupdate:
+    InstanceRefreshEnabled: true
+    UpdateLevel: minor
+  aws:elasticbeanstalk:sns:topics:
+    Notification Endpoint: jhamann42@gmail.com
+Platform:
+  PlatformArn: arn:aws:elasticbeanstalk:ap-southeast-2::platform/Python 3.6 running
+    on 64bit Amazon Linux/2.6.5
 packages:
   yum:
-    libjpeg-turbo-devel: []
-    libjpeg-devel: '6b'
-    zlib-devel: []
     freetype-devel: []
+    libjpeg-devel: 6b
+    libjpeg-turbo-devel: []
+    zlib-devel: []
