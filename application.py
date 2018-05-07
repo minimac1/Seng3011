@@ -23,13 +23,14 @@ redColour = "#800000"
 
 @application.context_processor
 def inject_user():
-    login = "Steve" #TEMPORARY change to login and this to log in after demo
-    link = "/profile"  # change this back to signin after demo
     if 'username' in session:
-        login = session['username'] # gotta set this when someone logs in
+        username = session['username']
+        print('session[username] = '+username)
+    else:
+        username = None  # <div class=\"g-signin2\" data-onsuccess=\"onSignIn\"></div>
 
     # will have to change link to the profile page if logged in
-    return dict(user=login,logged=link)
+    return dict(user=username)
 
 @application.route('/')
 ##@app.route('/News/<name>')
@@ -39,9 +40,23 @@ def base():
 def apiIndex():
     return render_template('homepage.html')
 
-@application.route('/signin')
+@application.route('/signin', methods=['POST'])
 def signIn():
-    return render_template('signin.html')
+    username = request.form.get('username')
+    if username is not None:
+        session['username'] = username
+        session.permanent = True
+        print('logged in as ' + username)
+        return username
+    else:
+        return "FAILED TO LOG IN"
+
+
+@application.route('/signout', methods=['POST'])
+def signOut():
+    session.pop('username', None)
+    return "Log out success"
+
 
 @application.route('/google6ba7dcd540cdf4c2.html')
 def googleVerification():
