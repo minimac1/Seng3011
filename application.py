@@ -128,7 +128,37 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
         session['userFol'] = names
         # change long term stored
     for name in names: # having most fields with colours, will need to add a function the chooses the colour based on the result
-        if (name=='AMP.ax'){
+        if (name=='AMP.ax'):
+            tempAMP = {}
+            tempAMP['name'] = name
+            tempAMP['change'] = 50 # Have to change this to what the actual change should be for the company
+            tempAMP['changec'] = "#800000"
+            tempAMP['recS'] = "Slightly Positive" # doing a sentiment analysis on the articles within past week
+            tempAMP['recSc'] = "#7a8c00"
+            tempAMP['stock'] = 3.2 # mby change in stock price or a recent period of time
+            tempAMP['stockc'] = "#7a8c00"
+            companies.append(tempAMP)
+        elif (name=='CBA.ax'):
+            tempCBA = {}
+            tempCBA['name'] = name
+            tempCBA['change'] = 50 # Have to change this to what the actual change should be for the company
+            tempCBA['changec'] = "#800000"
+            tempCBA['recS'] = "Slightly Positive" # doing a sentiment analysis on the articles within past week
+            tempCBA['recSc'] = "#7a8c00"
+            tempCBA['stock'] = 3.2 # mby change in stock price or a recent period of time
+            tempCBA['stockc'] = "#7a8c00"
+            companies.append(tempCBA)
+        elif (name=='QAN.ax'):
+            tempQAN = {}
+            tempQAN['name'] = name
+            tempQAN['change'] = 50 # Have to change this to what the actual change should be for the company
+            tempQAN['changec'] = "#800000"
+            tempQAN['recS'] = "Slightly Positive" # doing a sentiment analysis on the articles within past week
+            tempQAN['recSc'] = "#7a8c00"
+            tempQAN['stock'] = 3.2 # mby change in stock price or a recent period of time
+            tempQAN['stockc'] = "#7a8c00"
+            companies.append(tempQAN)
+        else:
             temp = {}
             temp['name'] = name
             temp['change'] = 50 # Have to change this to what the actual change should be for the company
@@ -138,37 +168,6 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             temp['stock'] = 3.2 # mby change in stock price or a recent period of time
             temp['stockc'] = "#7a8c00"
             companies.append(temp)
-        }else if (name=='CBA.ax'){
-            temp = {}
-            temp['name'] = name
-            temp['change'] = 50 # Have to change this to what the actual change should be for the company
-            temp['changec'] = "#800000"
-            temp['recS'] = "Slightly Positive" # doing a sentiment analysis on the articles within past week
-            temp['recSc'] = "#7a8c00"
-            temp['stock'] = 3.2 # mby change in stock price or a recent period of time
-            temp['stockc'] = "#7a8c00"
-            companies.append(temp)
-        }else if (name=='QAN.ax'){
-            temp = {}
-            temp['name'] = name
-            temp['change'] = 50 # Have to change this to what the actual change should be for the company
-            temp['changec'] = "#800000"
-            temp['recS'] = "Slightly Positive" # doing a sentiment analysis on the articles within past week
-            temp['recSc'] = "#7a8c00"
-            temp['stock'] = 3.2 # mby change in stock price or a recent period of time
-            temp['stockc'] = "#7a8c00"
-            companies.append(temp)
-        }else {
-            temp = {}
-            temp['name'] = name
-            temp['change'] = 50 # Have to change this to what the actual change should be for the company
-            temp['changec'] = "#800000"
-            temp['recS'] = "Slightly Positive" # doing a sentiment analysis on the articles within past week
-            temp['recSc'] = "#7a8c00"
-            temp['stock'] = 3.2 # mby change in stock price or a recent period of time
-            temp['stockc'] = "#7a8c00"
-            companies.append(temp)
-        }
     return render_template('profile.html',companies = companies)
 
 @application.route('/newsapi/gui')
