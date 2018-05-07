@@ -1,7 +1,8 @@
 alpha-vantage==2.0.0
 aniso8601==3.0.0
 awsebcli==3.12.4
-botocore==1.9.18
+boto3==1.7.14
+botocore==1.10.14
 cement==2.8.2
 click==6.7
 colorama==0.3.7
@@ -27,6 +28,7 @@ pytrends==4.3.0
 pytz==2018.3
 PyYAML==3.12
 requests==2.9.1
+s3transfer==0.1.13
 semantic-version==2.5.0
 simplejson==3.14.0
 six==1.11.0
