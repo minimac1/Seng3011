@@ -1,6 +1,7 @@
 from flask import Flask, render_template,Blueprint
 from flask_restful import Resource, Api, reqparse, fields, marshal
 from datetime import datetime
+from alpha_vantage.timeseries import TimeSeries
 import csv
 import json
 import requests
@@ -12,8 +13,8 @@ api = Api(application)
 currentVersion = 'v4.0'
 defaultPageSize = 200
 api_url = "http://content.guardianapis.com/search"
-
-alphaVantageAPIKey = ERXH2MS2R8UU6EDN
+#https://github.com/RomelTorres/alpha_vantage
+avTS = TimeSeries(key='ERXH2MS2R8UU6EDN')
 
 
 # Log JSON fields
