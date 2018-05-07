@@ -5,15 +5,13 @@
       google.charts.load('current', {'packages':['corechart']});
       google.charts.setOnLoadCallback(drawChart);
 
-      function drawChart() {
+      function drawChart() { //should probly get better data ltr with rohan DESIGN the case around the negative article on 04-27
         var data = google.visualization.arrayToDataTable([
-          ['Year', 'Trends', 'Returns'],
-          ['01/05',  15,      13],
-          ['02/05',  22,      17],
-          ['03/05',  37,       25],
-          ['04/05',  36,      35],
-          ['05/05',  33,      38],
-          ['06/05',  30,      34],
+          ['Year', 'Trends Change', 'Stocks Change'],
+          ['01/05',  25,      1.9],
+          ['02/05',  -13,     0.4],
+          ['03/05',  11,      0.5],
+          ['04/05',  -20,     -1.5],
         ]);
 
         var options = {
@@ -26,13 +24,13 @@
         chart.draw(data, options);
       }
     </script>
-    <div class="container-fluid CL-container">
+    <div class="container-fluid CL-container"">
         <table class="dbTable">
             <tr>
                 <td rowspan="3" style="width:300px;">
-                    <ul style="list-style: none;">
+                    <ul style="list-style: circle;">
                         {% for article in articles %}
-                        <li> <a href="{{article['url']}}" style="color:black"> {{article['sent']}} &nbsp {{article['headline']}} </a></li>
+                        <li class="dbl CL-body" style="line-height: 1.2;"> <a style="color:{{article['sentc']}}">{{article['sent']}}</a> <a href="{{article['url']}}" style="float: right;"> {{article['date']}}</a><br> <a style="font-size:16px;">{{article['headline']}}</a></li>
                         {% endfor %}
                     </ul>
                 </td>
@@ -42,7 +40,7 @@
             </tr>
             <tr>
                 <td>
-                    <div class="CL-heading">Statement: {{company['statement']}}</div>
+                    <div class="CL-heading" style="line-height: 1.5;">{{company['statement']|safe}}</div>
                 </td>
             </tr>
             <tr>
