@@ -24,10 +24,10 @@ def inject_user():
     link = "/profile"  # change this back to signin after demo
     if 'username' in session:
         login = session['username'] # gotta set this when someone logs in
-        
+
     # will have to change link to the profile page if logged in
     return dict(user=login,logged=link)
-    
+
 @application.route('/')
 ##@app.route('/News/<name>')
 def base():
@@ -47,7 +47,7 @@ def googleVerification():
 @application.route('/newsapi')
 def apiHome():
     return render_template('apiHome.html')
-    
+
 @application.route('/db')
 def db():
     # add dummy variables
@@ -58,17 +58,17 @@ def db():
     company['name'] = name
     company['change'] = 50
     #company['changec'] = "#800000"
-    #company['recS'] = "slightly Positive" probly dont need an overall sentiment here considering we list it for each article 
+    #company['recS'] = "slightly Positive" probly dont need an overall sentiment here considering we list it for each article
     #company['recSc'] = "#7a8c00"
-    company['returns'] = 5 
+    company['returns'] = 5
     #company['returnsc'] = "#7a8c00"
-    company['stock'] = 3.2 
+    company['stock'] = 3.2
     #company['stockc'] = "#7a8c00"
     statement = "Google trends indicates a lot has happened recently." # some way of creating a statement from reading our data
     statement += "A positive sentiment analysis indicates the company is doing well."
     company['statement'] = statement
-    
-    
+
+
     sDate="2018-05-01T00:00:00.000Z" # will probly need to pass in dates to choose the start date, once we've stored a results
     eDate="2018-05-06T00:00:00.000Z" # otherwise currently hardcoded to the previous week
     cId = name
@@ -87,9 +87,9 @@ def db():
         text = sentiment(text)
         temp['sent'] = round(text[0],2)
         articles.append(temp)
-        
+
     return render_template('dB.html',articles=articles,company=company)
-    
+
 #takes in an array of news articles
 #and returns an array of scores eg. [o.96, 0.3]
 #The score is from 0-1 and where 0.5 is netural
@@ -108,14 +108,14 @@ def sentiment(newsText):
 
     print(ar)
     return ar
-    
+
 @application.route('/profile')
 def profile(): # maybe for the demo add the few chosen companies to session['userFol'] before the if
     companies = []
-    names = [] # TEMPORARY enter 1/ 
+    names = [] # TEMPORARY enter 1/
     #session['userFol'] = names # TEMPORARY
     new = request.args.get('added')
-    
+
     if 'userFol' in session:
         names = session['userFol'] # for user following, to be filled with names of following companies when user logs in
     if new is not None:
@@ -132,7 +132,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
         temp['name'] = name
         temp['change'] = 50 # Have to change this to what the actual change should be for the company
         temp['changec'] = "#800000"
-        temp['recS'] = "slightly Positive" # doing a sentiment analysis on the articles within past week
+        temp['recS'] = "Slightly Positive" # doing a sentiment analysis on the articles within past week
         temp['recSc'] = "#7a8c00"
         temp['returns'] = 5 # might be nice to get the change in returns, comparing last weeks to the average of a time period b4 that
         temp['returnsc'] = "#7a8c00"
