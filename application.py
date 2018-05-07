@@ -82,14 +82,22 @@ def db():
     #if 'NewsDataSet' not in re:
         #company['statement'] += re['Developer Notes']['Execution Result']
         #return render_template('dB.html',articles=articles,company=company)
+    i = 0
     for art in re['NewsDataSet']:
+        if i > 9:
+            break; #limiting it to 10 articles
         temp = {}
         temp['headline'] = art['Headline']
         temp['url'] = art['URL']
-        text = [art['NewsText']]
+        text = art['NewsText']
+        if not text:
+            continue
+        text = [text]
         text = sentiment(text)
         temp['sent'] = round(text[0],2)
+        
         articles.append(temp)
+        i+= 1
 
     return render_template('dB.html',articles=articles,company=company)
 
