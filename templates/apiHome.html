@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
     <div class="container-fluid CL-container">
-    <h1 class="page-title">Api Home page</h1> 
+    <h1 class="page-title">Api Home page</h1>
+    <hr style="width:50px;border:5px solid red" class="w3-round"> 
     <p class="CL-heading">Here we will show all the information about our api and links to all pages related</p>
     <ul>
         {% for href, caption in [('newsapi/changes', 'Change log'), ('newsapi/documentation', 'Documentation'), ('newsapi/test', 'Test Data'), ('newsapi/gui', 'Api gui example')] %}
