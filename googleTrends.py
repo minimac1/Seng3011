@@ -58,23 +58,36 @@ def updateGoogleTrends(companyID, alias):
                 'Hourly Change (%)' : "0"}
         pytrendsCompanyList.append(newCID)
 
-#add user with provided set of CIDs
-def addGoogleTrendsUser(userID, listOfIds):
-    currUser = {'UserID' : userID, 'CompanyIDList' : listOfIds}
-    pytrendsUserList.append(currUser)
+def removeCIDfromCompanyList(CID):
+    for companyInstance in pytrendsCompanyList:
+        if (companyInstance['CompanyID'] == CID):
+            pytrendsCompanyList.remove(companyInstance)
 
-#assumes user exists
-def addIDsToGoogleTrendsUser(userID, newId):
+#add user with provided set of CIDs
+def addGoogleTrendsUser(userID, listOfCIDs):
+    currUser = {'UserID' : userID, 'CompanyIDList' : listOfCIDs}
+    pytrendsUserList.append(currUser)
+    for CID in listOfCIDs:
+        updateGoogleTrends(CID, CID)
+
+#assumes user exists, doesnt add duplicate
+def addIDsToGoogleTrendsUser(userID, newCID):
     for currUser in pytrendsUserList:
         if (currUser['UserID'] == userID):
-            if (not newId in currUser['CompanyIDList']):
-                currUser['CompanyIDList'].append(newId)
+            if (not newCID in currUser['CompanyIDList']):
+                currUser['CompanyIDList'].append(newCID)
+                updateGoogleTrends(newCID, newCID)
 
 def removeIDfromGoogleTrendsUser(userID, idToRemove):
+    count = 0
     for currUser in pytrendsUserList:
-        if (currUser['UserID'] == userID):
-            currUser['CompanyIDList'].remove(idToRemove)
-
+        if (idToRemove in currUser['CompanyIDList']):
+            count++
+            if (currUser['UserID'] == userID):
+                currUser['CompanyIDList'].remove(idToRemove)
+    #If this was the only occurance of this CID, remove from pytrendsCompanyList
+    if (count==1):
+        removeCIDfromCompanyList(idToRemove)
 
 addGoogleTrendsUser('thisismycookieID', ['ANZ.ax', 'WOW.ax'])
 updateGoogleTrends('ANZ.ax', 'ANZ')
