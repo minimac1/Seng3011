@@ -113,7 +113,7 @@ def sentiment(newsText):
 def profile(): # maybe for the demo add the few chosen companies to session['userFol'] before the if
     companies = []
     names = [] # TEMPORARY enter 1/
-    session['userFol'] = ['AMP.ax','CBA.ax','QAN.ax']
+    #session['userFol'] = ['AMP.ax','CBA.ax','QAN.ax']
     new = request.args.get('added')
 
     if 'userFol' in session:
