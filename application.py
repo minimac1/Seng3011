@@ -20,14 +20,15 @@ application.register_blueprint(api_v4, url_prefix='/newsapi/v4.0')
 
 @application.context_processor
 def inject_user():
-    login = "Steve" #TEMPORARY change to login and this to log in after demo
-    link = "/profile"  # change this back to signin after demo
     if 'username' in session:
-        login = session['username'] # gotta set this when someone logs in
-        
+        username = session['username']
+        print('session[username] = '+username)
+    else:
+        username = None  # <div class=\"g-signin2\" data-onsuccess=\"onSignIn\"></div>
+
     # will have to change link to the profile page if logged in
-    return dict(user=login,logged=link)
-    
+    return dict(user=username)
+
 @application.route('/')
 ##@app.route('/News/<name>')
 def base():
@@ -36,9 +37,23 @@ def base():
 def apiIndex():
     return render_template('homepage.html')
 
-@application.route('/signin')
+@application.route('/signin', methods=['POST'])
 def signIn():
-    return render_template('signin.html')
+    username = request.form.get('username')
+    if username is not None:
+        session['username'] = username
+        session.permanent = True
+        print('logged in as ' + username)
+        return username
+    else:
+        return "FAILED TO LOG IN"
+
+
+@application.route('/signout', methods=['POST'])
+def signOut():
+    session.pop('username', None)
+    return "Log out success"
+
 
 @application.route('/google6ba7dcd540cdf4c2.html')
 def googleVerification():
@@ -47,7 +62,7 @@ def googleVerification():
 @application.route('/newsapi')
 def apiHome():
     return render_template('apiHome.html')
-    
+
 @application.route('/db')
 def db():
     # add dummy variables
@@ -58,17 +73,17 @@ def db():
     company['name'] = name
     company['change'] = 50
     #company['changec'] = "#800000"
-    #company['recS'] = "slightly Positive" probly dont need an overall sentiment here considering we list it for each article 
+    #company['recS'] = "slightly Positive" probly dont need an overall sentiment here considering we list it for each article
     #company['recSc'] = "#7a8c00"
-    company['returns'] = 5 
+    company['returns'] = 5
     #company['returnsc'] = "#7a8c00"
-    company['stock'] = 3.2 
+    company['stock'] = 3.2
     #company['stockc'] = "#7a8c00"
     statement = "Google trends indicates a lot has happened recently." # some way of creating a statement from reading our data
     statement += "A positive sentiment analysis indicates the company is doing well."
     company['statement'] = statement
-    
-    
+
+
     sDate="2018-05-01T00:00:00.000Z" # will probly need to pass in dates to choose the start date, once we've stored a results
     eDate="2018-05-06T00:00:00.000Z" # otherwise currently hardcoded to the previous week
     cId = name
@@ -87,9 +102,9 @@ def db():
         text = sentiment(text)
         temp['sent'] = round(text[0],2)
         articles.append(temp)
-        
+
     return render_template('dB.html',articles=articles,company=company)
-    
+
 #takes in an array of news articles
 #and returns an array of scores eg. [o.96, 0.3]
 #The score is from 0-1 and where 0.5 is netural
@@ -108,14 +123,14 @@ def sentiment(newsText):
 
     print(ar)
     return ar
-    
+
 @application.route('/profile')
 def profile(): # maybe for the demo add the few chosen companies to session['userFol'] before the if
     companies = []
-    names = [] # TEMPORARY enter 1/ 
+    names = [] # TEMPORARY enter 1/
     #session['userFol'] = names # TEMPORARY
     new = request.args.get('added')
-    
+
     if 'userFol' in session:
         names = session['userFol'] # for user following, to be filled with names of following companies when user logs in
     if new is not None:
