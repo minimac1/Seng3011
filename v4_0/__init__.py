@@ -13,6 +13,8 @@ currentVersion = 'v4.0'
 defaultPageSize = 200
 api_url = "http://content.guardianapis.com/search"
 
+alphaVantageAPIKey = ERXH2MS2R8UU6EDN
+
 
 # Log JSON fields
 log_fields = {}

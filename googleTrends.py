@@ -1,6 +1,7 @@
 from flask import Flask, render_template,Blueprint
 from flask_restful import Resource, Api, reqparse, fields, marshal
 from datetime import datetime
+import v4_0
 import csv
 import json
 import requests
@@ -15,7 +16,7 @@ pytrendsCompanyList = []
 pytrendsInstance = {}
 pytrendsInstance['CompanyID'] = fields.String
 pytrendsInstance['Current Hour Results'] = fields.Integer
-pytrendsInstance['Hourly Change (%)'] = fields.String
+pytrendsInstance['Hourly Change (%)'] = fields.Integer
 #Store each user, with their set of company ids (no duplicates)
 userPytrends = {}
 userPytrends['UserID'] = fields.String
@@ -34,6 +35,20 @@ def companyListAsJson():
     data = {'Google Trends Companies' : pytrendsCompanyList}
     return marshal(data, output_fields)
 
+def getCurrentChange(cid):
+    for curInstance in pytrendsCompanyList:
+        if (curInstance['CompanyID']==cid):
+            return curInstance['Hourly Change (%)']
+
+def updateAllTrends():
+    for currInstance in pytrendsCompanyList:
+        curCID = currInstance['CompanyID']
+        curAlias = v4_0.fullName(curCID)
+        print("Current CID: " + curCID)
+        print("Current Alias: " + curAlias)
+        updateGoogleTrends(curCID, curAlias)
+
+
 #update CompanyID with alias to google
 def updateGoogleTrends(companyID, alias):
     kw_list = [alias]
@@ -42,14 +57,14 @@ def updateGoogleTrends(companyID, alias):
 
     found = False
     newRes = df[alias].sum()
-    for currCID in pytrendsCompanyList:
-        if (currCID['CompanyID'] == companyID):
+    for currInstance in pytrendsCompanyList:
+        if (currInstance['CompanyID'] == companyID):
             found = True
-            prevRes = currCID['Current Hour Results']
+            prevRes = currInstance['Current Hour Results']
             change = newRes - prevRes
             percentChange = (change/prevRes)*100
-            currCID['Current Hour Results'] = newRes
-            currCID['Hourly Change (%)'] = round(percentChange,2)
+            currInstance['Current Hour Results'] = newRes
+            currInstance['Hourly Change (%)'] = round(percentChange,4)
 
     #If not found, create
     if not found:
@@ -63,40 +78,44 @@ def removeCIDfromCompanyList(CID):
         if (companyInstance['CompanyID'] == CID):
             pytrendsCompanyList.remove(companyInstance)
 
-#add user with provided set of CIDs
-def addGoogleTrendsUser(userID, listOfCIDs):
-    currUser = {'UserID' : userID, 'CompanyIDList' : listOfCIDs}
-    pytrendsUserList.append(currUser)
-    for CID in listOfCIDs:
-        updateGoogleTrends(CID, CID)
+# #add user with provided set of CIDs
+# def addGoogleTrendsUser(userID, listOfCIDs):
+#     currUser = {'UserID' : userID, 'CompanyIDList' : listOfCIDs}
+#     pytrendsUserList.append(currUser)
+#     for CID in listOfCIDs:
+#         updateGoogleTrends(CID, CID)
 
-#assumes user exists, doesnt add duplicate
-def addIDsToGoogleTrendsUser(userID, newCID):
+#doesnt add duplicate
+def addIDsToGoogleTrendsUser(userID, newCID, newCIDalias):
+    userExists = False
     for currUser in pytrendsUserList:
         if (currUser['UserID'] == userID):
+            userExists = True
             if (not newCID in currUser['CompanyIDList']):
                 currUser['CompanyIDList'].append(newCID)
-                updateGoogleTrends(newCID, newCID)
+                updateGoogleTrends(newCID, newCIDalias)
+    if (not userExists):
+        currUser = {'UserID' : userID, 'CompanyIDList' : [newCID]}
+        pytrendsUserList.append(currUser)
+        updateGoogleTrends(newCID, newCIDalias)
 
 def removeIDfromGoogleTrendsUser(userID, idToRemove):
     count = 0
     for currUser in pytrendsUserList:
         if (idToRemove in currUser['CompanyIDList']):
-            count++
+            count += 1
             if (currUser['UserID'] == userID):
                 currUser['CompanyIDList'].remove(idToRemove)
     #If this was the only occurance of this CID, remove from pytrendsCompanyList
     if (count==1):
         removeCIDfromCompanyList(idToRemove)
 
-addGoogleTrendsUser('thisismycookieID', ['ANZ.ax', 'WOW.ax'])
-updateGoogleTrends('ANZ.ax', 'ANZ')
-updateGoogleTrends('WOW.ax', 'Woolworths')
-print("\n.....Printing Company List ['ANZ.ax', 'WOW.ax'].....\n")
+addIDsToGoogleTrendsUser('thisismycookieID', 'ANZ.ax', 'ANZ')
+addIDsToGoogleTrendsUser('thisismycookieID', 'CBA.ax', 'Commonwealth Bank of Australia')
+print("\n.....Printing Company List ['ANZ.ax', 'CBA.ax'].....\n")
 print(companyListAsJson())
 print("\n.....Call update again to show change.....\n")
-updateGoogleTrends('ANZ.ax', 'ANZ')
-updateGoogleTrends('WOW.ax', 'Woolworths')
+updateAllTrends()
 print(companyListAsJson())
 print("\n.....Now printinging user database.....\n")
 print(userListAsJson())
