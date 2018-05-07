@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
             <div class="container-fluid CL-container">
-                <div class="page-title">Change log</div>         
+                <div class="page-title">Change log</div>
+                <hr style="width:50px;border:5px solid red" class="w3-round">
                 <div class="CL-body">Use the first version number to choose which version to use. e.g. v1.0 or v2.0 or v3.0 . It will always access the latest
                 within that version.</div>
                 <div class="CL-heading"> Bug fixes, prep for demo &nbsp version 3.0 26/04/2018</div>
@@ -18,7 +19,7 @@
                     </ul>
                 <div class="CL-heading"> Second prototype, first update &nbsp version 2.0 &nbsp 11/04/2018</div>
                     <ul style="list-style: none;margin-left: 20px;padding-left: 1em; text-indent: -1em;">
-                        <li><b>+</b>&nbsp&nbsp Added 2 new pages. 1 a homepage for the api which will include a summary of everything about our api and a 
+                        <li><b>+</b>&nbsp&nbsp Added 2 new pages. 1 a homepage for the api which will include a summary of everything about our api and a
                         gui page, which is an example of what you can do with our api</li>
                         <li><b>+</b>&nbsp&nbsp Added versioning support so that you can check out older versions of our api as well as
                          the latest. Change the first number of the version to choose which version you are using.</li>
@@ -32,12 +33,11 @@
                     </ul>
                     <ul>
                        <li>Improved relevance for returned articles and articles are returned in order of relevance.</li>
-                       <li>In the case where there are no articles from using our api, we have changed this from an error to 
+                       <li>In the case where there are no articles from using our api, we have changed this from an error to
                        still being successful but with a helpful message.</li>
                         <li>Now correctly returns an error and message on malformed endpoints.</li>
                     </ul>
                 <div class="CL-heading"> First prototype &nbsp version 1.0 &nbsp 30/03/2018</div>
-                <div class="CL-body">
                     <ul style="list-style: none;margin-left: 20px;padding-left: 1em; text-indent: -1em;">
                         <li><b>+</b>&nbsp&nbsp Api is now hosted on a web server and is accessible 24/7</li>
                         <li><b>+</b>&nbsp&nbsp Api includes parameters for start + end dates, company Id or name and topics.</li>
@@ -52,14 +52,13 @@
                     <ul style="list-style: none; margin-left: 20px;padding-left: 1em;text-indent: -1em;">
                         <li><b>-</b>&nbsp&nbsp example minus sign for would be any removals</li>
                     </ul>
-                    </div>
             </div>
-        
-       
-        
+
+
+
     <!-- this page will include all updates to our api. Each new version will have its version v1.n.k -> v1.(n+1).0 whenever we add a feature or v1.n.k -> v1.n.(k+1) whenever its just a fix. This will be a list of all changes, the title will only be the version number, within the item it will include another list of every update. Use + for any added features, (dot) for any changed features and - for any removed features -->
-    
+
     <!-- might be ideal to store both changes and features in text files then use python to fill a list of records to push into here, but for now hardcoding a few should be fine-->
-    
+
     <!-- not sure how complicated it will be but if we could create a webhook so that git automatically adds update to our file that stores our update logs wud be gud but not necessary and definitely not for the upcoming prototypes-->
 {% endblock %}

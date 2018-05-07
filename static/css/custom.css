@@ -5,7 +5,9 @@ body {
 
 .page-title{
   font-size: 50px;
-  font-family:"red serifs", serif;
+  font-family:"Poppins", sans-serif;
+  font-weight: bold;
+  color: #f44336;
 }
 .dbTable{
   position:absolute;
@@ -95,6 +97,7 @@ body {
   margin-bottom:5px;
   border: none;
   border-collapse: collapse;
+  background-color: #f1f1f1;
 }
 .inTable td {
   border-left: 1px solid #ddd;
@@ -103,6 +106,8 @@ body {
 }
 .inTable td:first-child {
   border-left: none;
+  background-color: #616161;
+  color: #fff!important;
 }
 .inTable tr {
   border-top: 1px solid #ddd;
@@ -110,6 +115,8 @@ body {
 .inTable tr:first-child {
   border-top: none;
   border-bottom:2px solid #ddd;
+  background-color: #616161;
+  color: #fff!important;
 }
 .CL-container{
   position:fixed;
@@ -126,25 +133,25 @@ body {
 .CL-heading{
   font-size: 30px;
   line-height: 3;
-  font-family:serif;
+  font-family:"Poppins", sans-serif;
 }
 
 .CL-body{
   font-size: 20px;
   line-height: 1.5;
-  font-family:serif;
+  font-family:"Poppins", sans-serif;
 }
 
 .guiurl{
   font-size: 20px;
   line-height: 1.5;
-  font-family:serif;
+  font-family:"Poppins", sans-serif;
 }
 
 .guinote{
   font-size: 20px;
   line-height: 1.5;
-  font-family:serif;
+  font-family:"Poppins", sans-serif;
 }
 .enterWord{
   height:30px;
@@ -211,7 +218,7 @@ body {
   height: 100%;
   margin-left: -250px;
   overflow-y: auto;
-  background: #000;
+  background: #f44336;
   -webkit-transition: all 0.5s ease;
   -moz-transition: all 0.5s ease;
   -o-transition: all 0.5s ease;
@@ -229,31 +236,31 @@ body {
 .sidebar-brands {
   margin-top:30px;
   margin-bottom:20px;
-  color:#eeeeee;
+  color:#fff;
   font-size: 40px;
-  font-family:serif;
+  font-family:"Poppins", sans-serif;
 }
 
 .sidebar-head {
-  color:#cccccc;
+  color:#fff;
   margin-bottom:10px;
   font-size: 30px;
   line-height: 3;
-  font-family:serif;
+  font-family:"Poppins", sans-serif;
 }
 
 .sidebar-sub {
-  color:#bbbbbb;
+  color:#fff;
   font-size: 25px;
   line-height: 2;
-  font-family:serif;
+  font-family:"Poppins", sans-serif;
 }
 
 .sidebar-link {
-  color:#aaaaaa;
+  color:#fff;
   font-size: 15px;
   line-height: 1.5;
-  font-family:serif;
+  font-family:"Poppins", sans-serif;
 }
 /* Sidebar Styles */
 
@@ -274,12 +281,12 @@ body {
 .sidebar-nav li a {
   display: block;
   text-decoration: none;
-  color: #999999;
+  color: #fff;
 }
 
 .sidebar-nav li a:hover {
   text-decoration: none;
-  color: #fff;
+  color: #000;
   background: rgba(255, 255, 255, 0.2);
 }
 
@@ -339,4 +346,20 @@ body {
   width: auto;
   max-width: 680px;
   padding: 0 15px;
+}
+
+
+.w3-round,.w3-round-medium{
+    border-radius:4px;
+    left: 0px!important;
+    position: static;
+    margin: 0px;
+    margin-bottom: 20px!important;
+    display: block!important;
+}
+
+.btn-secondary {
+    color: #fff;
+    background-color: #f44336;
+    border-color: #f44336;
 }
