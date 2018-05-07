@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
     <div class="container-fluid CL-container">
-    <h1 class="page-title">Team Turtle: Website home page</h1> 
+    <h1 class="page-title">Team Turtle: Website home page</h1>
+    <hr style="width:50px;border:5px solid red" class="w3-round"> 
     <p class="CL-heading">These links (and our homepage) will be updated as the project is progressed.</p>
     <ul>
         {% for href, caption in [('/newsapi', 'Api Home page'), ('/newsapi/changes', 'Change log'), ('/newsapi/documentation', 'Documentation'), ('/newsapi/test', 'Test Data'), ('/newsapi/gui', 'Api gui example')] %}
