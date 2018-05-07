@@ -172,7 +172,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             tempAMP['stock'] = -3.3 # mby change in stock price or a recent period of time
             tempAMP['stockc'] = redColour
             companies.append(tempAMP)
-        elif ('CBA' in name):
+        elif ('CBA' in name || 'Commonwealth Bank'):
             tempCBA = {}
             tempCBA['name'] = name
             tempCBA['change'] = "17%" # Have to change this to what the actual change should be for the company
