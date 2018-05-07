@@ -1,13 +1,23 @@
 {% extends "base.html" %}
 {% block content %}
     <div class="container-fluid CL-container">
+    
     <h1 class="page-title">Team Turtle: Website home page</h1>
     <hr style="width:50px;border:5px solid red" class="w3-round"> 
-    <p class="CL-heading">These links (and our homepage) will be updated as the project is progressed.</p>
-    <ul>
-        {% for href, caption in [('/newsapi', 'Api Home page'), ('/newsapi/changes', 'Change log'), ('/newsapi/documentation', 'Documentation'), ('/newsapi/test', 'Test Data'), ('/newsapi/gui', 'Api gui example')] %}
-        <li><a class="CL-body" href="{{ href }}">{{ caption }}</a></li>
-    {% endfor %}
-    </ul>
+    <p><br></p>
+    <p class="CL-heading" style="line-height:1">Our aim</p>
+    <hr style="width:30px;border:3px solid black" class="w3-round"> 
+    <p class="CL-body">Our web application is intended to help users keep up with any significant events that could involve their stocks.</p>
+    <p><br></p>
+    <p class="CL-heading" style="line-height:1">How</p>
+    <hr style="width:30px;border:3px solid black" class="w3-round">
+    <p class="CL-body">Through the use of Google searches as a predictor we can tell whenever an important event happens and combining this with a sentiment analysis of
+    relevant articles during that time period we can accurately determine whether it was a good or bad event.</p>
+    <p><br></p>
+    <p class="CL-heading" style="line-height:1">Our API</p>
+    <hr style="width:30px;border:3px solid black" class="w3-round"> 
+    <p class="CL-body">We have also developed an api that can be used to retrieve all the information on a particular company within a specified time period. This is used
+     in our application to retrieve a list of related articles so that we can then perform a sentiment analysis. </p>
+     <p><br></p>
     </div>
 {% endblock %}

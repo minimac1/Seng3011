@@ -10,9 +10,9 @@ body {
   color: #f44336;
 }
 .dbTable{
-  position:absolute;
-  left:0;
-  padding-left:30px;
+  position:relative;
+  left:0px;
+  padding-right:20px;
 }
 
 .headL{
@@ -363,3 +363,5 @@ body {
     background-color: #f44336;
     border-color: #f44336;
 }
+
+
