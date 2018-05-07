@@ -1,6 +1,6 @@
 function init() {
   gapi.load('auth2', function() { console.log('gapi loaded') });
-  gapi.auth2.init({client_id: '245808396440-muan254t3oh49obnj6v8rk7meb3q6ps8.apps.googleusercontent.com'}})
+  gapi.auth2.init({client_id: '245808396440-muan254t3oh49obnj6v8rk7meb3q6ps8.apps.googleusercontent.com'})
 }
 
 function onSignIn(googleUser) {
