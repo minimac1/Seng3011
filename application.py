@@ -8,6 +8,7 @@ from v4_0 import application as api_v4
 import requests
 import os
 import re
+import indicoio
 
 application = Flask(__name__)
 application.secret_key = os.urandom(24)
@@ -17,7 +18,16 @@ application.register_blueprint(api_v2, url_prefix='/newsapi/v2.0')
 application.register_blueprint(api_v3, url_prefix='/newsapi/v3.0')
 application.register_blueprint(api_v4, url_prefix='/newsapi/v4.0')
 
-
+@application.context_processor
+def inject_user():
+    login = "Steve" #TEMPORARY change to login and this to log in after demo
+    link = "/profile"  # change this back to signin after demo
+    if 'username' in session:
+        login = session['username'] # gotta set this when someone logs in
+        
+    # will have to change link to the profile page if logged in
+    return dict(user=login,logged=link)
+    
 @application.route('/')
 ##@app.route('/News/<name>')
 def base():
@@ -37,6 +47,99 @@ def googleVerification():
 @application.route('/newsapi')
 def apiHome():
     return render_template('apiHome.html')
+    
+@application.route('/db')
+def db():
+    # add dummy variables
+    name = request.args.get('company')
+    if name is None:
+        return render_template('profile.html')
+    company = {}
+    company['name'] = name
+    company['change'] = 50
+    #company['changec'] = "#800000"
+    #company['recS'] = "slightly Positive" probly dont need an overall sentiment here considering we list it for each article 
+    #company['recSc'] = "#7a8c00"
+    company['returns'] = 5 
+    #company['returnsc'] = "#7a8c00"
+    company['stock'] = 3.2 
+    #company['stockc'] = "#7a8c00"
+    statement = "Google trends indicates a lot has happened recently." # some way of creating a statement from reading our data
+    statement += "A positive sentiment analysis indicates the company is doing well."
+    company['statement'] = statement
+    
+    
+    sDate="2018-05-01T00:00:00.000Z" # will probly need to pass in dates to choose the start date, once we've stored a results
+    eDate="2018-05-06T00:00:00.000Z" # otherwise currently hardcoded to the previous week
+    cId = name
+    url = ("http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=" + sDate
+     + "&endDate=" + eDate + "&companyId=" + cId)
+    re = requests.get(url).json()
+    articles = []
+    #if 'NewsDataSet' not in re:
+        #company['statement'] += re['Developer Notes']['Execution Result']
+        #return render_template('dB.html',articles=articles,company=company)
+    for art in re['NewsDataSet']:
+        temp = {}
+        temp['headline'] = art['Headline']
+        temp['url'] = art['URL']
+        text = [art['NewsText']]
+        text = sentiment(text)
+        temp['sent'] = round(text[0],2)
+        articles.append(temp)
+        
+    return render_template('dB.html',articles=articles,company=company)
+    
+#takes in an array of news articles
+#and returns an array of scores eg. [o.96, 0.3]
+#The score is from 0-1 and where 0.5 is netural
+# 1 is super duper positive and 0 is fully negative
+def sentiment(newsText):
+    indicoio.config.api_key = 'd1d92c5989dc9a21f0ed2f4e6c21f46e'
+    #indicoio.config.api_key = '5c28eab27da67528360f23ca9db6e3ea'
+
+    # single example
+    #indicoio.sentiment("I love writing code!")
+
+    s = newsText
+    print(s)
+
+    ar = indicoio.sentiment(s)
+
+    print(ar)
+    return ar
+    
+@application.route('/profile')
+def profile(): # maybe for the demo add the few chosen companies to session['userFol'] before the if
+    companies = []
+    names = [] # TEMPORARY enter 1/ 
+    #session['userFol'] = names # TEMPORARY
+    new = request.args.get('added')
+    
+    if 'userFol' in session:
+        names = session['userFol'] # for user following, to be filled with names of following companies when user logs in
+    if new is not None:
+        names.append(new)
+        session['userFol'] = names
+        # also add it to whereever we store it long term
+    new = request.args.get('removed')
+    if new is not None:
+        names.remove(new)
+        session['userFol'] = names
+        # change long term stored
+    for name in names: # having most fields with colours, will need to add a function the chooses the colour based on the result
+        temp = {}
+        temp['name'] = name
+        temp['change'] = 50 # Have to change this to what the actual change should be for the company
+        temp['changec'] = "#800000"
+        temp['recS'] = "slightly Positive" # doing a sentiment analysis on the articles within past week
+        temp['recSc'] = "#7a8c00"
+        temp['returns'] = 5 # might be nice to get the change in returns, comparing last weeks to the average of a time period b4 that
+        temp['returnsc'] = "#7a8c00"
+        temp['stock'] = 3.2 # mby change in stock price or a recent period of time
+        temp['stockc'] = "#7a8c00"
+        companies.append(temp)
+    return render_template('profile.html',companies = companies)
 
 @application.route('/newsapi/gui')
 def gui():

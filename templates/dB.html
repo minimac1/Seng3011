@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Year', 'Trends', 'Returns'],
+          ['01/05',  15,      13],
+          ['02/05',  22,      17],
+          ['03/05',  37,       25],
+          ['04/05',  36,      35],
+          ['05/05',  33,      38],
+          ['06/05',  30,      34],
+        ]);
+
+        var options = {
+          title: 'Company Performance',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('chart'));
+
+        chart.draw(data, options);
+      }
+    </script>
+    <div class="container-fluid CL-container">
+        <table class="dbTable">
+            <tr>
+                <td rowspan="3" style="width:300px;">
+                    <ul style="list-style: none;">
+                        {% for article in articles %}
+                        <li> <a href="{{article['url']}}" style="color:black"> {{article['sent']}} &nbsp {{article['headline']}} </a></li>
+                        {% endfor %}
+                    </ul>
+                </td>
+                <td>
+                    <div class="page-title">{{company['name']}}</div> 
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="CL-heading">Statement: {{company['statement']}}</div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                <div id="chart" style="width: 1000px; height: 600px"></div>
+                </td>
+            </tr>
+        </table>
+    </div>
+{% endblock %}
