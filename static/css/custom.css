@@ -27,8 +27,20 @@ body {
   padding-right:30px;
   position:absolute;
 }
-.profileC{ /* for the table in profile*/
-
+.profileC { /* for the table in profile*/
+    margin-top:5px;
+    margin-bottom:5px;
+    width: 100%;
+}
+.profileC td {
+  border-bottom:1px solid #ddd;
+}
+.profileC tr {
+  border-top: 1px solid #ddd;
+}
+.profileC tr:first-child {
+  border-bottom:2px solid #ddd;
+  border-top: 2px solid #ddd;
 }
 .horizontal-scroll-wrapper {
   display:block;
