@@ -1,5 +1,5 @@
 function init() {
-  gapi.load('auth2', function() { // Ready. });
+  gapi.load('auth2', function() { console.log('gapi loaded') });
 }
 
 function onSignIn(googleUser) {
