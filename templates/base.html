@@ -18,12 +18,12 @@
                     Turtle
                 </li>
                 <li class="sidebar-head">
-                    Pages 
+                    Pages
                 </li>
                 <li class="sidebar-sub">
                     <a href="/homepage">
                         Homepage
-                    </a>                
+                    </a>
                 <li>
                 <a href="/newsapi" class="sidebar-sub" >Our API</a>
                 {% for caption, id, page in [('Change log', '1','/newsapi/changes'), ('Documentation', '2','/newsapi/documentation'), ('Test Data', '3','/newsapi/test'), ('Api Graphical Interface','4', '/newsapi/gui')] %}
@@ -35,20 +35,19 @@
             </ul>
         </div>
         <!-- /#sidebar-wrapper -->
-        
+
         <!-- Page Content -->
         <div id="page-content-wrapper">
             <div class="container-fluid">
                 <div class="container">
                     <table class="">
                         <tr>
-                            <td class="headL"><a href="#menu-toggle" class="btn btn-secondary" id="menu-toggle">Menu</a></td>
                             <td class="headM">Finance thingy</td>
                             <td class="headR"><a href="{{logged}}" class="btn btn-secondary" id="menu-toggle">{{user}}</a></td>
                         </tr>
                     </table>
                 </div>
-                
+
                 <div>&nbsp</div>
                 <!-- <h1 class="mt-5">Team Turtle: News API home page</h1>
 
@@ -73,14 +72,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-
-    <!-- Menu Toggle Script -->
-    <script>
-    $("#menu-toggle").click(function(e) {
-        e.preventDefault();
-        $("#wrapper").toggleClass("toggled");
-    });
-    </script>
 
     <!-- on click function for sidebar -->
     <script>
