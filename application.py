@@ -120,7 +120,7 @@ def db():
             temp['sentc'] = greenColour
         articles.append(temp)
         i+= 1
-    
+
     articles = sorted(articles, key=lambda k: k['date'])
     return render_template('dB.html',articles=articles,company=company)
 
@@ -162,7 +162,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
         session['userFol'] = names
         # change long term stored
     for name in names: # having most fields with colours, will need to add a function the chooses the colour based on the result
-        if (name=='AMP.ax'):
+        if ('AMP' in name):
             tempAMP = {}
             tempAMP['name'] = name
             tempAMP['change'] = "21%" # Have to change this to what the actual change should be for the company
@@ -172,7 +172,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             tempAMP['stock'] = -3.3 # mby change in stock price or a recent period of time
             tempAMP['stockc'] = redColour
             companies.append(tempAMP)
-        elif (name=='CBA.ax'):
+        elif ('CBA' in name):
             tempCBA = {}
             tempCBA['name'] = name
             tempCBA['change'] = "17%" # Have to change this to what the actual change should be for the company
@@ -182,7 +182,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             tempCBA['stock'] = -2.1 # mby change in stock price or a recent period of time
             tempCBA['stockc'] = redColour
             companies.append(tempCBA)
-        elif (name=='QAN.ax'):
+        elif ('QAN' in name):
             tempQAN = {}
             tempQAN['name'] = name
             tempQAN['change'] = "13%" # Have to change this to what the actual change should be for the company
