@@ -18,6 +18,9 @@ application.register_blueprint(api_v2, url_prefix='/newsapi/v2.0')
 application.register_blueprint(api_v3, url_prefix='/newsapi/v3.0')
 application.register_blueprint(api_v4, url_prefix='/newsapi/v4.0')
 
+greenColour = "#7a8c00"
+redColour = "#800000"
+
 @application.context_processor
 def inject_user():
     login = "Steve" #TEMPORARY change to login and this to log in after demo
@@ -132,41 +135,41 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             tempAMP = {}
             tempAMP['name'] = name
             tempAMP['change'] = "21%" # Have to change this to what the actual change should be for the company
-            tempAMP['changec'] = "#800000"
+            tempAMP['changec'] = greenColour
             tempAMP['recS'] = "Strongly Negative" # doing a sentiment analysis on the articles within past week
-            tempAMP['recSc'] = "#7a8c00"
+            tempAMP['recSc'] = redColour
             tempAMP['stock'] = -3.3 # mby change in stock price or a recent period of time
-            tempAMP['stockc'] = "#7a8c00"
+            tempAMP['stockc'] = redColour
             companies.append(tempAMP)
         elif (name=='CBA.ax'):
             tempCBA = {}
             tempCBA['name'] = name
             tempCBA['change'] = "17%" # Have to change this to what the actual change should be for the company
-            tempCBA['changec'] = "#800000"
+            tempCBA['changec'] = greenColour
             tempCBA['recS'] = "Negative" # doing a sentiment analysis on the articles within past week
-            tempCBA['recSc'] = "#7a8c00"
+            tempCBA['recSc'] = redColour
             tempCBA['stock'] = -2.1 # mby change in stock price or a recent period of time
-            tempCBA['stockc'] = "#7a8c00"
+            tempCBA['stockc'] = redColour
             companies.append(tempCBA)
         elif (name=='QAN.ax'):
             tempQAN = {}
             tempQAN['name'] = name
             tempQAN['change'] = "13%" # Have to change this to what the actual change should be for the company
-            tempQAN['changec'] = "#800000"
+            tempQAN['changec'] = greenColour
             tempQAN['recS'] = "Fairly Positive" # doing a sentiment analysis on the articles within past week
-            tempQAN['recSc'] = "#7a8c00"
+            tempQAN['recSc'] = greenColour
             tempQAN['stock'] = 2.5 # mby change in stock price or a recent period of time
-            tempQAN['stockc'] = "#7a8c00"
+            tempQAN['stockc'] = greenColour
             companies.append(tempQAN)
         else:
             temp = {}
             temp['name'] = name
             temp['change'] = 50 # Have to change this to what the actual change should be for the company
-            temp['changec'] = "#800000"
+            temp['changec'] = greenColour
             temp['recS'] = "Slightly Positive" # doing a sentiment analysis on the articles within past week
-            temp['recSc'] = "#7a8c00"
+            temp['recSc'] = greenColour
             temp['stock'] = 3.2 # mby change in stock price or a recent period of time
-            temp['stockc'] = "#7a8c00"
+            temp['stockc'] = greenColour
             companies.append(temp)
     return render_template('profile.html',companies = companies)
 
