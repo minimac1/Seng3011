@@ -164,7 +164,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
     for name in names: # having most fields with colours, will need to add a function the chooses the colour based on the result
         if ('AMP' in name):
             tempAMP = {}
-            tempAMP['name'] = name
+            tempAMP['name'] = "AMP.ax"
             tempAMP['change'] = "21%" # Have to change this to what the actual change should be for the company
             tempAMP['changec'] = greenColour
             tempAMP['recS'] = "Strongly Negative" # doing a sentiment analysis on the articles within past week
@@ -174,7 +174,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             companies.append(tempAMP)
         elif ('CBA' in name or 'Commonwealth Bank' in name):
             tempCBA = {}
-            tempCBA['name'] = name
+            tempCBA['name'] = "CBA.ax"
             tempCBA['change'] = "17%" # Have to change this to what the actual change should be for the company
             tempCBA['changec'] = greenColour
             tempCBA['recS'] = "Negative" # doing a sentiment analysis on the articles within past week
@@ -184,7 +184,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             companies.append(tempCBA)
         elif ('QAN' in name):
             tempQAN = {}
-            tempQAN['name'] = name
+            tempQAN['name'] = "QAN.ax"
             tempQAN['change'] = "13%" # Have to change this to what the actual change should be for the company
             tempQAN['changec'] = greenColour
             tempQAN['recS'] = "Fairly Positive" # doing a sentiment analysis on the articles within past week
