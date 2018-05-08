@@ -122,7 +122,7 @@ def db():
         i+= 1
 
     articles = sorted(articles, key=lambda k: k['date'])
-    articles = articles.reverse()
+    #articles = articles.reverse()
     return render_template('dB.html',articles=articles,company=company)
 
 #takes in an array of news articles
