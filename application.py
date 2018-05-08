@@ -87,7 +87,7 @@ def db():
     company['statement'] = statement
 
 
-    sDate="2018-04-22T00:00:00.000Z" # will probly need to pass in dates to choose the start date, once we've stored a results
+    sDate="2018-04-16T00:00:00.000Z" # will probly need to pass in dates to choose the start date, once we've stored a results
     eDate="2018-05-06T00:00:00.000Z" # otherwise currently hardcoded to the previous week
     cId = name
     url = ("http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=" + sDate
