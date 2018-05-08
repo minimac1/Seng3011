@@ -116,7 +116,7 @@ def sentiment(newsText):
     return ar
 
 def csvRemoveTails(companyName):
-    nameEndings = [" Group Limited", " Limited", " LTD"]
+    nameEndings = [" Group Limited", " Limited", " LTD", "Airways"]
     for end in nameEndings:
         if(companyName.upper().endswith(end.upper())):
             companyName = companyName[:-len(end)]
