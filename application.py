@@ -82,13 +82,13 @@ def db():
     #company['returnsc'] = "#7a8c00"
     company['stock'] = 3.2
     #company['stockc'] = "#7a8c00"
-    statement = "Google trends indicates there have not been any significant events recently.<br>" # some way of creating a statement from reading our data
+    statement = "Google trends indicates there has been a minor event recently.<br>" # some way of creating a statement from reading our data
     statement += "A negative sentiment on the recent articles indicates a problem with this company."
     company['statement'] = statement
 
 
     sDate="2018-04-16T00:00:00.000Z" # will probly need to pass in dates to choose the start date, once we've stored a results
-    eDate="2018-05-06T00:00:00.000Z" # otherwise currently hardcoded to the previous week
+    eDate="2018-04-28T00:00:00.000Z" # otherwise currently hardcoded to the previous week
     cId = name
     url = ("http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=" + sDate
      + "&endDate=" + eDate + "&companyId=" + cId)
@@ -122,6 +122,7 @@ def db():
         i+= 1
 
     articles = sorted(articles, key=lambda k: k['date'])
+    articles = articles.reverse()
     return render_template('dB.html',articles=articles,company=company)
 
 #takes in an array of news articles
