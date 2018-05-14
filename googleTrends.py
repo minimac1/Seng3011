@@ -123,12 +123,11 @@ def addIDsToGoogleTrendsUser(userEmail, newCID, newCIDalias):
             userExists = True
             if (not newCID in currUser['CompanyIDList']):
                 currUser['CompanyIDList'].append(newCID)
-                updateGoogleTrends(newCID, newCIDalias)
     if (not userExists):
         print("GTrends: user doesnt exit, adding new user [addIDstoUser]")
         currUser = {'UserEmail' : userEmail, 'CompanyIDList' : [newCID]}
         pytrendsUserList.append(currUser)
-        updateGoogleTrends(newCID, newCIDalias)
+    updateGoogleTrends(newCID, newCIDalias)
 
 def removeIDfromGoogleTrendsUser(userEmail, idToRemove):
     count = 0

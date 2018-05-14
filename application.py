@@ -49,6 +49,7 @@ def signIn():
     username = request.form.get('username')
     if username is not None:
         session['username'] = username
+        session['userEmail'] = "teamturtleseng@gmail.com" #change this to the users email
         session.permanent = True
         print('logged in as ' + username)
         return username
@@ -150,7 +151,8 @@ def sentiment(newsText):
 
 @application.route('/profile')
 def profile(): # maybe for the demo add the few chosen companies to session['userFol'] before the if
-    sendEmail("teamturtleseng@gmail.com", "CBA.ax")
+    session['userEmail'] = "teamturtleseng@gmail.com" #temporary
+    #sendEmail("teamturtleseng@gmail.com", "CBA.ax")
     companies = []
     names = [] # TEMPORARY enter 1/
     #session['userFol'] = ['AMP.ax','CBA.ax','QAN.ax']
@@ -161,47 +163,51 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
     if new is not None:
         names.append(new)
         session['userFol'] = names
-        # also add it to whereever we store it long term
+        if (session['userEmail'] is not None):
+            googleTrends.addIDsToGoogleTrendsUser(session['userEmail'], new, new)
+        else:
+            googleTrends.addIDsToGoogleTrendsUser("notLoggedIn", new, new)
+
     new = request.args.get('removed')
     if new is not None:
         names.remove(new)
         session['userFol'] = names
         # change long term stored
     for name in names: # having most fields with colours, will need to add a function the chooses the colour based on the result
-        if ('AMP' in name):
-            tempAMP = {}
-            tempAMP['name'] = name
-            tempAMP['change'] = "21%" # Have to change this to what the actual change should be for the company
-            tempAMP['changec'] = greenColour
-            tempAMP['recS'] = "Strongly Negative" # doing a sentiment analysis on the articles within past week
-            tempAMP['recSc'] = redColour
-            tempAMP['stock'] = -3.3 # mby change in stock price or a recent period of time
-            tempAMP['stockc'] = redColour
-            companies.append(tempAMP)
-        elif ('CBA' in name or 'Commonwealth Bank' in name):
-            tempCBA = {}
-            tempCBA['name'] = name
-            tempCBA['change'] = "17%" # Have to change this to what the actual change should be for the company
-            tempCBA['changec'] = greenColour
-            tempCBA['recS'] = "Negative" # doing a sentiment analysis on the articles within past week
-            tempCBA['recSc'] = redColour
-            tempCBA['stock'] = -2.1 # mby change in stock price or a recent period of time
-            tempCBA['stockc'] = redColour
-            companies.append(tempCBA)
-        elif ('QAN' in name):
-            tempQAN = {}
-            tempQAN['name'] = name
-            tempQAN['change'] = "13%" # Have to change this to what the actual change should be for the company
-            tempQAN['changec'] = greenColour
-            tempQAN['recS'] = "Fairly Positive" # doing a sentiment analysis on the articles within past week
-            tempQAN['recSc'] = greenColour
-            tempQAN['stock'] = 2.5 # mby change in stock price or a recent period of time
-            tempQAN['stockc'] = greenColour
-            companies.append(tempQAN)
-        else:
+        # if ('AMP' in name):
+        #     tempAMP = {}
+        #     tempAMP['name'] = name
+        #     tempAMP['change'] = "21%" # Have to change this to what the actual change should be for the company
+        #     tempAMP['changec'] = greenColour
+        #     tempAMP['recS'] = "Strongly Negative" # doing a sentiment analysis on the articles within past week
+        #     tempAMP['recSc'] = redColour
+        #     tempAMP['stock'] = -3.3 # mby change in stock price or a recent period of time
+        #     tempAMP['stockc'] = redColour
+        #     companies.append(tempAMP)
+        # elif ('CBA' in name or 'Commonwealth Bank' in name):
+        #     tempCBA = {}
+        #     tempCBA['name'] = name
+        #     tempCBA['change'] = "17%" # Have to change this to what the actual change should be for the company
+        #     tempCBA['changec'] = greenColour
+        #     tempCBA['recS'] = "Negative" # doing a sentiment analysis on the articles within past week
+        #     tempCBA['recSc'] = redColour
+        #     tempCBA['stock'] = -2.1 # mby change in stock price or a recent period of time
+        #     tempCBA['stockc'] = redColour
+        #     companies.append(tempCBA)
+        # elif ('QAN' in name):
+        #     tempQAN = {}
+        #     tempQAN['name'] = name
+        #     tempQAN['change'] = "13%" # Have to change this to what the actual change should be for the company
+        #     tempQAN['changec'] = greenColour
+        #     tempQAN['recS'] = "Fairly Positive" # doing a sentiment analysis on the articles within past week
+        #     tempQAN['recSc'] = greenColour
+        #     tempQAN['stock'] = 2.5 # mby change in stock price or a recent period of time
+        #     tempQAN['stockc'] = greenColour
+        #     companies.append(tempQAN)
+        # else:
             temp = {}
             temp['name'] = name
-            temp['change'] = 50 # Have to change this to what the actual change should be for the company
+            temp['change'] = str(googleTrends.getCurrentChange(name)) + "%"
             temp['changec'] = greenColour
             temp['recS'] = "Slightly Positive" # doing a sentiment analysis on the articles within past week
             temp['recSc'] = greenColour
