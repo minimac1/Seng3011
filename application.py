@@ -1,5 +1,7 @@
 from flask import Flask, render_template, Blueprint, session, request
 from flask_restful import Resource, Api, reqparse, fields, marshal
+
+from botocore.exceptions import ClientError
 from v1_0 import application as api_v1
 from v2_0 import application as api_v2
 from v3_0 import application as api_v3
@@ -9,6 +11,7 @@ import requests
 import os
 import re
 import indicoio
+import boto3
 
 application = Flask(__name__)
 application.secret_key = os.urandom(24)
@@ -146,6 +149,7 @@ def sentiment(newsText):
 
 @application.route('/profile')
 def profile(): # maybe for the demo add the few chosen companies to session['userFol'] before the if
+    sendEmail("jhamann42@gmail.com", "CBA.ax")
     companies = []
     names = [] # TEMPORARY enter 1/
     #session['userFol'] = ['AMP.ax','CBA.ax','QAN.ax']
@@ -204,6 +208,69 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             temp['stockc'] = greenColour
             companies.append(temp)
     return render_template('profile.html',companies = companies)
+
+def sendEmail(sendToEmail, cID):
+    SENDER = "Turtle Trends <teamturtleseng@gmail.com>"
+    RECIPIENT = sendToEmail
+    AWS_REGION = "us-east-1"
+    SUBJECT = "Significant change in "+cid+" trends"
+    CHARSET = "UTF-8"
+
+    #for non-html email clients
+    BODY_TEXT = ("Amazon SES Test (Python)\r\n"
+                 "This email was sent with Amazon SES using the "
+                 "AWS SDK for Python (Boto)."
+                )
+
+    #for normal email clients
+    BODY_HTML = """<html>
+    <head></head>
+    <body>
+      <h1>Amazon SES Test (SDK for Python)</h1>
+      <p>This email was sent with
+        <a href='https://aws.amazon.com/ses/'>Amazon SES</a> using the
+        <a href='https://aws.amazon.com/sdk-for-python/'>
+          AWS SDK for Python (Boto)</a>.</p>
+    </body>
+    </html>
+                """
+
+    client = boto3.client('ses',region_name=AWS_REGION)
+
+    # Try to send the email.
+    try:
+        #Provide the contents of the email.
+        response = client.send_email(
+            Destination={
+                'ToAddresses': [
+                    RECIPIENT,
+                ],
+            },
+            Message={
+                'Body': {
+                    'Html': {
+                        'Charset': CHARSET,
+                        'Data': BODY_HTML,
+                    },
+                    'Text': {
+                        'Charset': CHARSET,
+                        'Data': BODY_TEXT,
+                    },
+                },
+                'Subject': {
+                    'Charset': CHARSET,
+                    'Data': SUBJECT,
+                },
+            },
+            Source=SENDER,
+        )
+    # Display an error if something goes wrong.
+    except ClientError as e:
+        print(e.response['Error']['Message'])
+    else:
+        print("Email sent! Message ID:"),
+        print(response['ResponseMetadata']['RequestId'])
+
 
 @application.route('/newsapi/gui')
 def gui():
