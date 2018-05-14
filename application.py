@@ -213,7 +213,7 @@ def sendEmail(sendToEmail, cID):
     SENDER = "Turtle Trends <teamturtleseng@gmail.com>"
     RECIPIENT = sendToEmail
     AWS_REGION = "us-east-1"
-    SUBJECT = "Significant change in "+cid+" trends"
+    SUBJECT = "Significant change in "+cID+" trends"
     CHARSET = "UTF-8"
 
     #for non-html email clients
