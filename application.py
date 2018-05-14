@@ -210,7 +210,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             companies.append(temp)
     return render_template('profile.html',companies = companies)
 
-def hourlyTrendCheck():
+#def hourlyTrendCheck():
     #loop through googleTrends.pytrendsCompanyList
         #googleTrends.updateGoogleTrends
         #getCurrentChange("companyid")
