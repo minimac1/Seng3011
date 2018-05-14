@@ -1,12 +1,11 @@
 from flask import Flask, render_template,Blueprint
 from flask_restful import Resource, Api, reqparse, fields, marshal
-from datetime import datetime
+from datetime import datetime, timedelta, date
 import v4_0
 import csv
 import json
 import requests
 import re
-import datetime
 from pytrends.request import TrendReq
 pytrends = TrendReq(hl='en-us', tz=-600) #change when functioning
 pytrendsUserList = []
@@ -52,25 +51,40 @@ def updateAllTrends():
 #update CompanyID with alias to google
 def updateGoogleTrends(companyID, alias):
     kw_list = [alias]
-    pytrends.build_payload(kw_list, cat=0, timeframe='now 1-H', geo='', gprop='')
+    #pytrends.build_payload(kw_list, cat=0, timeframe='now 1-H', geo='', gprop='')
+    today = date.today()
+    #print(str(today))
+    pytrends.build_payload(kw_list, cat=0, timeframe='now 1-d', geo='', gprop='')
     df = pytrends.interest_over_time();
-
-    found = False
     newRes = df[alias].sum()
+    #print("newres: " + str(newRes))
+    numMonths = 4
+    currDate = today
+    sevenDays = timedelta(days=7)
+    changeSum = 0
+    for x in range(0, numMonths):
+        oneweekago = currDate - sevenDays
+        #print("oneweekago: " + str(oneweekago))
+        dateRange = str(oneweekago)+'T00 '+str(oneweekago)+'T23'
+        #print("dateRange: " + str(dateRange))
+        pytrends.build_payload(kw_list, cat=0, timeframe=str(dateRange), geo='', gprop='')
+        df = pytrends.interest_over_time();
+        #print("changeSum: "+str(changeSum)+" inc: " + str(df[alias].sum()))
+        changeSum = changeSum + df[alias].sum()
+        currDate = oneweekago
+
+    #print("done loop")
+    #print("total change: " + str(changeSum))
+    average = (changeSum/numMonths)
+    #print("average: " + str(average))
+    change = newRes - average
+    percentChange = (change/average)*100
+    #print("percentagechange: " + str(round(percentChange,4)))
     for currInstance in pytrendsCompanyList:
         if (currInstance['CompanyID'] == companyID):
-            found = True
-            prevRes = currInstance['Current Hour Results']
-            change = newRes - prevRes
-            percentChange = (change/prevRes)*100
             currInstance['Current Hour Results'] = newRes
             currInstance['Hourly Change (%)'] = round(percentChange,4)
 
-    #If not found, create
-    if not found:
-        newCID = {'CompanyID' : companyID,
-                'Current Hour Results' : newRes,
-                'Hourly Change (%)' : "0"}
         pytrendsCompanyList.append(newCID)
 
 def removeCIDfromCompanyList(CID):
@@ -110,12 +124,14 @@ def removeIDfromGoogleTrendsUser(userID, idToRemove):
     if (count==1):
         removeCIDfromCompanyList(idToRemove)
 
-addIDsToGoogleTrendsUser('thisismycookieID', 'ANZ.ax', 'ANZ')
-addIDsToGoogleTrendsUser('thisismycookieID', 'CBA.ax', 'Commonwealth Bank of Australia')
-print("\n.....Printing Company List ['ANZ.ax', 'CBA.ax'].....\n")
-print(companyListAsJson())
-print("\n.....Call update again to show change.....\n")
-updateAllTrends()
-print(companyListAsJson())
-print("\n.....Now printinging user database.....\n")
-print(userListAsJson())
+# addIDsToGoogleTrendsUser('thisismycookieID', 'ANZ.ax', 'ANZ')
+# addIDsToGoogleTrendsUser('thisismycookieID', 'CBA.ax', 'Commonwealth Bank of Australia')
+# print("\n.....Printing Company List ['ANZ.ax', 'CBA.ax'].....\n")
+# print(companyListAsJson())
+# print("\n.....Call update again to show change.....\n")
+# updateAllTrends()
+# print(companyListAsJson())
+# print("\n.....Now printinging user database.....\n")
+# print(userListAsJson())
+
+updateGoogleTrends("WOW.ax", "Woolworths")

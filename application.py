@@ -12,6 +12,7 @@ import os
 import re
 import indicoio
 import boto3
+import googleTrends
 
 application = Flask(__name__)
 application.secret_key = os.urandom(24)
