@@ -150,7 +150,7 @@ def sentiment(newsText):
 
 @application.route('/profile')
 def profile(): # maybe for the demo add the few chosen companies to session['userFol'] before the if
-    sendEmail("jhamann42@gmail.com", "CBA.ax")
+    #sendEmail("jhamann42@gmail.com", "CBA.ax")
     companies = []
     names = [] # TEMPORARY enter 1/
     #session['userFol'] = ['AMP.ax','CBA.ax','QAN.ax']
