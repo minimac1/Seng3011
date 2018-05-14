@@ -150,7 +150,7 @@ def sentiment(newsText):
 
 @application.route('/profile')
 def profile(): # maybe for the demo add the few chosen companies to session['userFol'] before the if
-    #sendEmail("jhamann42@gmail.com", "CBA.ax")
+    sendEmail("teamturtleseng@gmail.com", "CBA.ax")
     companies = []
     names = [] # TEMPORARY enter 1/
     #session['userFol'] = ['AMP.ax','CBA.ax','QAN.ax']
@@ -209,6 +209,15 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             temp['stockc'] = greenColour
             companies.append(temp)
     return render_template('profile.html',companies = companies)
+
+def hourlyTrendCheck():
+    #loop through googleTrends.pytrendsCompanyList
+        #googleTrends.updateGoogleTrends
+        #getCurrentChange("companyid")
+        #if change > 15
+            #loop through googleTrends.pytrendsUserList
+            #if contains currCID
+                #sendEmail(getEmail)
 
 def sendEmail(sendToEmail, cID):
     SENDER = "Turtle Trends <teamturtleseng@gmail.com>"
@@ -644,3 +653,6 @@ application.add_url_rule('/newsapi/', 'apiIndex', (lambda: apiIndex()))
 
 if __name__ == '__main__':
     application.run(debug=True)
+    #run timer
+        #every hour
+        #hourlyTrendCheck()

@@ -23,7 +23,7 @@ pytrendsInstance['Current Hour Results'] = fields.Integer
 pytrendsInstance['Hourly Change (%)'] = fields.Integer
 #Store each user, with their set of company ids (no duplicates)
 userPytrends = {}
-userPytrends['UserID'] = fields.String
+userPytrends['UserEmail'] = fields.String
 userPytrends['CompanyIDList'] = fields.List(fields.String)
 
 
@@ -108,17 +108,17 @@ def removeCIDfromCompanyList(CID):
             pytrendsCompanyList.remove(companyInstance)
 
 # #add user with provided set of CIDs
-# def addGoogleTrendsUser(userID, listOfCIDs):
-#     currUser = {'UserID' : userID, 'CompanyIDList' : listOfCIDs}
+# def addGoogleTrendsUser(userEmail, listOfCIDs):
+#     currUser = {'UserEmail' : userEmail, 'CompanyIDList' : listOfCIDs}
 #     pytrendsUserList.append(currUser)
 #     for CID in listOfCIDs:
 #         updateGoogleTrends(CID, CID)
 
 #doesnt add duplicate
-def addIDsToGoogleTrendsUser(userID, newCID, newCIDalias):
+def addIDsToGoogleTrendsUser(userEmail, newCID, newCIDalias):
     userExists = False
     for currUser in pytrendsUserList:
-        if (currUser['UserID'] == userID):
+        if (currUser['UserEmail'] == userEmail):
             print("GTrends: user does exit [addIDstoUser]")
             userExists = True
             if (not newCID in currUser['CompanyIDList']):
@@ -126,16 +126,16 @@ def addIDsToGoogleTrendsUser(userID, newCID, newCIDalias):
                 updateGoogleTrends(newCID, newCIDalias)
     if (not userExists):
         print("GTrends: user doesnt exit, adding new user [addIDstoUser]")
-        currUser = {'UserID' : userID, 'CompanyIDList' : [newCID]}
+        currUser = {'UserEmail' : userEmail, 'CompanyIDList' : [newCID]}
         pytrendsUserList.append(currUser)
         updateGoogleTrends(newCID, newCIDalias)
 
-def removeIDfromGoogleTrendsUser(userID, idToRemove):
+def removeIDfromGoogleTrendsUser(userEmail, idToRemove):
     count = 0
     for currUser in pytrendsUserList:
         if (idToRemove in currUser['CompanyIDList']):
             count += 1
-            if (currUser['UserID'] == userID):
+            if (currUser['UserEmail'] == userEmail):
                 currUser['CompanyIDList'].remove(idToRemove)
     #If this was the only occurance of this CID, remove from pytrendsCompanyList
     if (count==1):
