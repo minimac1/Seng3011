@@ -11,6 +11,11 @@ pytrends = TrendReq(hl='en-us', tz=-600) #change when functioning
 pytrendsUserList = []
 pytrendsCompanyList = []
 
+#
+# IMPORTNANT FUNCTIONS [READ ME!]
+# getCurrentChange("companyid")
+# addIDsToGoogleTrendsUser('userid', 'companyid', 'companyFullname')
+#
 
 pytrendsInstance = {}
 pytrendsInstance['CompanyID'] = fields.String
@@ -50,6 +55,7 @@ def updateAllTrends():
 
 #update CompanyID with alias to google
 def updateGoogleTrends(companyID, alias):
+    print("updating " + companyID)
     kw_list = [alias]
     #pytrends.build_payload(kw_list, cat=0, timeframe='now 1-H', geo='', gprop='')
     today = date.today()
@@ -80,12 +86,21 @@ def updateGoogleTrends(companyID, alias):
     change = newRes - average
     percentChange = (change/average)*100
     #print("percentagechange: " + str(round(percentChange,4)))
+    cidExits = False
     for currInstance in pytrendsCompanyList:
         if (currInstance['CompanyID'] == companyID):
+            cidExits = True
+            print("found"+ str(companyID) + "[updateGoogleTrends]")
             currInstance['Current Hour Results'] = newRes
             currInstance['Hourly Change (%)'] = round(percentChange,4)
 
-        pytrendsCompanyList.append(newCID)
+    if (not cidExits):
+        print(str(companyID)+" doesnt exist, adding new cid [updateGoogleTrends]")
+        newInstance = {'CompanyID' : companyID,
+                       'Current Hour Results' : newRes,
+                       'Hourly Change (%)' : round(percentChange,4)
+                      }
+        pytrendsCompanyList.append(newInstance)
 
 def removeCIDfromCompanyList(CID):
     for companyInstance in pytrendsCompanyList:
@@ -104,11 +119,13 @@ def addIDsToGoogleTrendsUser(userID, newCID, newCIDalias):
     userExists = False
     for currUser in pytrendsUserList:
         if (currUser['UserID'] == userID):
+            print("GTrends: user does exit [addIDstoUser]")
             userExists = True
             if (not newCID in currUser['CompanyIDList']):
                 currUser['CompanyIDList'].append(newCID)
                 updateGoogleTrends(newCID, newCIDalias)
     if (not userExists):
+        print("GTrends: user doesnt exit, adding new user [addIDstoUser]")
         currUser = {'UserID' : userID, 'CompanyIDList' : [newCID]}
         pytrendsUserList.append(currUser)
         updateGoogleTrends(newCID, newCIDalias)
@@ -124,7 +141,7 @@ def removeIDfromGoogleTrendsUser(userID, idToRemove):
     if (count==1):
         removeCIDfromCompanyList(idToRemove)
 
-# addIDsToGoogleTrendsUser('thisismycookieID', 'ANZ.ax', 'ANZ')
+#Test 1
 # addIDsToGoogleTrendsUser('thisismycookieID', 'CBA.ax', 'Commonwealth Bank of Australia')
 # print("\n.....Printing Company List ['ANZ.ax', 'CBA.ax'].....\n")
 # print(companyListAsJson())
@@ -134,4 +151,6 @@ def removeIDfromGoogleTrendsUser(userID, idToRemove):
 # print("\n.....Now printinging user database.....\n")
 # print(userListAsJson())
 
-updateGoogleTrends("WOW.ax", "Woolworths")
+#Test 2
+# addIDsToGoogleTrendsUser('user', 'WOW.ax', 'Woolworths')
+# print(str(getCurrentChange("WOW.ax")) + "%")
