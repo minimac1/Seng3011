@@ -49,18 +49,23 @@ def signIn():
     username = request.form.get('username')
     if username is not None:
         session['username'] = username
-        session['userEmail'] = "teamturtleseng@gmail.com" #change this to the users email
+        session['userEmail'] = "teamturtleseng@gmail.com"  # change this to the users email
         session.permanent = True
-        print('logged in as ' + username)
-        return username
+        return "Success: Logged in as "+username
     else:
-        return "FAILED TO LOG IN"
+        return "Error: Missing Parameter"
 
 
 @application.route('/signout', methods=['POST'])
 def signOut():
     session.pop('username', None)
+    session.pop('userEmail', None)
     return "Log out success"
+
+
+@application.route('/redirect')
+def redirect():
+    return render_template('redirect.html')
 
 
 @application.route('/google6ba7dcd540cdf4c2.html')
