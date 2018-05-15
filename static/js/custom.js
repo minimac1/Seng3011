@@ -22,9 +22,9 @@ function onSignIn(googleUser) {
   xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
   xhr.onload = function() {
     console.log(xhr.responseText);
+    window.location.href = '/redirect';
   };
   xhr.send('username=' + profile.getName() + "&image=" + profile.getImageUrl() + "&email=" + profile.getEmail() + "&id=" + profile.getId());
-  window.location.href = '/redirect';
 }
 
 function signOut() {
@@ -40,13 +40,17 @@ function signOut() {
   xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
   xhr.onload = function() {
     console.log('logging out...' + xhr.responseText);
+    window.location.href = '/redirect';
   };
   xhr.send();
-  window.location.href = '/redirect';
 }
 
 
 function redirect(){
+  setTimeout(redirect2(), 3000)
+}
+
+function redirect2(){
   console.log('redirecting');
   window.location.href = '/';
 }
