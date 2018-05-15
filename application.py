@@ -130,6 +130,28 @@ def db():
     #articles = articles.reverse()
     return render_template('dB.html',articles=articles,company=company)
 
+
+def stockPrice(instrumentId):
+    s_params = {
+        'function': "TIME_SERIES_DAILY",
+        'symbol': "",
+        'apikey': "JSLIQKXENUXYT6V3"
+
+    }
+
+    a_url = "https://www.alphavantage.co/query?"
+    s_params['symbol'] = instrumentId
+
+    stock_url = (a_url + 'function=' + s_params['function']
+    + '&symbol=' + s_params['symbol'] + '&apikey='
+    + s_params['apikey'])
+
+    response = requests.get(stock_url)
+    print(response.text)
+    return response.json()
+
+
+
 #takes in an array of news articles
 #and returns an array of scores eg. [o.96, 0.3]
 #The score is from 0-1 and where 0.5 is netural
