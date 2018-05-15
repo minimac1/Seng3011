@@ -21,10 +21,10 @@ function onSignIn(googleUser) {
   xhr.open('POST', '/signin');
   xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
   xhr.onload = function() {
-    console.log('Signed in as: ' + xhr.responseText);
+    console.log(xhr.responseText);
   };
-  xhr.send('username=' + profile.getName());
-  location.reload();
+  xhr.send('username=' + profile.getName() + "&image=" + profile.getImageUrl() + "&email=" + profile.getEmail() + "&id=" + profile.getId());
+  window.location.href = '/redirect';
 }
 
 function signOut() {
@@ -42,5 +42,11 @@ function signOut() {
     console.log('logging out...' + xhr.responseText);
   };
   xhr.send();
-  location.reload();
+  window.location.href = '/redirect';
+}
+
+
+function redirect(){
+  console.log('redirecting');
+  window.location.href = '/';
 }
