@@ -47,19 +47,27 @@ def apiIndex():
 @application.route('/signin', methods=['POST'])
 def signIn():
     username = request.form.get('username')
-    if username is not None:
+    email = request.form.get('email')
+    image = request.form.get('image')
+    id = request.form.get('id')
+
+    if (username is None) or (email is None) or (image is None) or (id is None):
+        return "Error: Missing Parameter"
+    else:
         session['username'] = username
-        session['userEmail'] = "teamturtleseng@gmail.com"  # change this to the users email
+        session['userEmail'] = email
+        session['image'] = image
+        session['id'] = id
         session.permanent = True
         return "Success: Logged in as "+username
-    else:
-        return "Error: Missing Parameter"
 
 
 @application.route('/signout', methods=['POST'])
 def signOut():
     session.pop('username', None)
     session.pop('userEmail', None)
+    session.pop('image', None)
+    session.pop('id', None)
     return "Log out success"
 
 
