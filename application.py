@@ -130,7 +130,8 @@ def db():
     #articles = articles.reverse()
     return render_template('dB.html',articles=articles,company=company)
 
-
+#function that returns stock prices in json formating
+#argument instrumentId is a string eg. "ANZ.AX"
 def stockPrice(instrumentId):
     s_params = {
         'function': "TIME_SERIES_DAILY",
@@ -147,7 +148,6 @@ def stockPrice(instrumentId):
     + s_params['apikey'])
 
     response = requests.get(stock_url)
-    print(response.text)
     return response.json()
 
 
