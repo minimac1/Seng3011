@@ -214,6 +214,6 @@ def removeIDfromGoogleTrendsUser(userEmail, idToRemove):
 # print(df[alias])
 # print(str(df[alias].get(0)) + " " + str(today))
 
-check = trendFromNumWeek(12, "Facebook")
-print (check)
-print (len(check))
+# check = trendFromNumWeek(12, "Facebook")
+# print (check)
+# print (len(check))
