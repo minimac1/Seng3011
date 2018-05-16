@@ -7,12 +7,16 @@ from v2_0 import application as api_v2
 from v3_0 import application as api_v3
 from v4_0 import application as api_v4
 
+from googleTrends import trendFromNumWeek
+
 import requests
 import os
 import re
 import indicoio
 import boto3
 import googleTrends
+import datetime
+from datetime import timedelta
 
 application = Flask(__name__)
 application.secret_key = os.urandom(24)
@@ -22,8 +26,7 @@ application.register_blueprint(api_v2, url_prefix='/newsapi/v2.0')
 application.register_blueprint(api_v3, url_prefix='/newsapi/v3.0')
 application.register_blueprint(api_v4, url_prefix='/newsapi/v4.0')
 
-greenColour = "#7a8c00"
-redColour = "#800000"
+
 
 @application.context_processor
 def inject_user():
@@ -32,9 +35,12 @@ def inject_user():
         print('session[username] = '+username)
     else:
         username = None  # <div class=\"g-signin2\" data-onsuccess=\"onSignIn\"></div>
-
+    if 'image' in session:
+        image = session['image']
+    else:
+        image = "https://qualiscare.com/wp-content/uploads/2017/08/default-user-300x300.png"
     # will have to change link to the profile page if logged in
-    return dict(user=username)
+    return dict(user=username,image=image)
 
 @application.route('/')
 ##@app.route('/News/<name>')
@@ -83,6 +89,24 @@ def googleVerification():
 @application.route('/newsapi')
 def apiHome():
     return render_template('apiHome.html')
+    
+def rgCol(number):
+    if number > 100:
+        number = 100
+    elif number < 0:
+        number = 0
+    r = int(round((220-(number * 2.2)),0))
+    g = int(round((number * 2.2),0))
+    r = hex(r)
+    g = hex(g)
+    r = r[2:]
+    g = g[2:]
+    if (len(r) == 1):
+        r = "0"+r
+    if (len(g) == 1):
+        g = "0"+g
+    colour = "#"+r+g+"00"
+    return colour
 
 @application.route('/db')
 def db():
@@ -92,31 +116,34 @@ def db():
         return render_template('profile.html')
     company = {}
     company['name'] = name
-    company['change'] = 50
+    #company['change'] = 50
     #company['changec'] = "#800000"
     #company['recS'] = "slightly Positive" probly dont need an overall sentiment here considering we list it for each article
     #company['recSc'] = "#7a8c00"
-    company['returns'] = 5
+    #company['returns'] = 5
     #company['returnsc'] = "#7a8c00"
-    company['stock'] = 3.2
+    #company['stock'] = 3.2
     #company['stockc'] = "#7a8c00"
     statement = "Google trends indicates there has been a minor event recently.<br>" # some way of creating a statement from reading our data
     statement += "A negative sentiment on the recent articles indicates a problem with this company."
     company['statement'] = statement
-
-
-    sDate="2018-04-16T00:00:00.000Z" # will probly need to pass in dates to choose the start date, once we've stored a results
-    eDate="2018-04-28T00:00:00.000Z" # otherwise currently hardcoded to the previous week
-    cId = name
+    
+    now = (datetime.datetime.now()- timedelta(days=1)) # currently -1day because i can't use current day
+    eDate= now.isoformat()
+    eDate = eDate[0:23] + "Z" # will probly need to pass in dates to choose the start date, once we've stored a results
+    sDate= (now - timedelta(days=14)) # otherwise currently hardcoded to the previous week
+    sDate = str(eDate).replace(' ','T')
+    sDate = sDate[0:23] + "Z"
+    cId = name    
     url = ("http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=" + sDate
-     + "&endDate=" + eDate + "&companyId=" + cId)
-    re = requests.get(url).json()
+     + "&endDate=" + eDate + "&companyId=" + cId) 
+    res = requests.get(url).json()
     articles = []
     #if 'NewsDataSet' not in re:
         #company['statement'] += re['Developer Notes']['Execution Result']
         #return render_template('dB.html',articles=articles,company=company)
     i = 0
-    for art in re['NewsDataSet']:
+    for art in res['NewsDataSet']:
         if i > 9:
             break; #limiting it to 10 articles
         temp = {}
@@ -129,20 +156,90 @@ def db():
         text = art['NewsText']
         if not text:
             continue
-        text = [text]
-        text = sentiment(text)
-        temp['sent'] = round(text[0],2)*100
-        if temp['sent'] < 50:
-            temp['sentc'] = "#C00000"
-        else:
-            temp['sentc'] = greenColour
+        temp['sent'] = text
+        
         articles.append(temp)
         i+= 1
+    sent = []
+    for art in articles:
+        sent.append(art['sent'])
+    if sent != []:
+        sent = sentiment(sent)
+        for c, value in enumerate(sent,1):
+            value = round(value,2)*100
+            articles[c-1]['sent'] = value
+            articles[c-1]['sentc'] = rgCol(value)
+        articles = sorted(articles, key=lambda k: k['date'])
+    changes = stockPrice(name)
+    first = 1
+    earliest = ""
+    for date in changes:
+        if first == 1:
+            eariest = date;
+            first = 0
+        elif date < earliest:
+            earliest = date
+    
+    name = re.sub(r"\..*","",name)
+    now = datetime.datetime.now()
+    #nDate = now.year + "-" + now.month + "-" + now.day
+    trends = trendFromNumWeek(5, name)
+    tc = []
+    i = 3*7
+    while i < len(trends):
+        avg = average(trends,i)
+        change = round((trends[i]-avg)/avg*100,0)
+        tc.append(change)
+        i += 1
+    i = 0
+    tc.reverse()
+    for date in tc:
+        now = (datetime.datetime.now()- timedelta(days=i))
+        month = str(now.month)
+        day = str(now.day)
+        if len(month) == 1:
+            month = "0" + month
+        if len(day) == 1:
+            day = "0" + day
+        nDate = str(now.year) + "-" + month + "-" + day
+        print(nDate)
+        if nDate in changes:
+            changes[nDate]['trends'] = tc[i]
+            bDate = nDate[5:]
+            bDate = bDate.replace('-','/')
+            changes[nDate]['shortDate'] = bDate
+        else:
+            bDate = nDate[5:]
+            bDate = bDate.replace('-','/')
+            changes[nDate]={}
+            changes[nDate]['trends'] = tc[i]
+            changes[nDate]['stock'] = 0
+            changes[nDate]['shortDate'] = bDate
+        i += 1
+    
+    for date in list(changes):
+        if 'trends' not in changes[date]:
+            del changes[date]
+            
+    print(changes)
+    sChanges = []
+    for date in sorted(changes):
+        temp={}
+        temp['shortDate'] = changes[date]['shortDate']
+        temp['stock'] = changes[date]['stock']
+        temp['trends'] = changes[date]['trends']
+        sChanges.append(temp)
+    return render_template('dB.html',articles=articles,company=company,changes = sChanges)
 
-    articles = sorted(articles, key=lambda k: k['date'])
-    #articles = articles.reverse()
-    return render_template('dB.html',articles=articles,company=company)
-
+def average(numbers,pos):
+    count = 0
+    avg = 0
+    while (count < 3):
+        pos-= 7
+        count += 1
+        avg += numbers[pos]
+    avg = int(round((avg/count),0))
+    return avg 
 #function that returns stock prices in json formating
 #argument instrumentId is a string eg. "ANZ.AX"
 def stockPrice(instrumentId):
@@ -159,9 +256,25 @@ def stockPrice(instrumentId):
     stock_url = (a_url + 'function=' + s_params['function']
     + '&symbol=' + s_params['symbol'] + '&apikey='
     + s_params['apikey'])
-
-    response = requests.get(stock_url)
-    return response.json()
+    #stocks = []
+    
+    response = requests.get(stock_url).json()
+    points = response['Time Series (Daily)']
+    dates = sorted(points)
+    dates.reverse()
+    i = 0
+    #print(points)
+    stocks = {}
+    for point in dates:       
+        stocks[point] = {}
+        openS = float(points[point]['1. open'])
+        closeS = float(points[point]['4. close']) 
+        stocks[point]['stock']=round((openS - closeS),2)
+        #stocks.append(temp)
+        if i >10:
+            break
+        i += 1
+    return stocks
 
 
 
@@ -209,46 +322,15 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
         session['userFol'] = names
         # change long term stored
     for name in names: # having most fields with colours, will need to add a function the chooses the colour based on the result
-        # if ('AMP' in name):
-        #     tempAMP = {}
-        #     tempAMP['name'] = name
-        #     tempAMP['change'] = "21%" # Have to change this to what the actual change should be for the company
-        #     tempAMP['changec'] = greenColour
-        #     tempAMP['recS'] = "Strongly Negative" # doing a sentiment analysis on the articles within past week
-        #     tempAMP['recSc'] = redColour
-        #     tempAMP['stock'] = -3.3 # mby change in stock price or a recent period of time
-        #     tempAMP['stockc'] = redColour
-        #     companies.append(tempAMP)
-        # elif ('CBA' in name or 'Commonwealth Bank' in name):
-        #     tempCBA = {}
-        #     tempCBA['name'] = name
-        #     tempCBA['change'] = "17%" # Have to change this to what the actual change should be for the company
-        #     tempCBA['changec'] = greenColour
-        #     tempCBA['recS'] = "Negative" # doing a sentiment analysis on the articles within past week
-        #     tempCBA['recSc'] = redColour
-        #     tempCBA['stock'] = -2.1 # mby change in stock price or a recent period of time
-        #     tempCBA['stockc'] = redColour
-        #     companies.append(tempCBA)
-        # elif ('QAN' in name):
-        #     tempQAN = {}
-        #     tempQAN['name'] = name
-        #     tempQAN['change'] = "13%" # Have to change this to what the actual change should be for the company
-        #     tempQAN['changec'] = greenColour
-        #     tempQAN['recS'] = "Fairly Positive" # doing a sentiment analysis on the articles within past week
-        #     tempQAN['recSc'] = greenColour
-        #     tempQAN['stock'] = 2.5 # mby change in stock price or a recent period of time
-        #     tempQAN['stockc'] = greenColour
-        #     companies.append(tempQAN)
-        # else:
-            temp = {}
-            temp['name'] = name
-            temp['change'] = str(googleTrends.getCurrentChange(name)) + "%"
-            temp['changec'] = greenColour
-            temp['recS'] = "Slightly Positive" # doing a sentiment analysis on the articles within past week
-            temp['recSc'] = greenColour
-            temp['stock'] = 3.2 # mby change in stock price or a recent period of time
-            temp['stockc'] = greenColour
-            companies.append(temp)
+        temp = {}
+        temp['name'] = name
+        temp['change'] = str(googleTrends.getCurrentChange(name)) + "%"
+        temp['changec'] = greenColour
+        temp['recS'] = "Slightly Positive" # doing a sentiment analysis on the articles within past week
+        temp['recSc'] = greenColour
+        temp['stock'] = 3.2 # mby change in stock price or a recent period of time
+        temp['stockc'] = greenColour
+        companies.append(temp)
     return render_template('profile.html',companies = companies)
 
 #def hourlyTrendCheck():
