@@ -27,15 +27,7 @@ userPytrends = {}
 userPytrends['UserEmail'] = fields.String
 userPytrends['CompanyIDList'] = fields.List(fields.String)
 
-# Broken function, doesn't return most recent weeks data
-# def trendFromDateRange(startDate, endDate, query):
-#     kw_list = [query]
-#     dateRange = str(startDate)+' '+str(endDate)
-#     pytrends.build_payload(kw_list, cat=0, timeframe=dateRange, geo='', gprop='')
-#     df = pytrends.interest_over_time();
-#     return df[query].values;
-
-# Num weeks is integer of number of weeks for range
+# Num weeks is integer of number of weeks for range (max 3)
 # Query is string to query google with
 # Returns array of trends
 #   index 0                is todays trends
@@ -44,7 +36,7 @@ def trendFromNumWeek(numWeeks, query):
     kw_list = [query]
     pytrends.build_payload(kw_list, cat=0, timeframe='now 7-d', geo='', gprop='')
     dfCurrWeek = pytrends.interest_over_time();
-    pytrends.build_payload(kw_list, cat=0, timeframe='today 1-m', geo='', gprop='')
+    pytrends.build_payload(kw_list, cat=0, timeframe='today 3-m', geo='', gprop='')
     dfCurrMonth = pytrends.interest_over_time();
     resDict = {}
 
@@ -69,7 +61,13 @@ def trendFromNumWeek(numWeeks, query):
         resArray.append(curr[1])
     return resArray
 
-
+# Broken function, doesn't return most recent weeks data
+# def trendFromDateRange(startDate, endDate, query):
+#     kw_list = [query]
+#     dateRange = str(startDate)+' '+str(endDate)
+#     pytrends.build_payload(kw_list, cat=0, timeframe=dateRange, geo='', gprop='')
+#     df = pytrends.interest_over_time();
+#     return df[query].values;
 
 def userListAsJson():
     output_fields = {}
@@ -216,5 +214,6 @@ def removeIDfromGoogleTrendsUser(userEmail, idToRemove):
 # print(df[alias])
 # print(str(df[alias].get(0)) + " " + str(today))
 
-
-print (trendFromNumWeek(2, "Facebook"))
+check = trendFromNumWeek(12, "Facebook")
+print (check)
+print (len(check))
