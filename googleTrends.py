@@ -3,6 +3,7 @@ from flask_restful import Resource, Api, reqparse, fields, marshal
 from datetime import datetime, timedelta, date
 import v4_0
 import csv
+import collections
 import json
 import requests
 import re
@@ -26,13 +27,49 @@ userPytrends = {}
 userPytrends['UserEmail'] = fields.String
 userPytrends['CompanyIDList'] = fields.List(fields.String)
 
+# Broken function, doesn't return most recent weeks data
+# def trendFromDateRange(startDate, endDate, query):
+#     kw_list = [query]
+#     dateRange = str(startDate)+' '+str(endDate)
+#     pytrends.build_payload(kw_list, cat=0, timeframe=dateRange, geo='', gprop='')
+#     df = pytrends.interest_over_time();
+#     return df[query].values;
 
-def trendFromDateRange(startDate, endDate, query):
+# Num weeks is integer of number of weeks for range
+# Query is string to query google with
+# Returns array of trends
+#   index 0                is todays trends
+#   index (numWeeks*7)-1   is the end of the array
+def trendFromNumWeek(numWeeks, query):
     kw_list = [query]
-    dateRange = str(startDate)+' '+str(endDate)
-    pytrends.build_payload(kw_list, cat=0, timeframe=dateRange, geo='', gprop='')
-    df = pytrends.interest_over_time();
-    return df[query].values;
+    pytrends.build_payload(kw_list, cat=0, timeframe='now 7-d', geo='', gprop='')
+    dfCurrWeek = pytrends.interest_over_time();
+    pytrends.build_payload(kw_list, cat=0, timeframe='today 1-m', geo='', gprop='')
+    dfCurrMonth = pytrends.interest_over_time();
+    resDict = {}
+
+    for currdate in dfCurrMonth[query].index:
+        if not str(currdate.date()) in resDict:
+            resDict[str(currdate.date())] = dfCurrMonth[query].get(currdate)
+        elif (dfCurrMonth[query].get(currdate) > resDict[str(currdate.date())]):
+            resDict[str(currdate.date())] = dfCurrMonth[query].get(currdate)
+
+    for currdate in dfCurrWeek[query].index:
+        if not str(currdate.date()) in resDict:
+            resDict[str(currdate.date())] = dfCurrWeek[query].get(currdate)
+        elif (dfCurrWeek[query].get(currdate) > resDict[str(currdate.date())]):
+            resDict[str(currdate.date())] = dfCurrWeek[query].get(currdate)
+
+
+    dictIter = collections.OrderedDict(sorted(resDict.items()))
+    numDays = numWeeks*7
+    resArray = []
+    for x in range(0, numDays):
+        curr = dictIter.popitem()
+        resArray.append(curr[1])
+    return resArray
+
+
 
 def userListAsJson():
     output_fields = {}
@@ -162,4 +199,22 @@ def removeIDfromGoogleTrendsUser(userEmail, idToRemove):
 # print(str(getCurrentChange("WOW.ax")) + "%")
 
 
-print (trendFromDateRange("2016-12-14", "2017-01-25", "Woolworths"));
+#print (trendFromDateRange("2016-12-14", "2017-01-25", "Woolworths"));
+
+
+# today = date.today()
+# numMonths = 4
+# sevenDays = timedelta(days=7)
+# startRange = today - (sevenDays*numMonths)
+# dateRange =  str(startRange) + ' ' + str(today)
+# print("date range: " + str(dateRange))
+# alias = "Facebook"
+# kw_list = [alias]
+# pytrends.build_payload(kw_list, cat=0, timeframe="today 1-m", geo='', gprop='')
+# df = pytrends.interest_over_time();
+# res = df[alias]
+# print(df[alias])
+# print(str(df[alias].get(0)) + " " + str(today))
+
+
+print (trendFromNumWeek(2, "Facebook"))
