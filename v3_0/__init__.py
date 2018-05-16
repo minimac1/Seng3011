@@ -370,14 +370,17 @@ class InputProcess(Resource):
         if datetime.datetime.strptime(my_params['from-date'],
         strptime_format) > datetime.datetime.strptime(my_params['to-date'], strptime_format):
             return errorReturn(3,args)
-
+        
+        nowTime = str(datetime.datetime.now()).replace(' ','T')
+        
         if datetime.datetime.strptime(my_params['from-date'],
-        strptime_format) > datetime.datetime.now():
+        strptime_format) > nowTime:
             return errorReturn(11,args)
 
         if datetime.datetime.strptime(my_params['to-date'],
-        strptime_format) > datetime.datetime.now():
+        strptime_format) > nowTime:
             return errorReturn(11,args)
+        
 
         comp = []
         if args['companyId'] != None:
