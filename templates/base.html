@@ -12,7 +12,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css">
+    <script src="https://apis.google.com/js/api:client.js"></script>
+    <script>
+    var googleUser = {};
+    var startApp = function() {
+      gapi.load('auth2', function(){
+        // Retrieve the singleton for the GoogleAuth library and set up the client.
+        auth2 = gapi.auth2.init({
+          client_id: 'YOUR_CLIENT_ID.apps.googleusercontent.com',
+          cookiepolicy: 'single_host_origin',
+          // Request scopes in addition to 'profile' and 'email'
+          //scope: 'additional_scope'
+        });
+        attachSignin(document.getElementById('customBtn'));
+      });
+    };
+  
+    function attachSignin(element) {
+      console.log(element.id);
+      auth2.attachClickHandler(element, {},
+          function(googleUser) {
+            document.getElementById('name').innerText = "Signed in: " +
+                googleUser.getBasicProfile().getName();
+          }, function(error) {
+            alert(JSON.stringify(error, undefined, 2));
+          });
+    }
+    </script>
 </head>
 <body>
     <div id="wrapper">
@@ -20,12 +47,29 @@
         <!-- Sidebar -->
         <div id="sidebar-wrapper">
             <ul class="sidebar-nav">
+                <div class="circle"></div>
+                <img class="proPic" src={{image}} alt="Profile">
+                <div class="log">
+                    {% if user is not none %}
+                      <a href="/profile" class="btn btn-secondary" id="menu-toggle">{{user}}</a>
+                      <a href="#" onclick="signOut();">Sign out</a>
+                    {% else %}
+                      <div id="gSignInWrapper">
+                        <div id="customBtn" class="customGPlusSignIn">
+                          <span class="icon"><img src="https://i.imgur.com/TEpq0yT.jpg" style="height:36px;width:36px;left:16px;position:relative;"></span>
+                          <span class="buttonText">Google</span>
+                        </div>
+                      </div>
+                      <script>startApp();</script>
+                    {% endif %}
+                </div>
+                <div style="display:inline-block;height:300px;"></div>
                 <li class="sidebar-brands">
                     Turtle
                 </li>
-                <li class="sidebar-head">
+                <!--<li class="sidebar-head">
                     Pages
-                </li>
+                </li>-->
                 <li class="sidebar-sub">
                     <a href="/homepage">
                         Homepage
@@ -51,12 +95,7 @@
                             <td class="headM"></td>
 
                             <td class="headR">
-                            {% if user is not none %}
-                              <a href="/profile" class="btn btn-secondary" id="menu-toggle">{{user}}</a>
-                              <a href="#" onclick="signOut();">Sign out</a>
-                            {% else %}
-                              <div class="g-signin2" data-onsuccess="onSignIn"></div>
-                            {% endif %}
+                            
                             </td>
                         </tr>
                     </table>
