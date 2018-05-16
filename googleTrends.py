@@ -27,6 +27,13 @@ userPytrends['UserEmail'] = fields.String
 userPytrends['CompanyIDList'] = fields.List(fields.String)
 
 
+def trendFromDateRange(startDate, endDate, query):
+    kw_list = [query]
+    dateRange = str(startDate)+' '+str(endDate)
+    pytrends.build_payload(kw_list, cat=0, timeframe=dateRange, geo='', gprop='')
+    df = pytrends.interest_over_time();
+    return df[query].values;
+
 def userListAsJson():
     output_fields = {}
     output_fields['Google Trends Users'] = fields.List(fields.Nested(userPytrends))
@@ -153,3 +160,6 @@ def removeIDfromGoogleTrendsUser(userEmail, idToRemove):
 #Test 2
 # addIDsToGoogleTrendsUser('user', 'WOW.ax', 'Woolworths')
 # print(str(getCurrentChange("WOW.ax")) + "%")
+
+
+print (trendFromDateRange("2016-12-14", "2017-01-25", "Woolworths"));
