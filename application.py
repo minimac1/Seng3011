@@ -331,11 +331,11 @@ def sentiment(newsText):
     #indicoio.sentiment("I love writing code!")
 
     s = newsText
-    print(s)
+    #print(s)
 
     ar = indicoio.sentiment(s)
 
-    print(ar)
+    #print(ar)
     return ar
 
 @application.route('/profile')
