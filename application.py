@@ -9,6 +9,8 @@ from v4_0 import application as api_v4
 
 from googleTrends import trendFromNumWeek
 
+from v3_0 import removeExchangeCode, csvRemoveTails, asxCodeToName
+
 import requests
 import os
 import re
@@ -89,7 +91,7 @@ def googleVerification():
 @application.route('/newsapi')
 def apiHome():
     return render_template('apiHome.html')
-    
+
 def rgCol(number):
     if number > 100:
         number = 100
@@ -127,16 +129,16 @@ def db():
     statement = "Google trends indicates there has been a minor event recently.<br>" # some way of creating a statement from reading our data
     statement += "A negative sentiment on the recent articles indicates a problem with this company."
     company['statement'] = statement
-    
+
     now = (datetime.datetime.now()- timedelta(days=1)) # currently -1day because i can't use current day
     eDate= now.isoformat()
     eDate = eDate[0:23] + "Z" # will probly need to pass in dates to choose the start date, once we've stored a results
     sDate= (now - timedelta(days=14)) # otherwise currently hardcoded to the previous week
     sDate = str(eDate).replace(' ','T')
     sDate = sDate[0:23] + "Z"
-    cId = name    
+    cId = name
     url = ("http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=" + sDate
-     + "&endDate=" + eDate + "&companyId=" + cId) 
+     + "&endDate=" + eDate + "&companyId=" + cId)
     res = requests.get(url).json()
     articles = []
     #if 'NewsDataSet' not in re:
@@ -157,7 +159,7 @@ def db():
         if not text:
             continue
         temp['sent'] = text
-        
+
         articles.append(temp)
         i+= 1
     sent = []
@@ -179,7 +181,7 @@ def db():
             first = 0
         elif date < earliest:
             earliest = date
-    
+
     name = re.sub(r"\..*","",name)
     now = datetime.datetime.now()
     #nDate = now.year + "-" + now.month + "-" + now.day
@@ -216,11 +218,11 @@ def db():
             changes[nDate]['stock'] = 0
             changes[nDate]['shortDate'] = bDate
         i += 1
-    
+
     for date in list(changes):
         if 'trends' not in changes[date]:
             del changes[date]
-            
+
     print(changes)
     sChanges = []
     for date in sorted(changes):
@@ -239,7 +241,46 @@ def average(numbers,pos):
         count += 1
         avg += numbers[pos]
     avg = int(round((avg/count),0))
-    return avg 
+    return avg
+
+#Function that returns google news in json format
+#argements are all strings eg. ("ANZ.AX", "2017-09-06", "2018-01-10")
+def googleNews(instrumentId, startDate, endDate):
+    #12b538a8b7c24dc2b1b496061a014e80
+    g_url = 'https://newsapi.org/v2/everything?'
+
+    s_params = {
+        'q': "",
+        'sources': "australian-financial-review,abc-news-au",
+        'from': "",
+        'to': "",
+        'language': "en",
+        'sortBy': "relevancy",
+        'apikey': "12b538a8b7c24dc2b1b496061a014e80"
+
+    }
+
+    abbrev = removeExchangeCode(instrumentId)
+    company = csvRemoveTails(asxCodeToName(instrumentId))
+
+    qu = '(' + abbrev + ')' + 'OR' + '(' + company + ')'
+    s_params['q'] = qu
+    s_params['from'] = startDate
+    s_params['to'] = endDate
+
+    url_to_pass = (g_url + s_params['q'] + '&sources=' + s_params['sources']
+    + '&from=' + s_params['from'] + '&to=' + s_params['to'] + '&language='
+    + s_params['language'] + '&sortBy' + s_params['sortBy'] + '&apikey='
+    + s_params['apikey'] )
+
+    articles = requests.get(url_to_pass).json()
+    #print(articles)
+    return articles
+
+
+
+
+
 #function that returns stock prices in json formating
 #argument instrumentId is a string eg. "ANZ.AX"
 def stockPrice(instrumentId):
@@ -257,7 +298,7 @@ def stockPrice(instrumentId):
     + '&symbol=' + s_params['symbol'] + '&apikey='
     + s_params['apikey'])
     #stocks = []
-    
+
     response = requests.get(stock_url).json()
     points = response['Time Series (Daily)']
     dates = sorted(points)
@@ -265,10 +306,10 @@ def stockPrice(instrumentId):
     i = 0
     #print(points)
     stocks = {}
-    for point in dates:       
+    for point in dates:
         stocks[point] = {}
         openS = float(points[point]['1. open'])
-        closeS = float(points[point]['4. close']) 
+        closeS = float(points[point]['4. close'])
         stocks[point]['stock']=round((openS - closeS),2)
         #stocks.append(temp)
         if i >10:
