@@ -30,6 +30,16 @@ application.register_blueprint(api_v2, url_prefix='/newsapi/v2.0')
 application.register_blueprint(api_v3, url_prefix='/newsapi/v3.0')
 application.register_blueprint(api_v4, url_prefix='/newsapi/v4.0')
 
+company_list = ["Bratislava",
+          "Banská Bystrica",
+          "Prešov",
+          "Považská Bystrica",
+          "Žilina",
+          "Košice",
+          "Ružomberok",
+          "Zvolen",
+          "Poprad"]
+
 # connect to database
 try:
     dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
@@ -356,6 +366,15 @@ def sentiment(newsText):
     #print(ar)
     return ar
 
+class SearchForm(Form):
+    autocomp = TextField('Insert Company ID', id='profile_autocomplete')
+
+@application.route('/_autocomplete', methods=['GET'])
+def autocomplete():
+    return Response(json.dumps(company_list), mimetype='application/json')
+
+
+
 @application.route('/profile', methods=['GET', 'POST'])
 def profile(): # maybe for the demo add the few chosen companies to session['userFol'] before the if
     session['userEmail'] = "teamturtleseng@gmail.com" #temporary
@@ -402,7 +421,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
         companies.append(temp)
     # Autocomplete form
     form = SearchForm(request.form)
-    return render_template('profile.html',companies = companies)
+    return render_template('profile.html',companies = companies, form=form)
 
 #def hourlyTrendCheck():
     #loop through googleTrends.pytrendsCompanyList
