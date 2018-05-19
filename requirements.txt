@@ -37,3 +37,4 @@ termcolor==1.1.0
 virtualenv==15.1.0
 websocket-client==0.47.0
 Werkzeug==0.14.1
+WTForms==2.1

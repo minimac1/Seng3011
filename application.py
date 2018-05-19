@@ -1,6 +1,6 @@
-from flask import Flask, render_template, Blueprint, session, request
+from flask import Flask, render_template, Blueprint, session, request, Response
 from flask_restful import Resource, Api, reqparse, fields, marshal
-
+from wtforms import TextField, Form
 from botocore.exceptions import ClientError
 from v1_0 import application as api_v1
 from v2_0 import application as api_v2
@@ -18,6 +18,7 @@ import indicoio
 import boto3
 import googleTrends
 import datetime
+import json
 from datetime import timedelta
 
 application = Flask(__name__)
@@ -338,7 +339,7 @@ def sentiment(newsText):
     #print(ar)
     return ar
 
-@application.route('/profile')
+@application.route('/profile', methods=['GET', 'POST'])
 def profile(): # maybe for the demo add the few chosen companies to session['userFol'] before the if
     session['userEmail'] = "teamturtleseng@gmail.com" #temporary
     #sendEmail("teamturtleseng@gmail.com", "CBA.ax")
@@ -372,6 +373,8 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
         temp['stock'] = 3.2 # mby change in stock price or a recent period of time
         temp['stockc'] = greenColour
         companies.append(temp)
+    # Autocomplete form
+    form = SearchForm(request.form)
     return render_template('profile.html',companies = companies)
 
 #def hourlyTrendCheck():
