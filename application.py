@@ -17,6 +17,7 @@ import boto3
 import googleTrends
 import datetime
 from datetime import timedelta
+import psycopg2
 
 application = Flask(__name__)
 application.secret_key = os.urandom(24)
@@ -26,7 +27,12 @@ application.register_blueprint(api_v2, url_prefix='/newsapi/v2.0')
 application.register_blueprint(api_v3, url_prefix='/newsapi/v3.0')
 application.register_blueprint(api_v4, url_prefix='/newsapi/v4.0')
 
-
+# connect to database
+try:
+    dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
+    dbCur = dbConn.cursor()
+except:
+    print('unable to connect to the database')
 
 @application.context_processor
 def inject_user():
@@ -65,7 +71,18 @@ def signIn():
         session['image'] = image
         session['id'] = id
         session.permanent = True
-        return "Success: Logged in as "+username
+
+        try:
+            dbCur.execute("""SELECT * FROM userData WHERE id=%s;""", (id,))
+            rows = dbCur.fetchall()
+            if(len(rows) == 0):
+                print('adding user to database')
+                print(dbCur.mogrify("""INSERT INTO userData VALUES (%s, %s, %s, %s);""", (id, username, email, image)))
+                dbCur.execute("""INSERT INTO userData VALUES (%s, %s, %s, %s);""", (id, username, email, image))
+                dbConn.commit()
+            return "Success: Logged in as "+username
+        except:
+            return "Success: Logged in as "+username+"; error talking to database"
 
 
 @application.route('/signout', methods=['POST'])
@@ -89,7 +106,7 @@ def googleVerification():
 @application.route('/newsapi')
 def apiHome():
     return render_template('apiHome.html')
-    
+
 def rgCol(number):
     if number > 100:
         number = 100
@@ -127,16 +144,16 @@ def db():
     statement = "Google trends indicates there has been a minor event recently.<br>" # some way of creating a statement from reading our data
     statement += "A negative sentiment on the recent articles indicates a problem with this company."
     company['statement'] = statement
-    
+
     now = (datetime.datetime.now()- timedelta(days=1)) # currently -1day because i can't use current day
     eDate= now.isoformat()
     eDate = eDate[0:23] + "Z" # will probly need to pass in dates to choose the start date, once we've stored a results
     sDate= (now - timedelta(days=14)) # otherwise currently hardcoded to the previous week
     sDate = str(eDate).replace(' ','T')
     sDate = sDate[0:23] + "Z"
-    cId = name    
+    cId = name
     url = ("http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=" + sDate
-     + "&endDate=" + eDate + "&companyId=" + cId) 
+     + "&endDate=" + eDate + "&companyId=" + cId)
     res = requests.get(url).json()
     articles = []
     #if 'NewsDataSet' not in re:
@@ -157,7 +174,7 @@ def db():
         if not text:
             continue
         temp['sent'] = text
-        
+
         articles.append(temp)
         i+= 1
     sent = []
@@ -179,7 +196,7 @@ def db():
             first = 0
         elif date < earliest:
             earliest = date
-    
+
     name = re.sub(r"\..*","",name)
     now = datetime.datetime.now()
     #nDate = now.year + "-" + now.month + "-" + now.day
@@ -216,11 +233,11 @@ def db():
             changes[nDate]['stock'] = 0
             changes[nDate]['shortDate'] = bDate
         i += 1
-    
+
     for date in list(changes):
         if 'trends' not in changes[date]:
             del changes[date]
-            
+
     print(changes)
     sChanges = []
     for date in sorted(changes):
@@ -239,7 +256,7 @@ def average(numbers,pos):
         count += 1
         avg += numbers[pos]
     avg = int(round((avg/count),0))
-    return avg 
+    return avg
 #function that returns stock prices in json formating
 #argument instrumentId is a string eg. "ANZ.AX"
 def stockPrice(instrumentId):
@@ -257,7 +274,7 @@ def stockPrice(instrumentId):
     + '&symbol=' + s_params['symbol'] + '&apikey='
     + s_params['apikey'])
     #stocks = []
-    
+
     response = requests.get(stock_url).json()
     points = response['Time Series (Daily)']
     dates = sorted(points)
@@ -265,10 +282,10 @@ def stockPrice(instrumentId):
     i = 0
     #print(points)
     stocks = {}
-    for point in dates:       
+    for point in dates:
         stocks[point] = {}
         openS = float(points[point]['1. open'])
-        closeS = float(points[point]['4. close']) 
+        closeS = float(points[point]['4. close'])
         stocks[point]['stock']=round((openS - closeS),2)
         #stocks.append(temp)
         if i >10:
