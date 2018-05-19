@@ -19,6 +19,7 @@ import boto3
 import googleTrends
 import datetime
 from datetime import timedelta
+import psycopg2
 
 application = Flask(__name__)
 application.secret_key = os.urandom(24)
@@ -28,7 +29,12 @@ application.register_blueprint(api_v2, url_prefix='/newsapi/v2.0')
 application.register_blueprint(api_v3, url_prefix='/newsapi/v3.0')
 application.register_blueprint(api_v4, url_prefix='/newsapi/v4.0')
 
-
+# connect to database
+try:
+    dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
+    dbCur = dbConn.cursor()
+except:
+    print('unable to connect to the database')
 
 @application.context_processor
 def inject_user():
@@ -67,7 +73,18 @@ def signIn():
         session['image'] = image
         session['id'] = id
         session.permanent = True
-        return "Success: Logged in as "+username
+
+        try:
+            dbCur.execute("""SELECT * FROM userData WHERE id=%s;""", (id,))
+            rows = dbCur.fetchall()
+            if(len(rows) == 0):
+                print('adding user to database')
+                print(dbCur.mogrify("""INSERT INTO userData VALUES (%s, %s, %s, %s);""", (id, username, email, image)))
+                dbCur.execute("""INSERT INTO userData VALUES (%s, %s, %s, %s);""", (id, username, email, image))
+                dbConn.commit()
+            return "Success: Logged in as "+username
+        except:
+            return "Success: Logged in as "+username+"; error talking to database"
 
 
 @application.route('/signout', methods=['POST'])
