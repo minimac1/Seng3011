@@ -373,11 +373,21 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             googleTrends.addIDsToGoogleTrendsUser(session['userEmail'], new, new)
         else:
             googleTrends.addIDsToGoogleTrendsUser("notLoggedIn", new, new)
+        try:
+            dbCur.execute("""INSERT INTO userFollows VALUES (%s,%s);""", (session['id'], new))
+            dbConn.commit()
+        except:
+            pass
 
     new = request.args.get('removed')
     if new is not None:
         names.remove(new)
         session['userFol'] = names
+        try:
+            dbCur.execute("""DELETE FROM userFollows WHERE id = %s and company = %s;""", (session['id'], new))
+            dbConn.commit()
+        except:
+            pass
         # change long term stored
     for name in names: # having most fields with colours, will need to add a function the chooses the colour based on the result
         temp = {}
