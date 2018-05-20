@@ -1,13 +1,13 @@
 from flask import Flask, render_template, Blueprint, session, request, Response
 from flask_restful import Resource, Api, reqparse, fields, marshal
 from wtforms import TextField, Form
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.interval import IntervalTrigger
 from botocore.exceptions import ClientError
 from v1_0 import application as api_v1
 from v2_0 import application as api_v2
 from v3_0 import application as api_v3
 from v4_0 import application as api_v4
-
-from googleTrends import trendFromNumWeek
 
 from v3_0 import removeExchangeCode, csvRemoveTails, asxCodeToName
 
@@ -18,6 +18,7 @@ import indicoio
 import boto3
 import googleTrends
 import datetime
+import atexit
 import json
 from datetime import timedelta
 import psycopg2
@@ -213,7 +214,7 @@ def db():
     name = re.sub(r"\..*","",name)
     now = datetime.datetime.now()
     #nDate = now.year + "-" + now.month + "-" + now.day
-    trends = trendFromNumWeek(5, name)
+    trends = googleTrends.trendFromNumWeek(5, name)
     tc = []
     i = 3*7
     while i < len(trends):
@@ -432,11 +433,14 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             #if contains currCID
                 #sendEmail(getEmail)
 
-def sendEmail(sendToEmail, cID):
+def sendEmail(sendToEmail, cIDList):
     SENDER = "Turtle Trends <teamturtleseng@gmail.com>"
     RECIPIENT = sendToEmail
     AWS_REGION = "us-east-1"
-    SUBJECT = "Significant change in "+cID+" trends"
+    if (len(cIDList)==1):
+        SUBJECT = "Significant change in "+cIDList[0]+" trends"
+    else:
+        SUBJECT = "Significant change in multiple trends"
     CHARSET = "UTF-8"
 
     #for non-html email clients
@@ -857,6 +861,30 @@ def featuresPage1():
 @application.route('/test')
 def testPage1():
     return render_template('test.html')
+
+#Email Scheduler
+application.run(use_reloader=False)
+scheduler = BackgroundScheduler()
+scheduler.start()
+#Update Google Trends every 6 hours
+scheduler.add_job(
+    func=googleTrends.updateAllTrends,
+    trigger=IntervalTrigger(hours=6),
+    id='update_all_gtrends',
+    name='Updates all Google Trends companies [6hours]',
+    replace_existing=True)
+# #Update IndicoIO Sentiment every 24 hours
+# scheduler.add_job(
+#     func=updateSentiment,
+#     trigger=IntervalTrigger(hours=24),
+#     id='update_all_sentiments',
+#     name='Updates all Article Sentiments [24hours]',
+#     replace_existing=True)
+# Shut down the scheduler when exiting the app
+atexit.register(lambda: scheduler.shutdown())
+
+
+
 
 
 # this will change with a gui

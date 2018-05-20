@@ -1,6 +1,6 @@
 alpha-vantage==2.0.0
 aniso8601==3.0.0
-awsebcli==3.12.4
+APScheduler==3.5.1
 asn1crypto==0.24.0
 awscli==1.15.19
 awsebcli==3.13.0
@@ -53,7 +53,8 @@ simplejson==3.14.0
 six==1.11.0
 tabulate==0.7.5
 termcolor==1.1.0
-virtualenv==15.1.0
+tzlocal==1.5.1
+virtualenv==16.0.0
 websocket-client==0.47.0
 Werkzeug==0.14.1
 WTForms==2.1

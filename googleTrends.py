@@ -7,6 +7,7 @@ import collections
 import json
 import requests
 import re
+from application import sendEmail
 from pytrends.request import TrendReq
 pytrends = TrendReq(hl='en-us', tz=-600) #change when functioning
 pytrendsUserList = []
@@ -87,12 +88,14 @@ def getCurrentChange(cid):
             return curInstance['Hourly Change (%)']
 
 def updateAllTrends():
+    print("[GTrends] Updating All Google Trends...\n");
     for currInstance in pytrendsCompanyList:
         curCID = currInstance['CompanyID']
         curAlias = v4_0.fullName(curCID)
         print("Current CID: " + curCID)
         print("Current Alias: " + curAlias)
         updateGoogleTrends(curCID, curAlias)
+    print("[GTrends] Completed Updating All Google Trends\n");
 
 
 #update CompanyID with alias to google
