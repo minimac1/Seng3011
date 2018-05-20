@@ -22,6 +22,7 @@ import atexit
 import json
 from datetime import timedelta
 import psycopg2
+from aylienapiclient import textapi
 
 application = Flask(__name__)
 application.secret_key = os.urandom(24)
@@ -306,6 +307,20 @@ def googleNews(instrumentId, startDate, endDate):
     #print(articles)
     return articles
 
+#Function that extracts the articles
+#Argeument articles is an array of urls strings
+#returns an array of article texts.
+def extractNewText(articles):
+    arr = articles
+    toReturn = []
+    client = textapi.Client("3dd5c680", "2d20c5a25c086699eb796c7e21d2bfb8")
+
+    for c in arr:
+
+        extract = client.Extract({"url": c})
+        toReturn.append(extract['article'])
+
+    return toReturn
 
 
 
