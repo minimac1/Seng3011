@@ -863,25 +863,25 @@ def testPage1():
     return render_template('test.html')
 
 #Email Scheduler
-application.run(use_reloader=False)
-scheduler = BackgroundScheduler()
-scheduler.start()
-#Update Google Trends every 6 hours
-scheduler.add_job(
-    func=googleTrends.updateAllTrends,
-    trigger=IntervalTrigger(hours=6),
-    id='update_all_gtrends',
-    name='Updates all Google Trends companies [6hours]',
-    replace_existing=True)
-# #Update IndicoIO Sentiment every 24 hours
+# application.run(use_reloader=False)
+# scheduler = BackgroundScheduler()
+# scheduler.start()
+# #Update Google Trends every 6 hours
 # scheduler.add_job(
-#     func=updateSentiment,
-#     trigger=IntervalTrigger(hours=24),
-#     id='update_all_sentiments',
-#     name='Updates all Article Sentiments [24hours]',
+#     func=googleTrends.updateAllTrends,
+#     trigger=IntervalTrigger(hours=6),
+#     id='update_all_gtrends',
+#     name='Updates all Google Trends companies [6hours]',
 #     replace_existing=True)
-# Shut down the scheduler when exiting the app
-atexit.register(lambda: scheduler.shutdown())
+# # #Update IndicoIO Sentiment every 24 hours
+# # scheduler.add_job(
+# #     func=updateSentiment,
+# #     trigger=IntervalTrigger(hours=24),
+# #     id='update_all_sentiments',
+# #     name='Updates all Article Sentiments [24hours]',
+# #     replace_existing=True)
+# # Shut down the scheduler when exiting the app
+# atexit.register(lambda: scheduler.shutdown())
 
 
 
