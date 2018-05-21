@@ -632,10 +632,15 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
                     articles[c-1]['sent'] = value
                     articles[c-1]['sentc'] = rgCol(value)
                 articles = sorted(articles, key=lambda k: k['date'])
+
             if not numArt == 0:
                 avSent = round(totSent/numArt,0)
             else:
                 avSent = 0
+
+            print("Total Sentiment: " + str(totSent))
+            print("Number Articles: " + str(numArt))
+            print("Average Sentiment: " + str(avSent))
             greenColour = "#7a8c00"
             redColour = "#800000"
             if avSent > 75:
