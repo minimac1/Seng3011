@@ -452,13 +452,6 @@ def sentiment(newsText):
     #print(ar)
     return ar
 
-# class SearchForm(Form):
-#     autocomp = TextField('Insert Company ID', id='profile_autocomplete')
-#
-# @application.route('/_autocomplete', methods=['GET'])
-# def autocomplete():
-#     return Response(json.dumps(company_list), mimetype='application/json')
-
 
 
 @application.route('/profile', methods=['GET', 'POST'])
@@ -506,7 +499,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
         # change long term stored
     for name in names: # having most fields with colours, will need to add a function the chooses the colour based on the result
         found = False
-        for curComapny in companies:
+        for curCompany in companies:
             if name == curCompany['name']:
                 found = True
         if not found: # duplicate check
@@ -566,9 +559,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
     else:
         settings['emailEventPref'] = 'Yes'
 
-    # Autocomplete form
-    # form = SearchForm(request.form)
-    #return render_template('profile.html', companies=companies, form=form, settings=settings)
+
     return render_template('profile.html', companies=companies, settings=settings)
 
 
