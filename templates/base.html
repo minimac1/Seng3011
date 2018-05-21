@@ -48,11 +48,15 @@
         <div id="sidebar-wrapper">
             <ul class="sidebar-nav">
                 <div class="circle"></div>
-                <img class="proPic" src={{image}} alt="Profile">
+                <a href="/profile"> <div class="pcir"><img class="proPic" src={{image}} alt="Profile"></div></a>
                 <div class="log">
-                    {% if user is not none %}
-                      <a href="/profile" class="btn btn-secondary" id="menu-toggle">{{user}}</a>
-                      <a href="#" onclick="signOut();">Sign out</a>
+                    {% if user is not none %}                   
+                      <a href="#" onclick="signOut();">
+                      <div id="customBtn" class="customGPlusSignIn">
+                          <span class="icon"><img src="https://i.imgur.com/TEpq0yT.jpg" style="height:36px;width:36px;left:16px;position:relative;"></span>
+                          <span class="buttonText">Sign out</span>
+                        </div>
+                      </a>
                     {% else %}
                       <div id="gSignInWrapper">
                         <div id="customBtn" class="customGPlusSignIn">
@@ -73,6 +77,11 @@
                 <li class="sidebar-sub">
                     <a href="/homepage">
                         Homepage
+                    </a>
+                <li>
+                <li class="sidebar-sub">
+                    <a href="/profile">
+                        Profile
                     </a>
                 <li>
                 <a href="/newsapi" class="sidebar-sub" >Our API</a>

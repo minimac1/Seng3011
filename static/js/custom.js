@@ -46,7 +46,7 @@ function signOut() {
 }
 
 
-function redirect(){
+function redirect1(){
   setTimeout(redirect2(), 3000)
 }
 

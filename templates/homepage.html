@@ -1,7 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
     <div class="container-fluid CL-container">
-
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="message">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
     <h1 class="page-title">Team Turtle: Website home page</h1>
     <hr style="width:50px;border:5px solid red" class="w3-round">
     <p><br></p>
