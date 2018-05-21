@@ -408,7 +408,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
     if new is not None:
         names.append(new)
         session['userFol'] = names
-        googleTrends.updateMonthlyTrends(new)
+        googleTrends.updateMonthlyTrends(new,False)
         try:
             dbCur.execute("""INSERT INTO userFollows VALUES (%s,%s);""", (session['id'], new))
             dbConn.commit()

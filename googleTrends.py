@@ -157,15 +157,17 @@ def updateAllTrends():
         updateGoogleTrends(curCID, weekthreeFrom, weekthreeTo)
     print("[GTrends] Completed Updating All Google Trends\n");
 
-#Manually update
-def updateMonthlyTrends(cid):
+#Manually update,
+def updateMonthlyTrends(cid, forceBool):
     print("[GTrends] Updating Monthly Google Trends...\n");
     curCID = cid.upper()
     dbCIDList = getCIDList();
-    if (curCID in dbCIDList):
+    if (curCID in dbCIDList and not forceBool):
         print("[GTrends] Already in list, should be updated every 6 hours\n")
         print("[GTrends] Exiting...\n")
     else:
+        if (forceBool):
+            print("[GTrends] Already in list, forcing update...\n")
         dateTo = datetime.now()
         tenHours = timedelta(hours=10) #utc time
         dateTo = dateTo - tenHours

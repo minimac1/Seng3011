@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
     <div class="container-fluid CL-container">
-        <div class="page-title">{{user}}</div>
+        <div class="page-title">{{user}}<input type="submit" value="R" class="btn btn-secondary refresh"></div>
         <hr style="width:50px;border:5px solid red" class="w3-round">
         <div class="CL-heading"> </div>
         <form action="/profile" method ="GET|POST" >

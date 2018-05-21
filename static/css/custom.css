@@ -229,6 +229,18 @@ span.buttonText {
   text-align:center;
   line-height:25px;
 }
+
+.refresh {
+  height:30px;
+  width:50px;
+  font-size:25px;
+  margin-left: 20px;
+  padding:0;
+  background-color: #666666;
+  text-align:center;
+  line-height:25px;
+}
+
 .Go {
   height:30px;
   width:50px;
@@ -419,4 +431,3 @@ span.buttonText {
     background-color: #f44336;
     border-color: #f44336;
 }
-
