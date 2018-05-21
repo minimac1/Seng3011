@@ -460,7 +460,6 @@ def sentiment(newsText):
 def profile(): # maybe for the demo add the few chosen companies to session['userFol'] before the if
     greenColour = "#7a8c00"
     redColour = "#800000"
-    #sendEmail("teamturtleseng@gmail.com", "CBA.ax")
     companies = []
     names = [] # TEMPORARY enter 1/
     #session['userFol'] = ['AMP.ax','CBA.ax','QAN.ax']
@@ -956,6 +955,81 @@ def featuresPage1():
 def testPage1():
     return render_template('test.html')
 
+#Emails
+def sendRegularEmail(sendToEmail, cIDList, type):
+    SENDER = "Turtle Trends <teamturtleseng@gmail.com>"
+    RECIPIENT = sendToEmail
+    AWS_REGION = "us-east-1"
+    if (len(cIDList)==1):
+        SUBJECT = type + " Update: Change in "+cIDList[0]+" trends"
+    else:
+        SUBJECT = type + " Update: Change in multiple trends"
+    CHARSET = "UTF-8"
+
+    #for non-html email clients
+    BODY_TEXT = ("Turtle Trends\r\n"
+                 "This email was sent with Amazon SES using the "
+                 "AWS SDK for Python (Boto)."
+                )
+
+    #for normal email clients
+    BODY_HTML = """<html>
+    <head></head>
+    <body>
+      <h2>Turtle Trends</h2>
+      <p>This email was sent with
+        <a href='http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/profile'>Amazon SES</a> using the
+        <a href='https://aws.amazon.com/sdk-for-python/'>
+          AWS SDK for Python (Boto)</a>.</p>
+    </body>
+    </html>
+                """
+
+    client = boto3.client('ses',region_name=AWS_REGION)
+
+    # Try to send the email.
+    try:
+        print("sending " + str(RECIPIENT)+" > " + str(SUBJECT))
+        print(cIDList)
+        # #Provide the contents of the email.
+        # response = client.send_email(
+        #     Destination={
+        #         'ToAddresses': [
+        #             RECIPIENT,
+        #         ],
+        #     },
+        #     Message={
+        #         'Body': {
+        #             'Html': {
+        #                 'Charset': CHARSET,
+        #                 'Data': BODY_HTML,
+        #             },
+        #             'Text': {
+        #                 'Charset': CHARSET,
+        #                 'Data': BODY_TEXT,
+        #             },
+        #         },
+        #         'Subject': {
+        #             'Charset': CHARSET,
+        #             'Data': SUBJECT,
+        #         },
+        #     },
+        #     Source=SENDER,
+        # )
+    # Display an error if something goes wrong.
+    except ClientError as e:
+        print(e.response['Error']['Message'])
+    else:
+        print("Email sent! Message ID:"),
+        print(response['ResponseMetadata']['RequestId'])
+
+def sendEmailHelper(type):
+    print("Sending " + type + " email notice...")
+    emails = googleTrends.getEmailsFromType(type)
+    for curEmail in emails:
+        cIDList = googleTrends.getCIDListFromEmail(curEmail)
+        sendRegularEmail(curEmail, cIDList, type)
+
 
 #Email Scheduler
 scheduler = BackgroundScheduler(daemon=True)
@@ -968,7 +1042,7 @@ scheduler.add_job(
      replace_existing=True)
 #Send daily emails
 scheduler.add_job(
-    func=googleTrends.sendEmailHelper,
+    func=sendEmailHelper,
     trigger=IntervalTrigger(hours=24),
     args=['Daily'],
     id='email_daily',
@@ -976,7 +1050,7 @@ scheduler.add_job(
     replace_existing=True)
 #Send weekly emails
 scheduler.add_job(
-    func=googleTrends.sendEmailHelper,
+    func=sendEmailHelper,
     trigger=IntervalTrigger(days=7),
     args=['Weekly'],
     id='email_weekly',
@@ -984,7 +1058,7 @@ scheduler.add_job(
     replace_existing=True)
 #Send monthly
 scheduler.add_job(
-    func=googleTrends.sendEmailHelper,
+    func=sendEmailHelper,
     trigger=IntervalTrigger(weeks=4),
     args=['Monthly'],
     id='email_monthly',
@@ -999,6 +1073,8 @@ atexit.register(lambda: scheduler.shutdown())
 application.add_url_rule('/', 'index', (lambda: base()))
 application.add_url_rule('/newsapi/', 'apiIndex', (lambda: apiIndex()))
 
+now = datetime.now()
+googleTrends.sendEmailSignificant("CBA.AX",42,now,"teamturtleseng@gmail.com")
 
 if __name__ == '__main__':
     application.run(use_reloader=False, debug=True)

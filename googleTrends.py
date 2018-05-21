@@ -13,7 +13,6 @@ import boto3
 import re
 import psycopg2
 from pytrends.request import TrendReq
-#utcOffset = tz.utcoffset(dt)
 pytrends = TrendReq(hl='en-us', tz=-600) #change when functioning
 
 # connect to database
@@ -83,88 +82,23 @@ def getCIDListFromEmail(email):
         return "Error geting company list"
     return resList
 
-def getEmailAndFollowingFromType(type):
+def getEmailsFromType(type):
     resList = []
     try:
-        dbCur.execute("""SELECT d.userEmail,f.company FROM userData d JOIN userFollows f ON f.id=d.id WHERE d.company=%s;""", (type,))
+        dbCur.execute("""SELECT d.userEmail,f.company FROM userData d JOIN userFollows f ON f.id=d.id WHERE d.followTime=%s;""", (type,))
         rows = dbCur.fetchall()
         for row in rows:
-            resList.append(row)
+            curEmail = row[0]
+            if not curEmail in resList:
+                resList.append(curEmail)
     except:
         return "Error geting company list"
     return resList
 
-def sendEmailHelper(type):
-    print("[GTrends] Sending " + type + " email notice...")
-    emailFollowList = getEmailAndFollowingFromType(type)
-    print(emailFollowList)
-
-def sendRegularEmail(sendToEmail, cIDList, type):
-    SENDER = "Turtle Trends <teamturtleseng@gmail.com>"
-    RECIPIENT = sendToEmail
-    AWS_REGION = "us-east-1"
-    if (len(cIDList)==1):
-        SUBJECT = type + " Update: Change in "+cIDList[0]+" trends"
-    else:
-        SUBJECT = type + " Update: Change in multiple trends"
-    CHARSET = "UTF-8"
-
-    #for non-html email clients
-    BODY_TEXT = ("Amazon SES Test (Python)\r\n"
-                 "This email was sent with Amazon SES using the "
-                 "AWS SDK for Python (Boto)."
-                )
-
-    #for normal email clients
-    BODY_HTML = """<html>
-    <head></head>
-    <body>
-      <h1>Amazon SES Test (SDK for Python)</h1>
-      <p>This email was sent with
-        <a href='https://aws.amazon.com/ses/'>Amazon SES</a> using the
-        <a href='https://aws.amazon.com/sdk-for-python/'>
-          AWS SDK for Python (Boto)</a>.</p>
-    </body>
-    </html>
-                """
-
-    client = boto3.client('ses',region_name=AWS_REGION)
-
-    # Try to send the email.
-    try:
-        #Provide the contents of the email.
-        response = client.send_email(
-            Destination={
-                'ToAddresses': [
-                    RECIPIENT,
-                ],
-            },
-            Message={
-                'Body': {
-                    'Html': {
-                        'Charset': CHARSET,
-                        'Data': BODY_HTML,
-                    },
-                    'Text': {
-                        'Charset': CHARSET,
-                        'Data': BODY_TEXT,
-                    },
-                },
-                'Subject': {
-                    'Charset': CHARSET,
-                    'Data': SUBJECT,
-                },
-            },
-            Source=SENDER,
-        )
-    # Display an error if something goes wrong.
-    except ClientError as e:
-        print(e.response['Error']['Message'])
-    else:
-        print("Email sent! Message ID:"),
-        print(response['ResponseMetadata']['RequestId'])
-
 def sendEmailSignificant(cid,percentChange,now,email):
+    percentChange = str(percentChange)
+    cid = str(cid)
+    now = str(now)
     if email is None:
         emailList = getEmailsFromCID(cid)
     else:
@@ -176,19 +110,21 @@ def sendEmailSignificant(cid,percentChange,now,email):
     SUBJECT = "Significant change in "+cid+" trends"
 
     #for non-html email clients
-    BODY_TEXT = ("Amazon SES Test (Python)\r\n"
-                 "This email was sent with Amazon SES using the "
-                 "AWS SDK for Python (Boto)."
+    BODY_TEXT = ("Turtle Trends: Significant Change\r\n"
+                 "We have detected a substantial increase ("
+                 +percentChange+
+                 ") in the trends for "
+                 +cid+
+                 "\nVisit the following link to view your profile: "
+                 "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/profile"
                 )
     #for normal email clients
     BODY_HTML = """<html>
     <head></head>
     <body>
-      <h1>Amazon SES Test (SDK for Python)</h1>
-      <p>This email was sent with
-        <a href='https://aws.amazon.com/ses/'>Amazon SES</a> using the
-        <a href='https://aws.amazon.com/sdk-for-python/'>
-          AWS SDK for Python (Boto)</a>.</p>
+      <h2>Turtle Trends: Significant Change</h2>
+      <p>We have detected a substantial increase ("""+percentChange+"""") in the trends for """ + cid + """</p>
+      <p><a href='http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/profile'>Visit your profile for more</a></p>
     </body>
     </html>
                 """
@@ -198,41 +134,39 @@ def sendEmailSignificant(cid,percentChange,now,email):
         # Try to send the email.
         try:
             #Provide the contents of the email.
-            print("sending to "+str(RECIPIENT))
-            print(SUBJECT)
-            print(BODY_HTML)
-            # response = client.send_email(
-            #     Destination={
-            #         'ToAddresses': [
-            #             RECIPIENT,
-            #         ],
-            #     },
-            #     Message={
-            #         'Body': {
-            #             'Html': {
-            #                 'Charset': CHARSET,
-            #                 'Data': BODY_HTML,
-            #             },
-            #             'Text': {
-            #                 'Charset': CHARSET,
-            #                 'Data': BODY_TEXT,
-            #             },
-            #         },
-            #         'Subject': {
-            #             'Charset': CHARSET,
-            #             'Data': SUBJECT,
-            #         },
-            #     },
-            #     Source=SENDER,
-            # )
+            # print("sending to "+str(RECIPIENT))
+            # print(SUBJECT)
+            # print(BODY_HTML)
+            response = client.send_email(
+                Destination={
+                    'ToAddresses': [
+                        RECIPIENT,
+                    ],
+                },
+                Message={
+                    'Body': {
+                        'Html': {
+                            'Charset': CHARSET,
+                            'Data': BODY_HTML,
+                        },
+                        'Text': {
+                            'Charset': CHARSET,
+                            'Data': BODY_TEXT,
+                        },
+                    },
+                    'Subject': {
+                        'Charset': CHARSET,
+                        'Data': SUBJECT,
+                    },
+                },
+                Source=SENDER,
+            )
         # Display an error if something goes wrong.
         except ClientError as e:
             print(e.response['Error']['Message'])
         else:
             print("Email sent! Message ID:"),
             print(response['ResponseMetadata']['RequestId'])
-
-
 
 def getCIDList():
     resList = []
@@ -307,10 +241,9 @@ def updateGoogleTrends(companyID, dateFrom, dateTo):
                     #print ("Res: " + str(newRes) + " > " + str(curRes))
                     dbCur.execute("""DELETE FROM trendData WHERE cid=%s and date=%s and hour=%s and trend=%s;""", (companyID, dateString, hourString, curRes))
                     dbCur.execute("""INSERT INTO trendData VALUES (%s,%s,%s,%s);""", (companyID, dateString, hourString, newRes))
-                #else:
-                    #print("lower value [" +str(newRes)+"] <= ["+ str(curRes) + "]")
-
     dbConn.commit()
+    curRes = getCurrentChange(companyID)
+    print("[GTrends] Current Results: " + curRes)
 
 #force update
 def updateAllTrends():
@@ -334,6 +267,8 @@ def updateAllTrends():
         weekthreeTo = weektwoTo - sevenDays
         weekthreeFrom = weektwoFrom - sevenDays
         updateGoogleTrends(curCID, weekthreeFrom, weekthreeTo)
+        curRes = getCurrentChange(cid)
+        print("[GTrends] Current Results: " + curRes)
     print("[GTrends] Completed Updating All Google Trends\n");
 
 #Manually update,
@@ -364,11 +299,9 @@ def updateMonthlyTrends(cid, forceBool):
         weekthreeFrom = weektwoFrom - sevenDays
         updateGoogleTrends(curCID, weekthreeFrom, weekthreeTo)
         print("[GTrends] Completed Updating All Google Trends\n");
+    curRes = getCurrentChange(cid)
+    print("[GTrends] Current Results: " + curRes)
 
-#dbCur.execute("""SELECT trend from trendData where cid=%s and date=%s and hour=%s;""", (companyID, dateString, hourString))
-# rows = dbCur.fetchall()
-# for row in rows:
-#     curRes = row[0]
 def getCurrentChange(cid):
     cid = cid.upper()
     curDate = datetime.now()
@@ -444,5 +377,5 @@ def getCurrentChange(cid):
         #print("Percentage Change: " + str(pChangeRounded))
     if (percentChange > 15):
         now = datetime.now()
-        sendEmailSignificant(cid,percentChange,now)
+        sendEmailSignificant(cid,percentChange,now,False)
     return pChangeRounded
