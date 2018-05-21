@@ -233,8 +233,7 @@ span.buttonText {
 .refresh {
   height:30px;
   width:50px;
-  font-size:25px;
-  margin-left: 20px;
+  margin: 0px;
   padding:0;
   background-color: #666666;
   text-align:center;
@@ -430,4 +429,19 @@ span.buttonText {
     color: #fff;
     background-color: #f44336;
     border-color: #f44336;
+}
+
+.btn-email {
+    color: #fff;
+    background-color: #f44336;
+    border-color: #f44336;
+    width: 85px;
+}
+
+.btn-refresh {
+    color: #fff;
+    background-color: #f44336;
+    border-color: #f44336;
+    width: 85px;
+
 }
