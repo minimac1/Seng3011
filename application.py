@@ -441,80 +441,6 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
     form = SearchForm(request.form)
     return render_template('profile.html',companies = companies, form=form)
 
-#def hourlyTrendCheck():
-    #loop through googleTrends.pytrendsCompanyList
-        #googleTrends.updateGoogleTrends
-        #getCurrentChange("companyid")
-        #if change > 15
-            #loop through googleTrends.pytrendsUserList
-            #if contains currCID
-                #sendEmail(getEmail)
-
-def sendEmail(sendToEmail, cIDList):
-    SENDER = "Turtle Trends <teamturtleseng@gmail.com>"
-    RECIPIENT = sendToEmail
-    AWS_REGION = "us-east-1"
-    if (len(cIDList)==1):
-        SUBJECT = "Significant change in "+cIDList[0]+" trends"
-    else:
-        SUBJECT = "Significant change in multiple trends"
-    CHARSET = "UTF-8"
-
-    #for non-html email clients
-    BODY_TEXT = ("Amazon SES Test (Python)\r\n"
-                 "This email was sent with Amazon SES using the "
-                 "AWS SDK for Python (Boto)."
-                )
-
-    #for normal email clients
-    BODY_HTML = """<html>
-    <head></head>
-    <body>
-      <h1>Amazon SES Test (SDK for Python)</h1>
-      <p>This email was sent with
-        <a href='https://aws.amazon.com/ses/'>Amazon SES</a> using the
-        <a href='https://aws.amazon.com/sdk-for-python/'>
-          AWS SDK for Python (Boto)</a>.</p>
-    </body>
-    </html>
-                """
-
-    client = boto3.client('ses',region_name=AWS_REGION)
-
-    # Try to send the email.
-    try:
-        #Provide the contents of the email.
-        response = client.send_email(
-            Destination={
-                'ToAddresses': [
-                    RECIPIENT,
-                ],
-            },
-            Message={
-                'Body': {
-                    'Html': {
-                        'Charset': CHARSET,
-                        'Data': BODY_HTML,
-                    },
-                    'Text': {
-                        'Charset': CHARSET,
-                        'Data': BODY_TEXT,
-                    },
-                },
-                'Subject': {
-                    'Charset': CHARSET,
-                    'Data': SUBJECT,
-                },
-            },
-            Source=SENDER,
-        )
-    # Display an error if something goes wrong.
-    except ClientError as e:
-        print(e.response['Error']['Message'])
-    else:
-        print("Email sent! Message ID:"),
-        print(response['ResponseMetadata']['RequestId'])
-
 
 @application.route('/newsapi/gui')
 def gui():
@@ -879,50 +805,43 @@ def featuresPage1():
 def testPage1():
     return render_template('test.html')
 
+
 #Email Scheduler
-# application.run(use_reloader=False)
-# scheduler = BackgroundScheduler()
-# scheduler.start()
-# # #Update Google Trends every 1 hours
-# scheduler.add_job(
-#     func=updateAllTrends,
-#     trigger=IntervalTrigger(hours=1),
-#     id='update_all_gtrends',
-#     name='Updates all Google Trends companies [6hours]',
-#     replace_existing=True)
-# #Send daily emails
-# scheduler.add_job(
-#     func=updateAllTrends,
-#     trigger=IntervalTrigger(hours=24),
-#     id='email_daily',
-#     name='Send daily email',
-#     replace_existing=True)
-# #Send weekly emails
-# scheduler.add_job(
-#     func=updateAllTrends,
-#     trigger=IntervalTrigger(days=7),
-#     id='email_weekly',
-#     name='Send weekly email',
-#     replace_existing=True)
-# #Send monthly
-# scheduler.add_job(
-#     func=updateAllTrends,
-#     trigger=IntervalTrigger(weeks=4),
-#     id='email_monthly',
-#     name='Send monthly email',
-#     replace_existing=True)
-# # #Update IndicoIO Sentiment every 24 hours
-# # scheduler.add_job(
-# #     func=updateSentiment,
-# #     trigger=IntervalTrigger(hours=24),
-# #     id='update_all_sentiments',
-# #     name='Updates all Article Sentiments [24hours]',
-# #     replace_existing=True)
-# # Shut down the scheduler when exiting the app
-# atexit.register(lambda: scheduler.shutdown())
-
-
-
+scheduler = BackgroundScheduler(daemon=True)
+#Update Google Trends every 1 hours
+scheduler.add_job(
+     func=googleTrends.updateAllTrends,
+     trigger=IntervalTrigger(hours=1),
+     id='update_all_gtrends',
+     name='Updates all Google Trends companies [6hours]',
+     replace_existing=True)
+#Send daily emails
+scheduler.add_job(
+    func=googleTrends.sendEmailHelper,
+    trigger=IntervalTrigger(hours=24),
+    args = "Daily"
+    id='email_daily',
+    name='Send daily email',
+    replace_existing=True)
+#Send weekly emails
+scheduler.add_job(
+    func=googleTrends.sendEmailHelper,
+    trigger=IntervalTrigger(days=7),
+    args = "Weekly"
+    id='email_weekly',
+    name='Send weekly email',
+    replace_existing=True)
+#Send monthly
+scheduler.add_job(
+    func=googleTrends.sendEmailHelper,
+    trigger=IntervalTrigger(weeks=4),
+    args = "Monthly"
+    id='email_monthly',
+    name='Send monthly email',
+    replace_existing=True)
+scheduler.start()
+#Shut down the scheduler when exiting the app
+atexit.register(lambda: scheduler.shutdown())
 
 
 # this will change with a gui
@@ -931,7 +850,4 @@ application.add_url_rule('/newsapi/', 'apiIndex', (lambda: apiIndex()))
 
 
 if __name__ == '__main__':
-    application.run(debug=True)
-    #run timer
-        #every hour
-        #hourlyTrendCheck()
+    application.run(use_reloader=False, debug=True)

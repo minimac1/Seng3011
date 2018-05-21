@@ -57,6 +57,178 @@ def trendFromNumWeek(numWeeks, query):
         resArray.append(curr[1])
     return resArray
 
+#EMAIL STUFF
+def getEmailsFromCID(cid):
+    resList = []
+    try:
+        dbCur.execute("""SELECT d.userEmail FROM userData d JOIN userFollows f ON f.id=d.id WHERE f.company=%s;""", (cid,))
+        rows = dbCur.fetchall()
+        for row in rows:
+            curEmail = row[0]
+            resList.append(curEmail)
+    except:
+        return "Error geting company list"
+    return resList
+
+def getCIDListFromEmail(email):
+    resList = []
+    try:
+        dbCur.execute("""SELECT f.company FROM userData d JOIN userFollows f ON f.id=d.id WHERE d.userEmail=%s;""", (email,))
+        rows = dbCur.fetchall()
+        for row in rows:
+            curCid = row[0]
+            curCid = curCid.upper()
+            resList.append(curCid)
+    except:
+        return "Error geting company list"
+    return resList
+
+def getEmailAndFollowingFromType(type):
+    resList = []
+    try:
+        dbCur.execute("""SELECT d.userEmail,f.company FROM userData d JOIN userFollows f ON f.id=d.id WHERE d.company=%s;""", (type,))
+        rows = dbCur.fetchall()
+        for row in rows:
+            resList.append(row)
+    except:
+        return "Error geting company list"
+    return resList
+
+def sendEmailHelper(type):
+    print("[GTrends] Sending " + type + " email notice...")
+    emailFollowList = getEmailAndFollowingFromType(type)
+    print(emailFollowList)
+
+def sendRegularEmail(sendToEmail, cIDList, type):
+    SENDER = "Turtle Trends <teamturtleseng@gmail.com>"
+    RECIPIENT = sendToEmail
+    AWS_REGION = "us-east-1"
+    if (len(cIDList)==1):
+        SUBJECT = type + " Update: Change in "+cIDList[0]+" trends"
+    else:
+        SUBJECT = type + " Update: Change in multiple trends"
+    CHARSET = "UTF-8"
+
+    #for non-html email clients
+    BODY_TEXT = ("Amazon SES Test (Python)\r\n"
+                 "This email was sent with Amazon SES using the "
+                 "AWS SDK for Python (Boto)."
+                )
+
+    #for normal email clients
+    BODY_HTML = """<html>
+    <head></head>
+    <body>
+      <h1>Amazon SES Test (SDK for Python)</h1>
+      <p>This email was sent with
+        <a href='https://aws.amazon.com/ses/'>Amazon SES</a> using the
+        <a href='https://aws.amazon.com/sdk-for-python/'>
+          AWS SDK for Python (Boto)</a>.</p>
+    </body>
+    </html>
+                """
+
+    client = boto3.client('ses',region_name=AWS_REGION)
+
+    # Try to send the email.
+    try:
+        #Provide the contents of the email.
+        response = client.send_email(
+            Destination={
+                'ToAddresses': [
+                    RECIPIENT,
+                ],
+            },
+            Message={
+                'Body': {
+                    'Html': {
+                        'Charset': CHARSET,
+                        'Data': BODY_HTML,
+                    },
+                    'Text': {
+                        'Charset': CHARSET,
+                        'Data': BODY_TEXT,
+                    },
+                },
+                'Subject': {
+                    'Charset': CHARSET,
+                    'Data': SUBJECT,
+                },
+            },
+            Source=SENDER,
+        )
+    # Display an error if something goes wrong.
+    except ClientError as e:
+        print(e.response['Error']['Message'])
+    else:
+        print("Email sent! Message ID:"),
+        print(response['ResponseMetadata']['RequestId'])
+
+def sendEmailSignificant(cid,percentChange,now):
+    emailList = getEmailsFromCID(cid)
+    SENDER = "Turtle Trends <teamturtleseng@gmail.com>"
+    AWS_REGION = "us-east-1"
+    CHARSET = "UTF-8"
+    SUBJECT = "Significant change in "+cid+" trends"
+
+    #for non-html email clients
+    BODY_TEXT = ("Amazon SES Test (Python)\r\n"
+                 "This email was sent with Amazon SES using the "
+                 "AWS SDK for Python (Boto)."
+                )
+    #for normal email clients
+    BODY_HTML = """<html>
+    <head></head>
+    <body>
+      <h1>Amazon SES Test (SDK for Python)</h1>
+      <p>This email was sent with
+        <a href='https://aws.amazon.com/ses/'>Amazon SES</a> using the
+        <a href='https://aws.amazon.com/sdk-for-python/'>
+          AWS SDK for Python (Boto)</a>.</p>
+    </body>
+    </html>
+                """
+    client = boto3.client('ses',region_name=AWS_REGION)
+    for sendToEmail in emailList:
+        RECIPIENT = sendToEmail
+        # Try to send the email.
+        try:
+            #Provide the contents of the email.
+            print("sending to "+str(RECIPIENT))
+            print(SUBJECT)
+            print(BODY_HTML)
+            # response = client.send_email(
+            #     Destination={
+            #         'ToAddresses': [
+            #             RECIPIENT,
+            #         ],
+            #     },
+            #     Message={
+            #         'Body': {
+            #             'Html': {
+            #                 'Charset': CHARSET,
+            #                 'Data': BODY_HTML,
+            #             },
+            #             'Text': {
+            #                 'Charset': CHARSET,
+            #                 'Data': BODY_TEXT,
+            #             },
+            #         },
+            #         'Subject': {
+            #             'Charset': CHARSET,
+            #             'Data': SUBJECT,
+            #         },
+            #     },
+            #     Source=SENDER,
+            # )
+        # Display an error if something goes wrong.
+        except ClientError as e:
+            print(e.response['Error']['Message'])
+        else:
+            print("Email sent! Message ID:"),
+            print(response['ResponseMetadata']['RequestId'])
+
+
 def getCIDList():
     resList = []
     try:
@@ -102,6 +274,8 @@ def updateGoogleTrends(companyID, dateFrom, dateTo):
                 curRes = row[0]
                 #print("In table: ["+str(curRes)+"]")
                 if (newRes>curRes):
+                    change = newRes - curRes
+                    pChange = (change/curRes)*100
                     #print ("Res: " + str(newRes) + " > " + str(curRes))
                     dbCur.execute("""DELETE FROM trendData WHERE cid=%s and date=%s and hour=%s and trend=%s;""", (companyID, dateString, hourString, curRes))
                     dbCur.execute("""INSERT INTO trendData VALUES (%s,%s,%s,%s);""", (companyID, dateString, hourString, newRes))
@@ -257,78 +431,13 @@ def getCurrentChange(cid):
     #print("Final Check: " + str(prevChangeTotal))
     change = todayChange - prevChangeTotal
     if (prevChangeTotal == 0):
+        percentChange = 0
         pChangeRounded = 0
     else:
         percentChange = (change/prevChangeTotal)*100
         pChangeRounded = str(round(percentChange,3))
         #print("Percentage Change: " + str(pChangeRounded))
+    if (percentChange > 15):
+        now = datetime.now()
+        sendEmailSignificant(cid,percentChange,now)
     return pChangeRounded
-
-#EMAIL STUFF
-def sendEmail(sendToEmail, cIDList):
-    SENDER = "Turtle Trends <teamturtleseng@gmail.com>"
-    RECIPIENT = sendToEmail
-    AWS_REGION = "us-east-1"
-    if (len(cIDList)==1):
-        SUBJECT = "Significant change in "+cIDList[0]+" trends"
-    else:
-        SUBJECT = "Significant change in multiple trends"
-    CHARSET = "UTF-8"
-
-    #for non-html email clients
-    BODY_TEXT = ("Amazon SES Test (Python)\r\n"
-                 "This email was sent with Amazon SES using the "
-                 "AWS SDK for Python (Boto)."
-                )
-
-    #for normal email clients
-    BODY_HTML = """<html>
-    <head></head>
-    <body>
-      <h1>Amazon SES Test (SDK for Python)</h1>
-      <p>This email was sent with
-        <a href='https://aws.amazon.com/ses/'>Amazon SES</a> using the
-        <a href='https://aws.amazon.com/sdk-for-python/'>
-          AWS SDK for Python (Boto)</a>.</p>
-    </body>
-    </html>
-                """
-
-    client = boto3.client('ses',region_name=AWS_REGION)
-
-    # Try to send the email.
-    try:
-        #Provide the contents of the email.
-        response = client.send_email(
-            Destination={
-                'ToAddresses': [
-                    RECIPIENT,
-                ],
-            },
-            Message={
-                'Body': {
-                    'Html': {
-                        'Charset': CHARSET,
-                        'Data': BODY_HTML,
-                    },
-                    'Text': {
-                        'Charset': CHARSET,
-                        'Data': BODY_TEXT,
-                    },
-                },
-                'Subject': {
-                    'Charset': CHARSET,
-                    'Data': SUBJECT,
-                },
-            },
-            Source=SENDER,
-        )
-    # Display an error if something goes wrong.
-    except ClientError as e:
-        print(e.response['Error']['Message'])
-    else:
-        print("Email sent! Message ID:"),
-        print(response['ResponseMetadata']['RequestId'])
-
-
-#
