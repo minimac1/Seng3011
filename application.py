@@ -421,7 +421,10 @@ def stockPrice(instrumentId):
         openS = float(points[point]['1. open'])
         closeS = float(points[point]['4. close'])
         change = openS - closeS
-        percent = change/openS * 100
+        if openS == 0:
+            percent = 0
+        else:
+            percent = change/openS * 100
         #print("open is" + str(openS) + "change is " + str(change))
         #print(percent)
         stocks[point]['stock']=round((percent),2)
