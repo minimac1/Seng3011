@@ -656,8 +656,8 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
 
             #Stock price
             curStocks = stockPrice(name)
-            today = str(datetime.datetime.today())
-            today = today.date()
+            today = datetime.datetime.today()
+            today = str(today.date())
             stockChange = curStocks[today]['stock']
             if (stockChange > 0):
                 stockColour = "#7a8c00"
