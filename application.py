@@ -41,7 +41,7 @@ company_list = ["Bratislava",
          "Ruomberok",
          "Zvolen",
          "Poprad"]
-         
+
 # renamed a redirect function to redirect1 (also changed it once in js file)
 
 
@@ -585,19 +585,104 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
                 found = True
         if not found: # duplicate check
             print("Adding company :)")
+
+            #Sentiment
+            now = (datetime.datetime.now()- timedelta(days=1)) # currently -1day because i can't use current day
+            eDate= now.isoformat()
+            eDate = eDate[0:23] + "Z" # will probly need to pass in dates to choose the start date, once we've stored a results
+            sDate= (now - timedelta(days=14)) # otherwise currently hardcoded to the previous week
+            sDate = str(eDate).replace(' ','T')
+            sDate = sDate[0:23] + "Z"
+            cId = name
+            url = ("http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=" + sDate
+             + "&endDate=" + eDate + "&companyId=" + cId)
+            res = requests.get(url).json()
+            articles = []
+            i = 0
+            for art in res['NewsDataSet']:
+                if i > 9:
+                    break; #limiting it to 10 articles
+                temp = {}
+                temp['headline'] = art['Headline']
+                temp['url'] = art['URL']
+                date = art['TimeStamp']
+                date = date[0:16]
+                date = date.replace('T', ' ')
+                temp['date']=date
+                text = art['NewsText']
+                if not text:
+                    continue
+                temp['sent'] = text
+
+                articles.append(temp)
+                i+= 1
+            sent = []
+            for art in articles:
+                sent.append(art['sent'])
+            totSent = 0;
+            numArt = 0;
+            if sent != []:
+                sent = sentiment(sent)
+                for s in sent:
+                    totSent += s
+                    numArt += 1
+                for c, value in enumerate(sent,1):
+                    value = round(value*100,0)
+                    articles[c-1]['sent'] = value
+                    articles[c-1]['sentc'] = rgCol(value)
+                articles = sorted(articles, key=lambda k: k['date'])
+            if not leng == 0:
+                avSent = round(totSent/leng,0)
+            else:
+                avSent = 0
+            greenColour = "#7a8c00"
+            redColour = "#800000"
+            if avSent > 75:
+                sentString = "Extremely Positive"
+                sentColour = "#7a8c00"
+            elif avSent > 50:
+                sentString = "Relative Poisitive"
+                sentColour = "#7a8c00"
+            elif avSent == 50:
+                sentString = "Half and Half"
+                sentColour = "#000000"
+            elif avSent > 25:
+                sentString = "Relatively Negative"
+                sentColour = "#800000"
+            else:
+                sentString = "Extremely Negative"
+                sentColour = "#800000"
+
+            #Stock price
+            curStocks = stockPrice(name)
+            today = str(date.today())
+            stockChange = curStocks[today]['stock']
+            if (stockChange > 0):
+                stockColour = "#7a8c00"
+            elif (stockChange < 0):
+                stockColour = "#800000"
+            else:
+                stockColour = "#000000"
+
+            #Trends
+            trendScore = googleTrends.getCurrentChange(name,True)
+            trendString = str(trendScore) + "%"
+            if (trendScore > 0):
+                trendColour = "#7a8c00"
+            elif (trendScore < 0):
+                trendColour = "#800000"
+            else:
+                trendColour = "#000000"
+
+
             temp = {}
             temp['name'] = name
-            temp['change'] = str(googleTrends.getCurrentChange(name,True)) + "%" #name must be form -> "XXX.SX"
-            temp['changec'] = greenColour
-            temp['recS'] = "Slightly Positive" # doing a sentiment analysis on the articles within past week
-            temp['recSc'] = greenColour
-            curStocks = stockPrice(name)
-            print("Cur Stocks for "+name+": ")
-            print(curStocks)
-            today = str(date.today())
-            temp['stock'] = curStocks[today]['stock']
-            print("help2" + str(curStocks[today]['stock']))
-            temp['stockc'] = greenColour
+            temp['change'] = trendString
+            temp['changec'] = trendColour
+            temp['recS'] = sentString
+            temp['recSc'] = sentColour
+            temp['stock'] = stockChange
+            temp['stockc'] = stockColour
             companies.append(temp)
         else:
             print("Adding duplicate company :(")
