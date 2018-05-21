@@ -556,6 +556,28 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
         except:
             print("update setting 'followTime' failed")
 
+    testEmail = request.args.get("testEmail")
+    if (testEmail is not None):
+        curEmail = session['userEmail']
+        companyIDs = []
+        for curRes in companies:
+            curName = curRes['name']
+            companyIDs.append(curName)
+        googleTrends.sendRegularEmail(curEmail, companyIDs, "Daily")
+        cid = "CBA.AX"
+        percentageChange = "16.05"
+        now = datetime.datetime.now()
+        oneday = datetime.timedelta(days=1)
+        now = now - oneday
+        googleTrends.sendEmailSignificant(cid,percentChange,now,curEmail)
+
+
+    refreshAll = request.args.get("refreshAll")
+    if (refreshALL is not None):
+        for curRes in companies:
+            curName = curRes['name']
+            googleTrends.updateMonthlyTrends(curName, True)
+
     # get user settings
     if('followTime' in session):
         settings['followTime'] = session['followTime']
