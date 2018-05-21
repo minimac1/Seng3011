@@ -1140,6 +1140,71 @@ def sendRegularEmail(sendToEmail, cIDList, type):
            <td>Change in stock price</td>
        </tr>"""
     for company in cIDList:
+        now = (datetime.datetime.now()- timedelta(days=1)) # currently -1day because i can't use current day
+        eDate= now.isoformat()
+        eDate = eDate[0:23] + "Z" # will probly need to pass in dates to choose the start date, once we've stored a results
+        sDate= (now - timedelta(days=14)) # otherwise currently hardcoded to the previous week
+        sDate = str(sDate).replace(' ','T')
+        sDate = sDate[0:23] + "Z"
+        cId = company
+        url = ("http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=" + sDate
+         + "&endDate=" + eDate + "&companyId=" + cId)
+        print(url)
+        res = requests.get(url).json()
+        articles = []
+        i = 0
+        for art in res['NewsDataSet']:
+            if i > 9:
+                break; #limiting it to 10 articles
+            temp = {}
+            temp['headline'] = art['Headline']
+            temp['url'] = art['URL']
+            date = art['TimeStamp']
+            date = date[0:16]
+            date = date.replace('T', ' ')
+            temp['date']=date
+            text = art['NewsText']
+            if not text:
+                continue
+            temp['sent'] = text
+
+            articles.append(temp)
+            i+= 1
+        sent = []
+        for art in articles:
+            sent.append(art['sent'])
+        totSent = 0;
+        numArt = 0;
+        if sent != []:
+            sent = sentiment(sent)
+            for s in sent:
+                totSent += s
+                numArt += 1
+            for c, value in enumerate(sent,1):
+                value = round(value*100,0)
+                articles[c-1]['sent'] = value
+                articles[c-1]['sentc'] = rgCol(value)
+            articles = sorted(articles, key=lambda k: k['date'])
+
+        if not numArt == 0:
+            avSent = round(totSent/numArt,0)
+        else:
+            avSent = 0
+
+        greenColour = "#7a8c00"
+        redColour = "#800000"
+        if avSent > 75:
+            sentString = "Extremely Positive"
+        elif avSent > 50:
+            sentString = "Relative Poisitive"
+        elif avSent == 50:
+            sentString = "Half and Half"
+        elif avSent > 25:
+            sentString = "Relatively Negative"
+        else:
+            sentString = "Extremely Negative"
+
+
         curStocksArray = stockPrice(company)
         tenHours = timedelta(hours=10) #utc time
         today = datetime.datetime.now()
@@ -1151,7 +1216,7 @@ def sendRegularEmail(sendToEmail, cIDList, type):
         <tr>
             <td>""" + str(company) +"""</td>
             <td>""" + str(googleTrends.getCurrentChange(company,False)) + """%</td>
-            <td>"""+ str("Slightly Positive") + """</td>
+            <td>"""+ sentString + """</td>
             <td>"""+ str(curStocks) + """</td>
         </tr>"""
         htmlString += htmlAppend
