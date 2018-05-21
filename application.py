@@ -133,7 +133,7 @@ def googleVerification():
 def apiHome():
     return render_template('apiHome.html')
 
-def rgCol(number):
+def rgCol(number): # gets colour between 220,0,0 and 0,220,0
     if number > 100:
         number = 100
     elif number < 0:
@@ -203,13 +203,39 @@ def db():
 
         articles.append(temp)
         i+= 1
+    amount = len(articles)
+    if amount < 10:
+        sDate = sDate[0:10]
+        eDate = eDate[0:10]
+        #print("sdate is "+ sDate +"edate is "+ eDate)
+        gart = googleNews(cId,sDate,eDate)
+        gart = gart['articles']
+        #print(gart)
+        for art in gart:
+            temp = {}
+            temp['headline'] = art['title']
+            date = art['publishedAt']
+            date = date[0:16]
+            date = date.replace('T', ' ')
+            temp['date'] = date
+            #temp['sent'] = art['description']
+            temp['url'] = art['url']
+            temp['sent'] = extractNewText(art['url'])
+            if not temp['sent']:
+                continue
+            articles.append(temp)
+            amount += 1
+            if amount >= 10:
+                break;
+            #print(art['publishedAt'])
+            
     sent = []
     for art in articles:
         sent.append(art['sent'])
     if sent != []:
         sent = sentiment(sent)
         for c, value in enumerate(sent,1):
-            value = round(value,2)*100
+            value = round(value*100,0)
             articles[c-1]['sent'] = value
             articles[c-1]['sentc'] = rgCol(value)
         articles = sorted(articles, key=lambda k: k['date'])
@@ -245,7 +271,7 @@ def db():
         if len(day) == 1:
             day = "0" + day
         nDate = str(now.year) + "-" + month + "-" + day
-        print(nDate)
+        #print(nDate)
         if nDate in changes:
             changes[nDate]['trends'] = tc[i]
             bDate = nDate[5:]
@@ -264,7 +290,7 @@ def db():
         if 'trends' not in changes[date]:
             del changes[date]
 
-    print(changes)
+    #print(changes)
     sChanges = []
     for date in sorted(changes):
         temp={}
@@ -319,19 +345,16 @@ def googleNews(instrumentId, startDate, endDate):
     return articles
 
 #Function that extracts the articles
-#Argeument articles is an array of urls strings
+#Argument articles is an array of urls strings
 #returns an array of article texts.
-def extractNewText(articles):
-    arr = articles
-    toReturn = []
+def extractNewText(article):
     client = textapi.Client("3dd5c680", "2d20c5a25c086699eb796c7e21d2bfb8")
 
-    for c in arr:
+    #for c in arr:
 
-        extract = client.Extract({"url": c})
-        toReturn.append(extract['article'])
+    extract = client.Extract({"url": article})
 
-    return toReturn
+    return extract['article']
 
 
 
@@ -366,7 +389,11 @@ def stockPrice(instrumentId):
         stocks[point] = {}
         openS = float(points[point]['1. open'])
         closeS = float(points[point]['4. close'])
-        stocks[point]['stock']=round((openS - closeS),2)
+        change = openS - closeS
+        percent = change/openS * 100
+        #print("open is" + str(openS) + "change is " + str(change))
+        #print(percent)
+        stocks[point]['stock']=round((percent),2)
         #stocks.append(temp)
         if i >10:
             break
