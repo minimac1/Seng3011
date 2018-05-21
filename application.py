@@ -42,13 +42,6 @@ application.register_blueprint(api_v4, url_prefix='/newsapi/v4.0')
 #          "Zvolen",
 #          "Poprad"]
 
-# connect to database
-try:
-    dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
-    dbCur = dbConn.cursor()
-except:
-    print('unable to connect to the database')
-
 @application.context_processor
 def inject_user():
     if 'username' in session:
@@ -90,6 +83,8 @@ def signIn():
         session.permanent = True
 
         try:
+            dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
+            dbCur = dbConn.cursor()
             dbCur.execute("""SELECT followTime, emailEvent FROM userData WHERE id=%s;""", (id,))
             rows = dbCur.fetchall()
             if(len(rows) == 0):
@@ -102,6 +97,8 @@ def signIn():
                     session['followTime'] = row[0]
                     session['emailEventPref'] = row[1]
                 #read userFol
+            dbCur.close()
+            dbConn.close()
             return "Success: Logged in as "+username
         except:
             return "Success: Logged in as "+username+"; error talking to database"
@@ -419,8 +416,12 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
         session['userFol'] = names
         googleTrends.updateMonthlyTrends(new,False)
         try:
+            dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
+            dbCur = dbConn.cursor()
             dbCur.execute("""INSERT INTO userFollows VALUES (%s,%s);""", (str(session['id']), str(new)))
             dbConn.commit()
+            dbCur.close()
+            dbConn.close()
         except:
             pass
 
@@ -429,8 +430,12 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
         names.remove(new)
         session['userFol'] = names
         try:
+            dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
+            dbCur = dbConn.cursor()
             dbCur.execute("""DELETE FROM userFollows WHERE id = %s and company = %s;""", (str(session['id']), str(new)))
             dbConn.commit()
+            dbCur.close()
+            dbConn.close()
         except:
             pass
         # change long term stored
@@ -452,9 +457,13 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
     new = request.args.get('eventPref')
     if (new is not None):
         try:
-            dbCur.execute("""UPDATE userData SET emailEvent = %s WHERE id = %s;""", (new, str(session['id'])))
+            dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
+            dbCur = dbConn.cursor()
+            dbCur.execute("""UPDATE userData SET emailEvent = %s WHERE id = %s;""", (new, session['id']))
             #cur.execute("""UPDATE userData SET followTime =%s WHERE id = %s;""", ('Monthly', str(103735791600147053277)))
             dbConn.commit()
+            dbCur.close()
+            dbConn.close()
             session['emailEventPref'] = new
             print("changing user setting: emailEventPref = "+new)
         except:
@@ -463,8 +472,12 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
     new = request.args.get('time')
     if (new is not None):
         try:
-            dbCur.execute("""UPDATE userData SET followTime = %s WHERE id = %s;""", (new, str(session['id'])))
+            dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
+            dbCur = dbConn.cursor()
+            dbCur.execute("""UPDATE userData SET followTime = %s WHERE id = %s;""", (new, session['id']))
             dbConn.commit()
+            dbCur.close()
+            dbConn.close()
             session['followTime'] = new
             print("changing user setting: followTime = "+new)
         except:
