@@ -96,7 +96,11 @@ def signIn():
                 for row in rows:
                     session['followTime'] = row[0]
                     session['emailEventPref'] = row[1]
-                #read userFol
+                dbCur.execute("""SELECT company FROM userFollows WHERE id=%s;""", (id,))
+                rows = dbCur.fetchall()
+                session['userFol'] = []
+                for row in rows:
+                    session['userFol'].append(row[0])
             dbCur.close()
             dbConn.close()
             return "Success: Logged in as "+username
