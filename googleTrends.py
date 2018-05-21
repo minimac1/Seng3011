@@ -321,11 +321,10 @@ def getCurrentChange(cid,sendEmailBool):
         rowCount = dbCur.rowcount
         if (rowCount == 0): #Not in table so add
             print("[GTrends-GCC] Today Res. Not In Table (Date): " + str(curDateString) + "(Hour): " + str(hourString))
-            #curDateFrom = checkDate - oneday
-            #updateGoogleTrends(cid, curDateFrom, checkDate)
-            #getCurrentChange(cid) #remove this and return 0 if slow
-            #break;
-            todayChange = todayChange + 0
+            curDateFrom = checkDate - oneday
+            updateGoogleTrends(cid, curDateFrom, checkDate)
+            return getCurrentChange(cid, sendEmailBool) #remove this and return 0 if slow
+            #todayChange = todayChange + 0
         else:
             rows = dbCur.fetchall()
             for row in rows:
@@ -349,11 +348,10 @@ def getCurrentChange(cid,sendEmailBool):
             rowCount = dbCur.rowcount
             if (rowCount == 0): #Not in table so add
                 print("[GTrends-GCC] Prev Week ["+str(y+1)+"] Res. Not In Table (Date): " + str(curDateString) + "(Hour): " + str(hourString))
-                #curDateFrom = checkDate - oneday
-                #updateGoogleTrends(cid, curDateFrom, checkDate)
-                #getCurrentChange(cid) #remove this and return 0 if slow
-                #break;
-                prevChange = prevChange + 0
+                curDateFrom = checkDate - oneday
+                updateGoogleTrends(cid, curDateFrom, checkDate)
+                return getCurrentChange(cid,sendEmailBool) #remove this and return 0 if slow
+                #prevChange = prevChange + 0
             else:
                 rows = dbCur.fetchall()
                 for row in rows:
