@@ -184,9 +184,10 @@ def fullName(thingToCheck):
 # Returns the full name of a company from its ASX code, if not in our database then returns the input given
 def asxCodeToName(thingToCheck):
     companyDict = openAllCompanyLists()
-    # check if it ends in an exchange code
+    thingToCheck = thingToCheck.upper()
+    # check if it ends in an exchange code    
     for end in getExchanges(True):
-        if thingToCheck.endswith(end):
+        if thingToCheck.endswith(end):           
             for company in companyDict[end[1:]]:
                 if removeExchangeCode(thingToCheck) == company["Symbol"].upper():
                     return company["Company name"]

@@ -158,7 +158,10 @@ def db():
     if name is None:
         return render_template('profile.html')
     company = {}
-    company['name'] = name
+    temp = csvRemoveTails(asxCodeToName(name)) + "(" + name +")"
+    temp = temp.replace('.','')
+    temp = temp.replace(', inc','')
+    company['name'] = temp
     #company['change'] = 50
     #company['changec'] = "#800000"
     #company['recS'] = "slightly Positive" probly dont need an overall sentiment here considering we list it for each article
@@ -244,7 +247,7 @@ def db():
     earliest = ""
     for date in changes:
         if first == 1:
-            eariest = date;
+            earliest = date;
             first = 0
         elif date < earliest:
             earliest = date
@@ -289,7 +292,7 @@ def db():
     for date in list(changes):
         if 'trends' not in changes[date]:
             del changes[date]
-
+    #print ("asdjasdxashdoasd")
     #print(changes)
     sChanges = []
     for date in sorted(changes):
@@ -318,7 +321,7 @@ def googleNews(instrumentId, startDate, endDate):
 
     s_params = {
         'q': "",
-        'sources': "australian-financial-review,abc-news-au",
+        'sources': "australian-financial-review,abc-news-au,abc-news,new-scientist,new-york-magazine,google-news,bbc-news,business-insider,cnbc,daily-post,the-next-web,the-new-york-times",
         'from': "",
         'to': "",
         'language': "en",
@@ -326,20 +329,38 @@ def googleNews(instrumentId, startDate, endDate):
         'apikey': "12b538a8b7c24dc2b1b496061a014e80"
 
     }
-
-    abbrev = removeExchangeCode(instrumentId)
+    code = instrumentId.split('.', 1)[-1]
+    code = code.upper()
+        
+    if code == 'AX':
+        code = "ASX"
+    elif code == 'EUX':
+        code = "EUX"
+    elif code == 'LSE':
+        code = "LSE"
+    elif code == 'NYSE':
+        code = "NYSE"
+    elif code == 'SSX':
+        code = "SSX"
+    abbrev = instrumentId.split('.', 1)[0]
     company = csvRemoveTails(asxCodeToName(instrumentId))
-
-    qu = '(' + abbrev + ')' + 'OR' + '(' + company + ')'
+    words = company.split(' ')
+    first = words[0]
+    company = company.replace(' ','%20')
+    company = company.replace('.','')
+    if abbrev == "wow":
+        abbrev = "wow%2Eax"
+    qu = '%28' + company + '%20OR%20' + abbrev + '%20OR%20' + first + '%29'
+    #qu = company
     s_params['q'] = qu
     s_params['from'] = startDate
     s_params['to'] = endDate
 
-    url_to_pass = (g_url + s_params['q'] + '&sources=' + s_params['sources']
+    url_to_pass = (g_url  + "q=" + s_params['q'] + '&sources=' + s_params['sources']
     + '&from=' + s_params['from'] + '&to=' + s_params['to'] + '&language='
     + s_params['language'] + '&sortBy' + s_params['sortBy'] + '&apikey='
     + s_params['apikey'] )
-
+    #print(url_to_pass)
     articles = requests.get(url_to_pass).json()
     #print(articles)
     return articles
@@ -371,14 +392,24 @@ def stockPrice(instrumentId):
     }
 
     a_url = "https://www.alphavantage.co/query?"
+    #instrumentId = instrumentId.split('.')[0]
+    instrumentId = instrumentId.replace('.nyse','')
+    instrumentId = instrumentId.replace('.nasdaq','')
+    if ".eux" in instrumentId:
+        return {}
+    if ".ssx" in instrumentId:
+        return {}
+    if ".lse" in instrumentId:
+        return {}
     s_params['symbol'] = instrumentId
 
     stock_url = (a_url + 'function=' + s_params['function']
     + '&symbol=' + s_params['symbol'] + '&apikey='
     + s_params['apikey'])
     #stocks = []
-
+    #print(stock_url)
     response = requests.get(stock_url).json()
+    #print(response)
     points = response['Time Series (Daily)']
     dates = sorted(points)
     dates.reverse()
