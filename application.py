@@ -32,15 +32,15 @@ application.register_blueprint(api_v2, url_prefix='/newsapi/v2.0')
 application.register_blueprint(api_v3, url_prefix='/newsapi/v3.0')
 application.register_blueprint(api_v4, url_prefix='/newsapi/v4.0')
 
-company_list = ["Bratislava",
-          "Banská Bystrica",
-          "Prešov",
-          "Považská Bystrica",
-          "Žilina",
-          "Košice",
-          "Ružomberok",
-          "Zvolen",
-          "Poprad"]
+# company_list = ["Bratislava",
+#          "Bansk Bystrica",
+#          "Preov",
+#          "Povask Bystrica",
+#          "Zilina",
+#          "Koice",
+#          "Ruomberok",
+#          "Zvolen",
+#          "Poprad"]
 
 # connect to database
 try:
