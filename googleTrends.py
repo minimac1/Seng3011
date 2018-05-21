@@ -64,6 +64,7 @@ def getCIDList():
         rows = dbCur.fetchall()
         for row in rows:
             curCid = row[0]
+            curCid = curCid.upper()
             resList.append(curCid)
     except:
         return "Error geting company list"
@@ -130,6 +131,7 @@ def updateGoogleTrends(companyID, dateFrom, dateTo):
 
     dbConn.commit()
 
+#force update
 def updateAllTrends():
     print("[GTrends] Updating All Google Trends...\n");
     dbCIDList = getCIDList();
@@ -153,7 +155,7 @@ def updateAllTrends():
         updateGoogleTrends(curCID, weekthreeFrom, weekthreeTo)
     print("[GTrends] Completed Updating All Google Trends\n");
 
-
+#Manually update
 def updateMonthlyTrends(cid):
     print("[GTrends] Updating Monthly Google Trends...\n");
     curCID = cid.upper()
@@ -257,9 +259,6 @@ def getCurrentChange(cid):
         pChangeRounded = str(round(percentChange,3))
         #print("Percentage Change: " + str(pChangeRounded))
     return pChangeRounded
-
-#updateAllTrends()
-getCurrentChange("CBA.AX")
 
 #EMAIL STUFF
 def sendEmail(sendToEmail, cIDList):
