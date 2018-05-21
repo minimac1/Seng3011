@@ -509,7 +509,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             print("Adding company :)")
             temp = {}
             temp['name'] = name
-            temp['change'] = str(googleTrends.getCurrentChange(name)) + "%" #name must be form -> "XXX.SX"
+            temp['change'] = str(googleTrends.getCurrentChange(name,True)) + "%" #name must be form -> "XXX.SX"
             temp['changec'] = greenColour
             temp['recS'] = "Slightly Positive" # doing a sentiment analysis on the articles within past week
             temp['recSc'] = greenColour
@@ -960,27 +960,47 @@ def sendRegularEmail(sendToEmail, cIDList, type):
     SENDER = "Turtle Trends <teamturtleseng@gmail.com>"
     RECIPIENT = sendToEmail
     AWS_REGION = "us-east-1"
-    if (len(cIDList)==1):
-        SUBJECT = type + " Update: Change in "+cIDList[0]+" trends"
-    else:
-        SUBJECT = type + " Update: Change in multiple trends"
     CHARSET = "UTF-8"
+    SUBJECT = type + " Update"
+    htmlString = """<table>
+    <tr>
+        <td>Company name</td>
+        <td>Change in Google activity</td>
+        <td>Recent Sentiment</td>
+        <td>Change in stock price</td>
+    </tr>"""
+    for company in cIDList:
+        curStocksArray = stockPrice(company)
+        tenHours = timedelta(hours=10) #utc time
+        today = datetime.datetime.now()
+        today = today - tenHours
+        today = str(today.date())
 
-    #for non-html email clients
-    BODY_TEXT = ("Turtle Trends\r\n"
-                 "This email was sent with Amazon SES using the "
-                 "AWS SDK for Python (Boto)."
+        curStocks = curStocksArray[today]['stock']
+        htmlAppend = """
+        <tr>
+            <td>""" + str(company) +"""</td>
+            <td>""" + str(googleTrends.getCurrentChange(company,False)) + """%</td>
+            <td>"""+ str("Slightly Positive") + """</td>
+            <td>"""+ str(curStocks) + """</td>
+        </tr>
+     </table>"""
+        htmlString += htmlAppend
+
+
+    companyStringList = ' & '.join(cIDList)
+    BODY_TEXT = ("Turtle Trends: "
+                 +type+
+                 " Update\r\n"
+                 "The following have been updated"
+                 str(companyStringList)
                 )
-
-    #for normal email clients
     BODY_HTML = """<html>
     <head></head>
     <body>
-      <h2>Turtle Trends</h2>
-      <p>This email was sent with
-        <a href='http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/profile'>Amazon SES</a> using the
-        <a href='https://aws.amazon.com/sdk-for-python/'>
-          AWS SDK for Python (Boto)</a>.</p>
+      <h2>Turtle Trends: """ type """+ Update</h2>
+      """+htmlString+"""
+      <p><a href='http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/profile'>Visit your profile for more</a></p>
     </body>
     </html>
                 """
@@ -989,33 +1009,31 @@ def sendRegularEmail(sendToEmail, cIDList, type):
 
     # Try to send the email.
     try:
-        print("sending " + str(RECIPIENT)+" > " + str(SUBJECT))
-        print(cIDList)
-        # #Provide the contents of the email.
-        # response = client.send_email(
-        #     Destination={
-        #         'ToAddresses': [
-        #             RECIPIENT,
-        #         ],
-        #     },
-        #     Message={
-        #         'Body': {
-        #             'Html': {
-        #                 'Charset': CHARSET,
-        #                 'Data': BODY_HTML,
-        #             },
-        #             'Text': {
-        #                 'Charset': CHARSET,
-        #                 'Data': BODY_TEXT,
-        #             },
-        #         },
-        #         'Subject': {
-        #             'Charset': CHARSET,
-        #             'Data': SUBJECT,
-        #         },
-        #     },
-        #     Source=SENDER,
-        # )
+        #Provide the contents of the email.
+        response = client.send_email(
+            Destination={
+                'ToAddresses': [
+                    RECIPIENT,
+                ],
+            },
+            Message={
+                'Body': {
+                    'Html': {
+                        'Charset': CHARSET,
+                        'Data': BODY_HTML,
+                    },
+                    'Text': {
+                        'Charset': CHARSET,
+                        'Data': BODY_TEXT,
+                    },
+                },
+                'Subject': {
+                    'Charset': CHARSET,
+                    'Data': SUBJECT,
+                },
+            },
+            Source=SENDER,
+        )
     # Display an error if something goes wrong.
     except ClientError as e:
         print(e.response['Error']['Message'])

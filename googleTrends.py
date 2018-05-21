@@ -242,7 +242,7 @@ def updateGoogleTrends(companyID, dateFrom, dateTo):
                     dbCur.execute("""DELETE FROM trendData WHERE cid=%s and date=%s and hour=%s and trend=%s;""", (companyID, dateString, hourString, curRes))
                     dbCur.execute("""INSERT INTO trendData VALUES (%s,%s,%s,%s);""", (companyID, dateString, hourString, newRes))
     dbConn.commit()
-    curRes = getCurrentChange(companyID)
+    curRes = getCurrentChange(companyID,True)
     print("[GTrends] Current Results: " + curRes)
 
 #force update
@@ -267,7 +267,7 @@ def updateAllTrends():
         weekthreeTo = weektwoTo - sevenDays
         weekthreeFrom = weektwoFrom - sevenDays
         updateGoogleTrends(curCID, weekthreeFrom, weekthreeTo)
-        curRes = getCurrentChange(cid)
+        curRes = getCurrentChange(cid,True)
         print("[GTrends] Current Results: " + curRes)
     print("[GTrends] Completed Updating All Google Trends\n");
 
@@ -299,10 +299,10 @@ def updateMonthlyTrends(cid, forceBool):
         weekthreeFrom = weektwoFrom - sevenDays
         updateGoogleTrends(curCID, weekthreeFrom, weekthreeTo)
         print("[GTrends] Completed Updating All Google Trends\n");
-    curRes = getCurrentChange(cid)
+    curRes = getCurrentChange(cid,True)
     print("[GTrends] Current Results: " + curRes)
 
-def getCurrentChange(cid):
+def getCurrentChange(cid,sendEmailBool):
     cid = cid.upper()
     curDate = datetime.now()
     tenHours = timedelta(hours=10) #utc time
@@ -375,7 +375,7 @@ def getCurrentChange(cid):
         percentChange = (change/prevChangeTotal)*100
         pChangeRounded = str(round(percentChange,3))
         #print("Percentage Change: " + str(pChangeRounded))
-    if (percentChange > 15):
+    if (percentChange > 15 and sendEmailBool):
         now = datetime.now()
         sendEmailSignificant(cid,percentChange,now,False)
     return pChangeRounded
