@@ -4,7 +4,7 @@
         <div class="page-title">{{user}}<input type="submit" value="R" class="btn btn-secondary refresh"></div>
         <hr style="width:50px;border:5px solid red" class="w3-round">
         <div class="CL-heading"> </div>
-        <form action="/profile" method ="GET|POST" >
+        <form action="/profile" method ="GET|POST">
             <table style="width:100%">
                 <tr>
                     <td style="width:250px"><p style="font-size:25px;">Add Company</p></td>
@@ -12,13 +12,33 @@
                     <!--{{ form.autocomp.label }}: {{ form.autocomp }} -->
                     <td style="height:30px">
                         <label for="sel1">Email Frequency:</label>
-                            <select style="height:30px">
+                            <select style="height:30px" name="time">
+                              {% if settings['followTime'] == 'Daily' %}
+                                <option selected="selected">Daily</option>
+                              {% else %}
                                 <option>Daily</option>
+                              {% endif %}
+                              {% if settings['followTime'] == 'Weekly' %}
+                                <option selected="selected">Weekly</option>
+                              {% else %}
                                 <option>Weekly</option>
+                              {% endif %}
+                              {% if settings['followTime'] == 'Monthly' %}
+                                <option selected="selected">Monthly</option>
+                              {% else %}
                                 <option>Monthly</option>
+                              {% endif %}
                             </select>
                     </td>
-                    <td><input type="checkbox" checked=checked> Recieve email on significant event</td>
+
+                    <td>
+                    {% if settings['emailEventPref'] == True %}
+                      <input type="checkbox"  name="eventPref" checked=checked> Recieve email on significant event
+                    {% else %}
+                      <input type="checkbox"  name="eventPref"> Recieve email on significant event
+                    {% endif %}
+                    </td>
+
                     <td><input type="submit" value="Add" class="btn btn-secondary add"></form></td></tr>
             </table>
         <table class="profileC">

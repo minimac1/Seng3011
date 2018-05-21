@@ -85,6 +85,8 @@ def signIn():
         session['userEmail'] = email
         session['image'] = image
         session['id'] = id
+        session['followTime'] = "Weekly"
+        session['emailEventPref'] = True
         session.permanent = True
 
         try:
@@ -95,6 +97,11 @@ def signIn():
                 print(dbCur.mogrify("""INSERT INTO userData VALUES (%s, %s, %s, %s);""", (id, username, email, image)))
                 dbCur.execute("""INSERT INTO userData VALUES (%s, %s, %s, %s);""", (id, username, email, image))
                 dbConn.commit()
+            else:
+                pass
+                #read followTime
+                #read emailEventPref
+                #read userFol
             return "Success: Logged in as "+username
         except:
             return "Success: Logged in as "+username+"; error talking to database"
@@ -106,6 +113,9 @@ def signOut():
     session.pop('userEmail', None)
     session.pop('image', None)
     session.pop('id', None)
+    #pop followTime
+    #pop emailEventPref
+    session.pop('userFol', None)
     return "Log out success"
 
 
@@ -437,9 +447,33 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
         temp['stock'] = curStocks[today]['stock']
         temp['stockc'] = greenColour
         companies.append(temp)
+    settings = {}
+
+    # update user settings
+    new = request.args.get('eventPref')
+    if (new is not None):
+        print('setting update: eventPref = ' + True)
+    elif('emailEventPref' in session and not session['emailEventPref']):
+        print('setting update: eventPref = ' + False)
+
+    new = request.args.get('time')
+    if (new is not None) and ('followTime' in session) and (new is not session['followTime']):
+        print('setting update: time = ' + new)
+
+    # get user settings
+    if('followTime' in session):
+        settings['followTime'] = session['followTime']
+    else:
+        settings['followTime'] = "Daily"
+
+    if('emailEventPref' in session):
+        settings['emailEventPref'] = session['emailEventPref']
+    else:
+        settings['emailEventPref'] = True
+
     # Autocomplete form
     form = SearchForm(request.form)
-    return render_template('profile.html',companies = companies, form=form)
+    return render_template('profile.html', companies=companies, form=form, settings=settings)
 
 #def hourlyTrendCheck():
     #loop through googleTrends.pytrendsCompanyList
