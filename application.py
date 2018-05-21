@@ -513,7 +513,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             temp['recS'] = "Slightly Positive" # doing a sentiment analysis on the articles within past week
             temp['recSc'] = greenColour
             curStocks = stockPrice(name)
-            print("Cur Stocks: ")
+            print("Cur Stocks for "+name+": ")
             print(curStocks)
             today = str(date.today())
             temp['stock'] = curStocks[today]['stock']
