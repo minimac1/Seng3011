@@ -182,7 +182,7 @@ def db():
     eDate= now.isoformat()
     eDate = eDate[0:23] + "Z" # will probly need to pass in dates to choose the start date, once we've stored a results
     sDate= (now - timedelta(days=14)) # otherwise currently hardcoded to the previous week
-    sDate = str(eDate).replace(' ','T')
+    sDate = str(sDate).replace(' ','T')
     sDate = sDate[0:23] + "Z"
     cId = name
     url = ("http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=" + sDate
@@ -591,7 +591,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             eDate= now.isoformat()
             eDate = eDate[0:23] + "Z" # will probly need to pass in dates to choose the start date, once we've stored a results
             sDate= (now - timedelta(days=14)) # otherwise currently hardcoded to the previous week
-            sDate = str(eDate).replace(' ','T')
+            sDate = str(sDate).replace(' ','T')
             sDate = sDate[0:23] + "Z"
             cId = name
             url = ("http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=" + sDate
