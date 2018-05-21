@@ -244,7 +244,7 @@ def db():
     if sent != []:
         sent = sentiment(sent)
         for s in sent:
-            totSent += s
+            totSent += round(s*100,0)
             numArt += 1
         for c, value in enumerate(sent,1):
             value = round(value*100,0)
@@ -303,7 +303,7 @@ def db():
             del changes[date]
     #print ("asdjasdxashdoasd")
     #print(changes)
-    totSent # total sent
+    #totSent # total sent
     leng = len(articles)
     articles = reversed(articles)
     avSto = 0
@@ -320,12 +320,19 @@ def db():
         temp['trends'] = changes[date]['trends']
         avTre = temp['trends']
         sChanges.append(temp)
-    avSent = round(totSent/leng,0)
+    if(leng != 0):
+        avSent = round(totSent/leng,0)
+    else:
+        avSent = 101
     #avSto = round(totSto/num,0)
     #avTre
     img = ""
     text = ""
-    if avSent > 75:
+    if avSent > 100:
+        img = "https://i.imgur.com/fq0KzNu.jpg"
+        text = "There have been no articles for this company recently so we cannot perform a sentiment analysis"
+        avSent = 50
+    elif avSent > 75:
         img = "https://i.imgur.com/KeZc7m3.jpg"
         text = "Seems like there has been really good news surrounding this company"
     elif avSent > 50:
