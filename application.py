@@ -562,7 +562,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
         for curRes in companies:
             curName = curRes['name']
             companyIDs.append(curName)
-        googleTrends.sendRegularEmail(curEmail, companyIDs, "Daily")
+        sendRegularEmail(curEmail, companyIDs, "Daily")
         cid = "CBA.AX"
         percentageChange = "16.05"
         now = datetime.datetime.now()
