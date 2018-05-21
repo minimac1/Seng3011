@@ -243,7 +243,7 @@ def updateGoogleTrends(companyID, dateFrom, dateTo):
                     dbCur.execute("""INSERT INTO trendData VALUES (%s,%s,%s,%s);""", (companyID, dateString, hourString, newRes))
     dbConn.commit()
     curRes = getCurrentChange(companyID,True)
-    print("[GTrends] Current Results: " + curRes)
+    print("[GTrends] Current Results: " + str(curRes))
 
 #force update
 def updateAllTrends():
@@ -268,7 +268,7 @@ def updateAllTrends():
         weekthreeFrom = weektwoFrom - sevenDays
         updateGoogleTrends(curCID, weekthreeFrom, weekthreeTo)
         curRes = getCurrentChange(cid,True)
-        print("[GTrends] Current Results: " + curRes)
+        print("[GTrends] Current Results: " + str(curRes))
     print("[GTrends] Completed Updating All Google Trends\n");
 
 #Manually update,
@@ -300,7 +300,7 @@ def updateMonthlyTrends(cid, forceBool):
         updateGoogleTrends(curCID, weekthreeFrom, weekthreeTo)
         print("[GTrends] Completed Updating All Google Trends\n");
     curRes = getCurrentChange(cid,True)
-    print("[GTrends] Current Results: " + curRes)
+    print("[GTrends] Current Results: " + str(curRes))
 
 def getCurrentChange(cid,sendEmailBool):
     cid = cid.upper()
@@ -373,7 +373,7 @@ def getCurrentChange(cid,sendEmailBool):
         pChangeRounded = 0
     else:
         percentChange = (change/prevChangeTotal)*100
-        pChangeRounded = str(round(percentChange,3))
+        pChangeRounded = round(percentChange,3)
         #print("Percentage Change: " + str(pChangeRounded))
     if (percentChange > 15 and sendEmailBool):
         now = datetime.now()
