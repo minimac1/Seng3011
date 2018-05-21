@@ -498,6 +498,8 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
         except:
             pass
         # change long term stored
+    print("Names: ")
+    print(names)
     for name in names: # having most fields with colours, will need to add a function the chooses the colour based on the result
         print("name: " + str(name))
         found = False
