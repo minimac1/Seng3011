@@ -4,6 +4,7 @@ APScheduler==3.5.1
 asn1crypto==0.24.0
 awscli==1.15.19
 awsebcli==3.13.0
+aylien-apiclient==0.6.0
 bcrypt==3.1.4
 boto==2.48.0
 boto3==1.7.14
@@ -21,6 +22,7 @@ docutils==0.14
 fabric==2.0.0
 Flask==0.12.2
 Flask-RESTful==0.3.6
+httplib2==0.11.3
 idna==2.6
 IndicoIo==1.1.4
 invoke==1.0.0

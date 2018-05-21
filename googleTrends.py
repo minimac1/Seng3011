@@ -157,23 +157,28 @@ def updateAllTrends():
 def updateMonthlyTrends(cid):
     print("[GTrends] Updating Monthly Google Trends...\n");
     curCID = cid.upper()
-    dateTo = datetime.now()
-    tenHours = timedelta(hours=10) #utc time
-    dateTo = dateTo - tenHours
-    oneday = timedelta(days=1)
-    dateFrom = dateTo - oneday
-    updateGoogleTrends(curCID, dateFrom, dateTo)
-    sevenDays = timedelta(days=7)
-    weekoneTo = dateTo - sevenDays
-    weekoneFrom = dateFrom - sevenDays
-    updateGoogleTrends(curCID, weekoneFrom, weekoneTo)
-    weektwoTo = weekoneTo - sevenDays
-    weektwoFrom = weekoneFrom - sevenDays
-    updateGoogleTrends(curCID, weektwoFrom, weektwoTo)
-    weekthreeTo = weektwoTo - sevenDays
-    weekthreeFrom = weektwoFrom - sevenDays
-    updateGoogleTrends(curCID, weekthreeFrom, weekthreeTo)
-    print("[GTrends] Completed Updating All Google Trends\n");
+    dbCIDList = getCIDList();
+    if (curCID in dbCIDList):
+        print("[GTrends] Already in list, should be updated every 6 hours\n")
+        print("[GTrends] Exiting...\n")
+    else:
+        dateTo = datetime.now()
+        tenHours = timedelta(hours=10) #utc time
+        dateTo = dateTo - tenHours
+        oneday = timedelta(days=1)
+        dateFrom = dateTo - oneday
+        updateGoogleTrends(curCID, dateFrom, dateTo)
+        sevenDays = timedelta(days=7)
+        weekoneTo = dateTo - sevenDays
+        weekoneFrom = dateFrom - sevenDays
+        updateGoogleTrends(curCID, weekoneFrom, weekoneTo)
+        weektwoTo = weekoneTo - sevenDays
+        weektwoFrom = weekoneFrom - sevenDays
+        updateGoogleTrends(curCID, weektwoFrom, weektwoTo)
+        weekthreeTo = weektwoTo - sevenDays
+        weekthreeFrom = weektwoFrom - sevenDays
+        updateGoogleTrends(curCID, weekthreeFrom, weekthreeTo)
+        print("[GTrends] Completed Updating All Google Trends\n");
 
 #dbCur.execute("""SELECT trend from trendData where cid=%s and date=%s and hour=%s;""", (companyID, dateString, hourString))
 # rows = dbCur.fetchall()
