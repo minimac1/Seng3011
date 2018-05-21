@@ -98,9 +98,11 @@ def signIn():
                 dbCur.execute("""INSERT INTO userData VALUES (%s, %s, %s, %s, %s, %s);""", (id, username, email, image, session['followTime'], session['emailEventPref']))
                 dbConn.commit()
             else:
-                pass
-                #read followTime
-                #read emailEventPref
+                dbCur.execute("""SELECT followTime, emailEvent FROM userData;""")
+                rows = dbCur.fetchall()
+                for row in rows:
+                    session['followTime'] = row[0]
+                    session['emailEventPref'] = row[1]
                 #read userFol
             return "Success: Logged in as "+username
         except:
@@ -451,25 +453,23 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
     # update user settings
     new = request.args.get('eventPref')
     if (new is not None):
-        if(('emailEventPref' not in session) or (not new == session['emailEventPref'])):
-            try:
-                dbCur.execute("""UPDATE userData SET emailEvent = %s WHERE id = %s;""", (new, session['id']))
-                dbConn.commit()
-                session['emailEventPref'] = new
-                print("changing user setting: emailEventPref = "+new)
-            except:
-                print("update setting 'EventPref' failed")
+        try:
+            dbCur.execute("""UPDATE userData SET emailEvent = %s WHERE id = %s;""", (new, session['id']))
+            dbConn.commit()
+            session['emailEventPref'] = new
+            print("changing user setting: emailEventPref = "+new)
+        except:
+            print("update setting 'EventPref' failed")
 
     new = request.args.get('time')
     if (new is not None):
-        if(('followTime' not in session) or (not new == session['followTime'])):
-            try:
-                dbCur.execute("""UPDATE userData SET followTime = %s WHERE id = %s;""", (new, session['id']))
-                dbConn.commit()
-                session['followTime'] = new
-                print("changing user setting: followTime = "+new)
-            except:
-                print("update setting 'followTime' failed")
+        try:
+            dbCur.execute("""UPDATE userData SET followTime = %s WHERE id = %s;""", (new, session['id']))
+            dbConn.commit()
+            session['followTime'] = new
+            print("changing user setting: followTime = "+new)
+        except:
+            print("update setting 'followTime' failed")
 
     # get user settings
     if('followTime' in session):
