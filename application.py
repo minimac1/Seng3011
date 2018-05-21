@@ -20,7 +20,7 @@ import googleTrends
 import datetime
 import atexit
 import json
-from datetime import timedelta
+from datetime import timedelta, date
 import psycopg2
 from aylienapiclient import textapi
 
@@ -432,7 +432,9 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
         temp['changec'] = greenColour
         temp['recS'] = "Slightly Positive" # doing a sentiment analysis on the articles within past week
         temp['recSc'] = greenColour
-        temp['stock'] = 3.2 # mby change in stock price or a recent period of time
+        curStocks = stockPrice(name)
+        today = str(date.today())
+        temp['stock'] = curStocks[today]['stock']
         temp['stockc'] = greenColour
         companies.append(temp)
     # Autocomplete form
