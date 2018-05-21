@@ -1073,8 +1073,5 @@ atexit.register(lambda: scheduler.shutdown())
 application.add_url_rule('/', 'index', (lambda: base()))
 application.add_url_rule('/newsapi/', 'apiIndex', (lambda: apiIndex()))
 
-now = datetime.now()
-googleTrends.sendEmailSignificant("CBA.AX",42,now,"teamturtleseng@gmail.com")
-
 if __name__ == '__main__':
     application.run(use_reloader=False, debug=True)
