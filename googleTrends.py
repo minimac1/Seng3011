@@ -67,7 +67,7 @@ def getEmailsFromCID(cid):
             curEmail = row[0]
             resList.append(curEmail)
     except:
-        return "Error geting company list"
+        return "Error geting email list"
     return resList
 
 def getCIDListFromEmail(email):
