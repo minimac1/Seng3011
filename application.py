@@ -32,22 +32,15 @@ application.register_blueprint(api_v2, url_prefix='/newsapi/v2.0')
 application.register_blueprint(api_v3, url_prefix='/newsapi/v3.0')
 application.register_blueprint(api_v4, url_prefix='/newsapi/v4.0')
 
-company_list = ["Bratislava",
-          "Banská Bystrica",
-          "Prešov",
-          "Považská Bystrica",
-          "Žilina",
-          "Košice",
-          "Ružomberok",
-          "Zvolen",
-          "Poprad"]
-
-# connect to database
-try:
-    dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
-    dbCur = dbConn.cursor()
-except:
-    print('unable to connect to the database')
+# company_list = ["Bratislava",
+#          "Bansk Bystrica",
+#          "Preov",
+#          "Povask Bystrica",
+#          "Zilina",
+#          "Koice",
+#          "Ruomberok",
+#          "Zvolen",
+#          "Poprad"]
 
 @application.context_processor
 def inject_user():
@@ -85,16 +78,31 @@ def signIn():
         session['userEmail'] = email
         session['image'] = image
         session['id'] = id
+        session['followTime'] = "Daily"
+        session['emailEventPref'] = 'Yes'
         session.permanent = True
 
         try:
-            dbCur.execute("""SELECT * FROM userData WHERE id=%s;""", (id,))
+            dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
+            dbCur = dbConn.cursor()
+            dbCur.execute("""SELECT followTime, emailEvent FROM userData WHERE id=%s;""", (id,))
             rows = dbCur.fetchall()
             if(len(rows) == 0):
                 print('adding user to database')
-                print(dbCur.mogrify("""INSERT INTO userData VALUES (%s, %s, %s, %s);""", (id, username, email, image)))
-                dbCur.execute("""INSERT INTO userData VALUES (%s, %s, %s, %s);""", (id, username, email, image))
+                print(dbCur.mogrify("""INSERT INTO userData VALUES (%s, %s, %s, %s, %s, %s);""", (id, username, email, image, session['followTime'], session['emailEventPref'])))
+                dbCur.execute("""INSERT INTO userData VALUES (%s, %s, %s, %s, %s, %s);""", (id, username, email, image, session['followTime'], session['emailEventPref']))
                 dbConn.commit()
+            else:
+                for row in rows:
+                    session['followTime'] = row[0]
+                    session['emailEventPref'] = row[1]
+                dbCur.execute("""SELECT company FROM userFollows WHERE id=%s;""", (id,))
+                rows = dbCur.fetchall()
+                session['userFol'] = []
+                for row in rows:
+                    session['userFol'].append(row[0])
+            dbCur.close()
+            dbConn.close()
             return "Success: Logged in as "+username
         except:
             return "Success: Logged in as "+username+"; error talking to database"
@@ -106,6 +114,9 @@ def signOut():
     session.pop('userEmail', None)
     session.pop('image', None)
     session.pop('id', None)
+    session.pop('followTime', None)
+    session.pop('emailEventPref', None)
+    session.pop('userFol', None)
     return "Log out success"
 
 
@@ -122,7 +133,7 @@ def googleVerification():
 def apiHome():
     return render_template('apiHome.html')
 
-def rgCol(number):
+def rgCol(number): # gets colour between 220,0,0 and 0,220,0
     if number > 100:
         number = 100
     elif number < 0:
@@ -192,13 +203,39 @@ def db():
 
         articles.append(temp)
         i+= 1
+    amount = len(articles)
+    if amount < 10:
+        sDate = sDate[0:10]
+        eDate = eDate[0:10]
+        #print("sdate is "+ sDate +"edate is "+ eDate)
+        gart = googleNews(cId,sDate,eDate)
+        gart = gart['articles']
+        #print(gart)
+        for art in gart:
+            temp = {}
+            temp['headline'] = art['title']
+            date = art['publishedAt']
+            date = date[0:16]
+            date = date.replace('T', ' ')
+            temp['date'] = date
+            #temp['sent'] = art['description']
+            temp['url'] = art['url']
+            temp['sent'] = extractNewText(art['url'])
+            if not temp['sent']:
+                continue
+            articles.append(temp)
+            amount += 1
+            if amount >= 10:
+                break;
+            #print(art['publishedAt'])
+            
     sent = []
     for art in articles:
         sent.append(art['sent'])
     if sent != []:
         sent = sentiment(sent)
         for c, value in enumerate(sent,1):
-            value = round(value,2)*100
+            value = round(value*100,0)
             articles[c-1]['sent'] = value
             articles[c-1]['sentc'] = rgCol(value)
         articles = sorted(articles, key=lambda k: k['date'])
@@ -234,7 +271,7 @@ def db():
         if len(day) == 1:
             day = "0" + day
         nDate = str(now.year) + "-" + month + "-" + day
-        print(nDate)
+        #print(nDate)
         if nDate in changes:
             changes[nDate]['trends'] = tc[i]
             bDate = nDate[5:]
@@ -253,7 +290,7 @@ def db():
         if 'trends' not in changes[date]:
             del changes[date]
 
-    print(changes)
+    #print(changes)
     sChanges = []
     for date in sorted(changes):
         temp={}
@@ -308,19 +345,16 @@ def googleNews(instrumentId, startDate, endDate):
     return articles
 
 #Function that extracts the articles
-#Argeument articles is an array of urls strings
+#Argument articles is an array of urls strings
 #returns an array of article texts.
-def extractNewText(articles):
-    arr = articles
-    toReturn = []
+def extractNewText(article):
     client = textapi.Client("3dd5c680", "2d20c5a25c086699eb796c7e21d2bfb8")
 
-    for c in arr:
+    #for c in arr:
 
-        extract = client.Extract({"url": c})
-        toReturn.append(extract['article'])
+    extract = client.Extract({"url": article})
 
-    return toReturn
+    return extract['article']
 
 
 
@@ -355,7 +389,11 @@ def stockPrice(instrumentId):
         stocks[point] = {}
         openS = float(points[point]['1. open'])
         closeS = float(points[point]['4. close'])
-        stocks[point]['stock']=round((openS - closeS),2)
+        change = openS - closeS
+        percent = change/openS * 100
+        #print("open is" + str(openS) + "change is " + str(change))
+        #print(percent)
+        stocks[point]['stock']=round((percent),2)
         #stocks.append(temp)
         if i >10:
             break
@@ -396,7 +434,6 @@ def autocomplete():
 def profile(): # maybe for the demo add the few chosen companies to session['userFol'] before the if
     greenColour = "#7a8c00"
     redColour = "#800000"
-    session['userEmail'] = "teamturtleseng@gmail.com" #temporary
     #sendEmail("teamturtleseng@gmail.com", "CBA.ax")
     companies = []
     names = [] # TEMPORARY enter 1/
@@ -406,22 +443,30 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
     if 'userFol' in session:
         names = session['userFol'] # for user following, to be filled with names of following companies when user logs in
     if new is not None:
-        names.append(new)
-        session['userFol'] = names
-        googleTrends.updateMonthlyTrends(new,False)
         try:
-            dbCur.execute("""INSERT INTO userFollows VALUES (%s,%s);""", (session['id'], new))
+            dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
+            dbCur = dbConn.cursor()
+            dbCur.execute("""INSERT INTO userFollows VALUES (%s,%s);""", (str(session['id']), str(new)))
             dbConn.commit()
+            dbCur.close()
+            dbConn.close()
+            names.append(new)
+            session['userFol'] = names
+            googleTrends.updateMonthlyTrends(new,False)
         except:
             pass
 
     new = request.args.get('removed')
     if new is not None:
-        names.remove(new)
-        session['userFol'] = names
         try:
-            dbCur.execute("""DELETE FROM userFollows WHERE id = %s and company = %s;""", (session['id'], new))
+            dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
+            dbCur = dbConn.cursor()
+            dbCur.execute("""DELETE FROM userFollows WHERE id = %s and company = %s;""", (str(session['id']), str(new)))
             dbConn.commit()
+            dbCur.close()
+            dbConn.close()
+            names.remove(new)
+            session['userFol'] = names
         except:
             pass
         # change long term stored
@@ -437,9 +482,52 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
         temp['stock'] = curStocks[today]['stock']
         temp['stockc'] = greenColour
         companies.append(temp)
+    settings = {}
+
+    # update user settings
+    new = request.args.get('eventPref')
+    if (new is not None):
+        try:
+            dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
+            dbCur = dbConn.cursor()
+            dbCur.execute("""UPDATE userData SET emailEvent = %s WHERE id = %s;""", (new, session['id']))
+            #cur.execute("""UPDATE userData SET followTime =%s WHERE id = %s;""", ('Monthly', str(103735791600147053277)))
+            dbConn.commit()
+            dbCur.close()
+            dbConn.close()
+            session['emailEventPref'] = new
+            print("changing user setting: emailEventPref = "+new)
+        except:
+            print("update setting 'EventPref' failed")
+
+    new = request.args.get('time')
+    if (new is not None):
+        try:
+            dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
+            dbCur = dbConn.cursor()
+            dbCur.execute("""UPDATE userData SET followTime = %s WHERE id = %s;""", (new, session['id']))
+            dbConn.commit()
+            dbCur.close()
+            dbConn.close()
+            session['followTime'] = new
+            print("changing user setting: followTime = "+new)
+        except:
+            print("update setting 'followTime' failed")
+
+    # get user settings
+    if('followTime' in session):
+        settings['followTime'] = session['followTime']
+    else:
+        settings['followTime'] = "Daily"
+
+    if('emailEventPref' in session):
+        settings['emailEventPref'] = session['emailEventPref']
+    else:
+        settings['emailEventPref'] = 'Yes'
+
     # Autocomplete form
     form = SearchForm(request.form)
-    return render_template('profile.html',companies = companies, form=form)
+    return render_template('profile.html', companies=companies, form=form, settings=settings)
 
 
 @application.route('/newsapi/gui')
