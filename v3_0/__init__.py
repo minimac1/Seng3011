@@ -185,9 +185,9 @@ def fullName(thingToCheck):
 def asxCodeToName(thingToCheck):
     companyDict = openAllCompanyLists()
     thingToCheck = thingToCheck.upper()
-    # check if it ends in an exchange code    
+    # check if it ends in an exchange code
     for end in getExchanges(True):
-        if thingToCheck.endswith(end):           
+        if thingToCheck.endswith(end):
             for company in companyDict[end[1:]]:
                 if removeExchangeCode(thingToCheck) == company["Symbol"].upper():
                     return company["Company name"]
@@ -371,8 +371,8 @@ class InputProcess(Resource):
         if datetime.datetime.strptime(my_params['from-date'],
         strptime_format) > datetime.datetime.strptime(my_params['to-date'], strptime_format):
             return errorReturn(3,args)
-        
-        
+
+
         if datetime.datetime.strptime(my_params['from-date'],
         strptime_format) > datetime.datetime.now():
             return errorReturn(11,args)
@@ -380,7 +380,7 @@ class InputProcess(Resource):
         if datetime.datetime.strptime(my_params['to-date'],
         strptime_format) > datetime.datetime.now():
             return errorReturn(11,args)
-        
+
 
         comp = []
         if args['companyId'] != None:
@@ -486,17 +486,18 @@ class InputProcess(Resource):
         # if there is one page
         print("Total Articles: " + str(data["response"]["total"]))
         print("Pages: " + str(data["response"]["pages"]))
-        if (data["response"]["pages"] == 1):
-            print("Calling page: 1")
-            resultsList = data["response"]["results"]
-        # if there is more than one page
-        elif (data["response"]["pages"] != 1):
-            for x in range(0, data["response"]["pages"]):
-                print("Calling page: " + str(x+1))
-                data = callGuardian(my_params, x+1)
-                resultsList = resultsList + data["response"]["results"]
-        else:
-            print("\nYou shouldn't be here!!!!\n")
+        resultsList = data["response"]["results"]
+        # if (data["response"]["pages"] == 1):
+        #     print("Calling page: 1")
+        #     resultsList = data["response"]["results"]
+        # # if there is more than one page
+        # elif (data["response"]["pages"] != 1):
+        #     for x in range(0, data["response"]["pages"]):
+        #         print("Calling page: " + str(x+1))
+        #         data = callGuardian(my_params, x+1)
+        #         resultsList = resultsList + data["response"]["results"]
+        # else:
+        #     print("\nYou shouldn't be here!!!!\n")
 
         #print statments for debugging please keep for future use
         #print(response.url) #to see the url call to the api to make sure its correct
