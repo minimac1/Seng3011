@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Blueprint, session, request, Response
+from flask import Flask, render_template, Blueprint, session, request, Response, url_for, redirect, flash
 from flask_restful import Resource, Api, reqparse, fields, marshal
 from wtforms import TextField, Form
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -41,6 +41,9 @@ company_list = ["Bratislava",
          "Ruomberok",
          "Zvolen",
          "Poprad"]
+         
+# renamed a redirect function to redirect1 (also changed it once in js file)
+
 
 @application.context_processor
 def inject_user():
@@ -121,7 +124,7 @@ def signOut():
 
 
 @application.route('/redirect')
-def redirect():
+def redirect1():
     return render_template('redirect.html')
 
 
@@ -158,9 +161,10 @@ def db():
     if name is None:
         return render_template('profile.html')
     company = {}
-    temp = csvRemoveTails(asxCodeToName(name)) + "(" + name +")"
+    temp = csvRemoveTails(asxCodeToName(name))
     temp = temp.replace('.','')
     temp = temp.replace(', inc','')
+    temp = temp + " (" + name +")"
     company['name'] = temp
     #company['change'] = 50
     #company['changec'] = "#800000"
@@ -235,8 +239,13 @@ def db():
     sent = []
     for art in articles:
         sent.append(art['sent'])
+    totSent = 0;
+    numArt = 0;
     if sent != []:
         sent = sentiment(sent)
+        for s in sent:
+            totSent += s
+            numArt += 1
         for c, value in enumerate(sent,1):
             value = round(value*100,0)
             articles[c-1]['sent'] = value
@@ -294,13 +303,79 @@ def db():
             del changes[date]
     #print ("asdjasdxashdoasd")
     #print(changes)
+    totSent # total sent
+    leng = len(articles)
+    articles = reversed(articles)
+    avSto = 0
+    avTre = 0
+    num = 0;
     sChanges = []
     for date in sorted(changes):
+        num += 1
         temp={}
         temp['shortDate'] = changes[date]['shortDate']
         temp['stock'] = changes[date]['stock']
+        if temp['stock'] != 0:
+            avSto = temp['stock']
         temp['trends'] = changes[date]['trends']
+        avTre = temp['trends']
         sChanges.append(temp)
+    avSent = round(totSent/leng,0)
+    #avSto = round(totSto/num,0)
+    #avTre
+    img = ""
+    text = ""
+    if avSent > 75:
+        img = "https://i.imgur.com/KeZc7m3.jpg"
+        text = "Seems like there has been really good news surrounding this company"
+    elif avSent > 50:
+        img = "https://i.imgur.com/bQOWNFw.jpg"
+        text = "This sentiment indicates there has been somewhat positive news surrounding this company"
+    elif avSent == 50:
+        img = "https://i.imgur.com/fq0KzNu.jpg"
+        text = "Never really expected it to be even but I guess there is both good and bad articles that will have to be evaluated by you"
+    elif avSent > 25:
+        img = "https://i.imgur.com/gLAMWd0.jpg"
+        text = "This sentiment indicates there has been somewhat negative news surrounding this company"
+    else:
+        img = "https://i.imgur.com/Fk32cdt.jpg"
+        text = "There has been a some quiet bad news surrounding this company, be careful"
+    company['sent'] = img
+    company['sentt'] = text
+    if avTre > 30:
+        img = "https://i.imgur.com/KeZc7m3.jpg"
+        text = "Something big must of happened recently"
+    elif avTre > 0:
+        img = "https://i.imgur.com/bQOWNFw.jpg"
+        text = "Something could of happened but this also might just be normal odds that slightly change as nothing continues to happen"
+    elif avTre == 0:
+        img = "https://i.imgur.com/fq0KzNu.jpg"
+        text = "Wow no change, guess there the same stuff that happened last week is continuing to happen"
+    elif avTre > -30:
+        img = "https://i.imgur.com/gLAMWd0.jpg"
+        text = "This could just be the normal flow of people slightly more busy this week and not enough time to be using google, or attention surrounding an event has almost died out"
+    else:
+        img = "https://i.imgur.com/Fk32cdt.jpg"
+        text = "Likely a recent event has happened but people have lost interest"
+    company['trends'] = img
+    company['trendst'] = text
+    if avSto > 3:
+        img = "https://i.imgur.com/KeZc7m3.jpg"
+        text = "Wow, magnificent. This company is doing well"
+    elif avSto > 0:
+        img = "https://i.imgur.com/bQOWNFw.jpg"
+        text = "Going up but not reflective of anything out of ordinary"
+    elif avSto == 0:
+        img = "https://i.imgur.com/fq0KzNu.jpg"
+        text = "No change, seems nothing has changed with this company"
+    elif avSto > -3:
+        img = "https://i.imgur.com/gLAMWd0.jpg"
+        text = "Going down but not reflective of anything out of ordinary"
+    else:
+        img = "https://i.imgur.com/Fk32cdt.jpg"
+        text = "Be careful, this is likely reflective of something the company has done very poorly"
+    company['stocks'] = img
+    company['stockst'] = text
     return render_template('dB.html',articles=articles,company=company,changes = sChanges)
 
 def average(numbers,pos):
@@ -468,6 +543,9 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
 
     if 'userFol' in session:
         names = session['userFol'] # for user following, to be filled with names of following companies when user logs in
+    else:
+        flash('Make sure to log in with your google account before you go to profile')
+        return redirect(url_for('homepage1'))
     if new is not None:
         if asxCheckValid(new):
             print("Entered an valid CID")

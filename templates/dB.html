@@ -26,25 +26,32 @@
     <div class="container-fluid CL-container"">
         <table class="dbTable">
             <tr>
-                <td rowspan="3" style="width:300px;">
+                <td colspan="4">
+                    <div class="page-title">{{company['name']}}</div>
+                </td>
+                
+            </tr>
+            <tr>
+                <td colspan="1">
+                    <div class="CL-heading2" style="line-height: 1.5;">Trends<br><img src="{{company['trends']}}" title="{{company['trendst']}}"></div>
+                </td>
+                <td colspan="1">
+                    <div class="CL-heading2" style="line-height: 1.5;">Sentiment<br><img src="{{company['sent']}}" title="{{company['sentt']}}"></div>
+                </td>
+                <td colspan="1">
+                    <div class="CL-heading2" style="line-height: 1.5;">Stock<br><img src="{{company['stocks']}}" title="{{company['stockst']}}"></div>
+                </td>
+                <td rowspan="2" style="width:300px;" colspan="1">
                     <ul style="list-style: circle;">
                         {% for article in articles %}
                         <li class="dbl CL-body" style="line-height: 1.2;"> <a style="color:{{article['sentc']}}">{{article['sent']}}</a> <a href="{{article['url']}}" style="float: right;"> {{article['date']}}</a><br> <a style="font-size:16px;">{{article['headline']}}</a></li>
                         {% endfor %}
                     </ul>
                 </td>
-                <td>
-                    <div class="page-title">{{company['name']}}</div>
-                </td>
             </tr>
             <tr>
-                <td>
-                    <div class="CL-heading" style="line-height: 1.5;">{{company['statement']|safe}}</div>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                <div id="chart" style="width: 1000px; height: 600px"></div>
+                <td colspan="3">
+                    <div id="chart" style="width: 1200px; height: 800px"></div>
                 </td>
             </tr>
         </table>
