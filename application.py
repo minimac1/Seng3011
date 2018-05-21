@@ -638,9 +638,9 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             else:
                 avSent = 0
 
-            print("Total Sentiment: " + str(totSent))
-            print("Number Articles: " + str(numArt))
-            print("Average Sentiment: " + str(avSent))
+            print("Total Sentiment "+cid+" : " + str(totSent))
+            print("Number Articles "+cid+" : " + str(numArt))
+            print("Average Sentiment "+cid+" : " + str(avSent))
             greenColour = "#7a8c00"
             redColour = "#800000"
             if avSent > 75:
