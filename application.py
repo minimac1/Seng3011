@@ -94,15 +94,16 @@ def signIn():
             rows = dbCur.fetchall()
             if(len(rows) == 0):
                 print('adding user to database')
-                print(dbCur.mogrify("""INSERT INTO userData VALUES (%s, %s, %s, %s, %s, %s);""", (id, username, email, image, session['followTime'], session['emailEventPref'])))
-                dbCur.execute("""INSERT INTO userData VALUES (%s, %s, %s, %s, %s, %s);""", (id, username, email, image, session['followTime'], session['emailEventPref']))
+                print(dbCur.mogrify("""INSERT INTO userData VALUES (%s, %s, %s, %s, %s, %s);""", (str(id), username, email, image, session['followTime'], session['emailEventPref'])))
+                dbCur.execute("""INSERT INTO userData VALUES (%s, %s, %s, %s, %s, %s);""", (str(id), username, email, image, session['followTime'], session['emailEventPref']))
                 dbConn.commit()
             else:
-                dbCur.execute("""SELECT followTime, emailEvent FROM userData;""")
-                rows = dbCur.fetchall()
-                for row in rows:
-                    session['followTime'] = row[0]
-                    session['emailEventPref'] = row[1]
+                pass
+                #dbCur.execute("""SELECT followTime, emailEvent FROM userData where id=%s;""", (str(id),))
+                #rows = dbCur.fetchall()
+                #for row in rows:
+                #    session['followTime'] = row[0]
+                #    session['emailEventPref'] = row[1]
                 #read userFol
             return "Success: Logged in as "+username
         except:
@@ -455,6 +456,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
     if (new is not None):
         try:
             dbCur.execute("""UPDATE userData SET emailEvent = %s WHERE id = %s;""", (str(new), str(session['id'])))
+            #cur.execute("""UPDATE userData SET followTime =%s WHERE id = %s;""", ('Monthly', str(103735791600147053277)))
             dbConn.commit()
             session['emailEventPref'] = new
             print("changing user setting: emailEventPref = "+new)
