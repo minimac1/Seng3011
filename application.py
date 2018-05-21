@@ -9,7 +9,7 @@ from v2_0 import application as api_v2
 from v3_0 import application as api_v3
 from v4_0 import application as api_v4
 
-from v3_0 import removeExchangeCode, csvRemoveTails, asxCodeToName
+from v3_0 import removeExchangeCode, csvRemoveTails, asxCodeToName, asxCheckValid
 
 import requests
 import os
@@ -452,12 +452,12 @@ def sentiment(newsText):
     #print(ar)
     return ar
 
-class SearchForm(Form):
-    autocomp = TextField('Insert Company ID', id='profile_autocomplete')
-
-@application.route('/_autocomplete', methods=['GET'])
-def autocomplete():
-    return Response(json.dumps(company_list), mimetype='application/json')
+# class SearchForm(Form):
+#     autocomp = TextField('Insert Company ID', id='profile_autocomplete')
+#
+# @application.route('/_autocomplete', methods=['GET'])
+# def autocomplete():
+#     return Response(json.dumps(company_list), mimetype='application/json')
 
 
 
@@ -474,18 +474,21 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
     if 'userFol' in session:
         names = session['userFol'] # for user following, to be filled with names of following companies when user logs in
     if new is not None:
-        try:
-            dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
-            dbCur = dbConn.cursor()
-            dbCur.execute("""INSERT INTO userFollows VALUES (%s,%s);""", (str(session['id']), str(new)))
-            dbConn.commit()
-            dbCur.close()
-            dbConn.close()
-            names.append(new)
-            session['userFol'] = names
-            googleTrends.updateMonthlyTrends(new,False)
-        except:
-            pass
+        if asxCheckValid(new):
+            try:
+                dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
+                dbCur = dbConn.cursor()
+                dbCur.execute("""INSERT INTO userFollows VALUES (%s,%s);""", (str(session['id']), str(new)))
+                dbConn.commit()
+                dbCur.close()
+                dbConn.close()
+                names.append(new)
+                session['userFol'] = names
+                googleTrends.updateMonthlyTrends(new,False)
+            except:
+                pass
+        else:
+            print("Entered an invalid CID")
 
     new = request.args.get('removed')
     if new is not None:
@@ -502,17 +505,24 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             pass
         # change long term stored
     for name in names: # having most fields with colours, will need to add a function the chooses the colour based on the result
-        temp = {}
-        temp['name'] = name
-        temp['change'] = str(googleTrends.getCurrentChange(name)) + "%" #name must be form -> "XXX.SX"
-        temp['changec'] = greenColour
-        temp['recS'] = "Slightly Positive" # doing a sentiment analysis on the articles within past week
-        temp['recSc'] = greenColour
-        curStocks = stockPrice(name)
-        today = str(date.today())
-        temp['stock'] = curStocks[today]['stock']
-        temp['stockc'] = greenColour
-        companies.append(temp)
+        found = False
+        for curComapny in companies:
+            if name == curCompany['name']:
+                found = True
+        if not found: # duplicate check
+            temp = {}
+            temp['name'] = name
+            temp['change'] = str(googleTrends.getCurrentChange(name)) + "%" #name must be form -> "XXX.SX"
+            temp['changec'] = greenColour
+            temp['recS'] = "Slightly Positive" # doing a sentiment analysis on the articles within past week
+            temp['recSc'] = greenColour
+            curStocks = stockPrice(name)
+            today = str(date.today())
+            temp['stock'] = curStocks[today]['stock']
+            temp['stockc'] = greenColour
+            companies.append(temp)
+        else:
+            print("Adding duplicate company :(")
     settings = {}
 
     # update user settings
@@ -557,8 +567,9 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
         settings['emailEventPref'] = 'Yes'
 
     # Autocomplete form
-    form = SearchForm(request.form)
-    return render_template('profile.html', companies=companies, form=form, settings=settings)
+    # form = SearchForm(request.form)
+    #return render_template('profile.html', companies=companies, form=form, settings=settings)
+    return render_template('profile.html', companies=companies, settings=settings)
 
 
 @application.route('/newsapi/gui')

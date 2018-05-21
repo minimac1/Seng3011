@@ -9,7 +9,7 @@
                 <tr>
                     <td style="width:250px"><p style="font-size:25px;">Add Company</p></td>
                     <td style="width:330px"><input class="enterWord" type="text" name="added" placeholder="Company ID or Name" required></td>
-                    <!--{{ form.autocomp.label }}: {{ form.autocomp }} -->
+
                     <td style="height:30px">
                         <label for="sel1">Email Frequency:</label>
                             <select style="height:30px" name="time">
@@ -78,17 +78,5 @@
         //for later if we change search bar to include droplist
     }
     </script>
-    <!--Autocomplete function -->
-    <script>
-        $(function() {
-            $.ajax({
-                url: '{{ url_for("autocomplete") }}'
-                }).done(function (data){
-                    $('#profile_autocomplete').autocomplete({
-                        source: data,
-                        minLength: 3
-                    });
-                });
-            });
-    </script>
+
 {% endblock %}
