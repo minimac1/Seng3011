@@ -990,7 +990,7 @@ def sendRegularEmail(sendToEmail, cIDList, type):
 
     companyStringList = ' & '.join(cIDList)
     BODY_TEXT = ("Turtle Trends: "
-                 +type
+                 +type+
                  " Update\r\n"
                  "The following have been updated"
                  +str(companyStringList)
@@ -998,7 +998,7 @@ def sendRegularEmail(sendToEmail, cIDList, type):
     BODY_HTML = """<html>
     <head></head>
     <body>
-      <h2>Turtle Trends: """ +type+ """+ Update</h2>
+      <h2>Turtle Trends: """ +type+ """ Update</h2>
       """+htmlString+"""
       <p><a href='http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/profile'>Visit your profile for more</a></p>
     </body>
