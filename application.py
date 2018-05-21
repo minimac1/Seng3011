@@ -416,9 +416,6 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
     if 'userFol' in session:
         names = session['userFol'] # for user following, to be filled with names of following companies when user logs in
     if new is not None:
-        names.append(new)
-        session['userFol'] = names
-        googleTrends.updateMonthlyTrends(new,False)
         try:
             dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
             dbCur = dbConn.cursor()
@@ -426,13 +423,14 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             dbConn.commit()
             dbCur.close()
             dbConn.close()
+            names.append(new)
+            session['userFol'] = names
+            googleTrends.updateMonthlyTrends(new,False)
         except:
             pass
 
     new = request.args.get('removed')
     if new is not None:
-        names.remove(new)
-        session['userFol'] = names
         try:
             dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
             dbCur = dbConn.cursor()
@@ -440,6 +438,8 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             dbConn.commit()
             dbCur.close()
             dbConn.close()
+            names.remove(new)
+            session['userFol'] = names
         except:
             pass
         # change long term stored
