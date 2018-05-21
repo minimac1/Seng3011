@@ -164,8 +164,12 @@ def sendRegularEmail(sendToEmail, cIDList, type):
         print("Email sent! Message ID:"),
         print(response['ResponseMetadata']['RequestId'])
 
-def sendEmailSignificant(cid,percentChange,now):
-    emailList = getEmailsFromCID(cid)
+def sendEmailSignificant(cid,percentChange,now,email):
+    if email is None:
+        emailList = getEmailsFromCID(cid)
+    else:
+        emailList = [email]
+
     SENDER = "Turtle Trends <teamturtleseng@gmail.com>"
     AWS_REGION = "us-east-1"
     CHARSET = "UTF-8"
@@ -227,6 +231,7 @@ def sendEmailSignificant(cid,percentChange,now):
         else:
             print("Email sent! Message ID:"),
             print(response['ResponseMetadata']['RequestId'])
+
 
 
 def getCIDList():
