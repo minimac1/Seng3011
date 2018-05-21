@@ -421,7 +421,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
         session['userFol'] = names
         googleTrends.updateMonthlyTrends(new,False)
         try:
-            dbCur.execute("""INSERT INTO userFollows VALUES (%s,%s);""", (session['id'], new))
+            dbCur.execute("""INSERT INTO userFollows VALUES (%s,%s);""", (str(session['id']), str(new)))
             dbConn.commit()
         except:
             pass
@@ -431,7 +431,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
         names.remove(new)
         session['userFol'] = names
         try:
-            dbCur.execute("""DELETE FROM userFollows WHERE id = %s and company = %s;""", (session['id'], new))
+            dbCur.execute("""DELETE FROM userFollows WHERE id = %s and company = %s;""", (str(session['id']), str(new)))
             dbConn.commit()
         except:
             pass
@@ -454,7 +454,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
     new = request.args.get('eventPref')
     if (new is not None):
         try:
-            dbCur.execute("""UPDATE userData SET emailEvent = %s WHERE id = %s;""", (new, session['id']))
+            dbCur.execute("""UPDATE userData SET emailEvent = %s WHERE id = %s;""", (str(new), str(session['id'])))
             dbConn.commit()
             session['emailEventPref'] = new
             print("changing user setting: emailEventPref = "+new)
@@ -464,7 +464,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
     new = request.args.get('time')
     if (new is not None):
         try:
-            dbCur.execute("""UPDATE userData SET followTime = %s WHERE id = %s;""", (new, session['id']))
+            dbCur.execute("""UPDATE userData SET followTime = %s WHERE id = %s;""", (str(new), str(session['id'])))
             dbConn.commit()
             session['followTime'] = new
             print("changing user setting: followTime = "+new)
