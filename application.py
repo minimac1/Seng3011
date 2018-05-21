@@ -568,7 +568,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
         now = datetime.datetime.now()
         oneday = datetime.timedelta(days=1)
         now = now - oneday
-        googleTrends.sendEmailSignificant(cid,percentChange,now,curEmail)
+        googleTrends.sendEmailSignificant(cid,percentageChange,now,curEmail)
 
 
     refreshAll = request.args.get("refreshAll")
