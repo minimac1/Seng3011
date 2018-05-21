@@ -435,7 +435,6 @@ def stockPrice(instrumentId):
     return stocks
 
 
-
 #takes in an array of news articles
 #and returns an array of scores eg. [o.96, 0.3]
 #The score is from 0-1 and where 0.5 is netural
@@ -471,6 +470,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
         names = session['userFol'] # for user following, to be filled with names of following companies when user logs in
     if new is not None:
         if asxCheckValid(new):
+            print("Entered an valid CID")
             try:
                 dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
                 dbCur = dbConn.cursor()
@@ -483,8 +483,6 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
                 googleTrends.updateMonthlyTrends(new,False)
             except:
                 pass
-        else:
-            print("Entered an invalid CID")
 
     new = request.args.get('removed')
     if new is not None:
@@ -501,11 +499,13 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             pass
         # change long term stored
     for name in names: # having most fields with colours, will need to add a function the chooses the colour based on the result
+        print("name: " + str(name))
         found = False
         for curCompany in companies:
             if name == curCompany['name']:
                 found = True
         if not found: # duplicate check
+            print("Adding company :)")
             temp = {}
             temp['name'] = name
             temp['change'] = str(googleTrends.getCurrentChange(name)) + "%" #name must be form -> "XXX.SX"
@@ -513,8 +513,11 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             temp['recS'] = "Slightly Positive" # doing a sentiment analysis on the articles within past week
             temp['recSc'] = greenColour
             curStocks = stockPrice(name)
+            print("Cur Stocks: ")
+            print(curStocks)
             today = str(date.today())
             temp['stock'] = curStocks[today]['stock']
+            print("help2" + str(curStocks[today]['stock']))
             temp['stockc'] = greenColour
             companies.append(temp)
         else:
