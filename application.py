@@ -625,7 +625,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             if sent != []:
                 sent = sentiment(sent)
                 for s in sent:
-                    totSent += s
+                    totSent += round(s*100,0)
                     numArt += 1
                 for c, value in enumerate(sent,1):
                     value = round(value*100,0)
