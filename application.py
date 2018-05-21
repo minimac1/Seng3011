@@ -573,7 +573,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
 
 
     refreshAll = request.args.get("refreshAll")
-    if (refreshALL is not None):
+    if (refreshAll is not None):
         for curRes in companies:
             curName = curRes['name']
             googleTrends.updateMonthlyTrends(curName, True)
