@@ -983,14 +983,14 @@ def sendRegularEmail(sendToEmail, cIDList, type):
             <td>""" + str(googleTrends.getCurrentChange(company,False)) + """%</td>
             <td>"""+ str("Slightly Positive") + """</td>
             <td>"""+ str(curStocks) + """</td>
-        </tr>
-     </table>"""
+        </tr>"""
         htmlString += htmlAppend
+        htmlString += "</table>"
 
 
     companyStringList = ' & '.join(cIDList)
     BODY_TEXT = ("Turtle Trends: "
-                 +type+
+                 +type
                  " Update\r\n"
                  "The following have been updated"
                  +str(companyStringList)

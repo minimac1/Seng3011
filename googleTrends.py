@@ -123,7 +123,7 @@ def sendEmailSignificant(cid,percentChange,now,email):
     <head></head>
     <body>
       <h2>Turtle Trends: Significant Change</h2>
-      <p>We have detected a substantial increase ("""+percentChange+"""") in the trends for """ + cid + """</p>
+      <p>We have detected a substantial increase ("""+percentChange+""") in the trends for """ + cid + """</p>
       <p><a href='http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/profile'>Visit your profile for more</a></p>
     </body>
     </html>
