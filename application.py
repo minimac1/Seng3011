@@ -963,12 +963,12 @@ def sendRegularEmail(sendToEmail, cIDList, type):
     CHARSET = "UTF-8"
     SUBJECT = type + " Update"
     htmlString = """<table>
-    <tr>
-        <td>Company name</td>
-        <td>Change in Google activity</td>
-        <td>Recent Sentiment</td>
-        <td>Change in stock price</td>
-    </tr>"""
+       <tr>
+           <td>Company name</td>
+           <td>Change in Google activity</td>
+           <td>Recent Sentiment</td>
+           <td>Change in stock price</td>
+       </tr>"""
     for company in cIDList:
         curStocksArray = stockPrice(company)
         tenHours = timedelta(hours=10) #utc time
@@ -985,7 +985,7 @@ def sendRegularEmail(sendToEmail, cIDList, type):
             <td>"""+ str(curStocks) + """</td>
         </tr>"""
         htmlString += htmlAppend
-        htmlString += "</table>"
+    htmlString += "</table>"
 
 
     companyStringList = ' & '.join(cIDList)
