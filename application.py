@@ -85,8 +85,8 @@ def signIn():
         session['userEmail'] = email
         session['image'] = image
         session['id'] = id
-        session['followTime'] = "Weekly"
-        session['emailEventPref'] = True
+        session['followTime'] = "Daily"
+        session['emailEventPref'] = 'Yes'
         session.permanent = True
 
         try:
@@ -406,7 +406,6 @@ def autocomplete():
 def profile(): # maybe for the demo add the few chosen companies to session['userFol'] before the if
     greenColour = "#7a8c00"
     redColour = "#800000"
-    session['userEmail'] = "teamturtleseng@gmail.com" #temporary
     #sendEmail("teamturtleseng@gmail.com", "CBA.ax")
     companies = []
     names = [] # TEMPORARY enter 1/
@@ -453,24 +452,24 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
     new = request.args.get('eventPref')
     if (new is not None):
         if(('emailEventPref' not in session) or (not new == session['emailEventPref'])):
-            print("changing user setting: emailEventPref = "+new)
-            session['emailEventPref'] = new
             try:
                 dbCur.execute("""UPDATE userData SET emailEvent = %s WHERE id = %s;""", (new, session['id']))
                 dbConn.commit()
+                session['emailEventPref'] = new
+                print("changing user setting: emailEventPref = "+new)
             except:
-                pass
+                print("update setting 'EventPref' failed")
 
     new = request.args.get('time')
     if (new is not None):
         if(('followTime' not in session) or (not new == session['followTime'])):
-            print("changing user setting: followTime = "+new)
-            session['followTime'] = new
             try:
                 dbCur.execute("""UPDATE userData SET followTime = %s WHERE id = %s;""", (new, session['id']))
                 dbConn.commit()
+                session['followTime'] = new
+                print("changing user setting: followTime = "+new)
             except:
-                pass
+                print("update setting 'followTime' failed")
 
     # get user settings
     if('followTime' in session):
@@ -481,7 +480,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
     if('emailEventPref' in session):
         settings['emailEventPref'] = session['emailEventPref']
     else:
-        settings['emailEventPref'] = True
+        settings['emailEventPref'] = 'Yes'
 
     # Autocomplete form
     form = SearchForm(request.form)
