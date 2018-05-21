@@ -2,9 +2,55 @@ body {
   overflow-x: hidden;
 }
 
+.message{
+  position:fixed;
+  left:500px;
+  top:300px;
+  font-family:"Poppins", sans-serif;
+  background-color:#f44336;
+  text-align:center;
+  line-height: 90px;
+  height:90px;
+  width:60%;
+  font-size:30px;
+  color:white;
+  pointer-events:none;
+  animation: flickerAnimation 5s 1;
+  -webkit-animation: flickerAnimation 5s 1;
+  -moz-animation: flickerAnimation 5s 1;
+  -o-animation: flickerAnimation 5s 1;
+  animation-fill-mode:forwards;
+  -webkit-animation-fill-mode: forwards;
+  -moz-animation-fill-mode: forwards;
+  -o-animation-fill-mode: forwards; 
+}
+@keyframes flickerAnimation {
+  0% { opacity:0; }
+  20%   { opacity:1; }
+  90%  { opacity:1; }
+  100% { opacity:0; }
+}
+@-o-keyframes flickerAnimation{
+  0% { opacity:0; }
+  20%   { opacity:1; }
+  90%  { opacity:1; }
+  100% { opacity:0; }
+}
+@-moz-keyframes flickerAnimation{
+  0% { opacity:0; }
+  20%   { opacity:1; }
+  90%  { opacity:1; }
+  100% { opacity:0; }
+}
+@-webkit-keyframes flickerAnimation{
+  0% { opacity:0; }
+  20%   { opacity:1; }
+  90%  { opacity:1; }
+  100% { opacity:0; }
+}
 
 .page-title{
-  font-size: 50px;
+  font-size: 40px;
   font-family:"Poppins", sans-serif;
   font-weight: bold;
   color: #f44336;
@@ -58,17 +104,27 @@ span.buttonText {
   font-family: 'Roboto', sans-serif;
 }
 .proPic {
-  height: 120px;
-  width: 120px;
-  position: fixed;
-  left:50px;
-  top:30px;
+  height: 150px;
+  position: relative;
 }
 .log {
   position:fixed;
   left:20px;
   top:160px;
 }
+.pcir {
+  position: fixed;
+  left:50px;
+  top:30px;
+  height: 120px;
+  width: 120px;
+  border-radius: 50%;
+  overflow:hidden;
+  display:flex;
+  justify-content: center;
+  align-items:center;
+}
+
 .circle {
   height: 400px;
   width: 450px;
@@ -177,16 +233,22 @@ span.buttonText {
 .CL-container{
   position:fixed;
   margin-left:0px;
-  top:100px;
+  top:30px;
   padding-left:270px;
   left:0px;
-  height:83vh;
+  height:88vh;
   width:100vw;
   overflow:auto;
 }
 
 
 .CL-heading{
+  font-size: 30px;
+  line-height: 3;
+  font-family:"Poppins", sans-serif;
+}
+.CL-heading2{
+  text-align:center;
   font-size: 30px;
   line-height: 3;
   font-family:"Poppins", sans-serif;
