@@ -32,15 +32,15 @@ application.register_blueprint(api_v2, url_prefix='/newsapi/v2.0')
 application.register_blueprint(api_v3, url_prefix='/newsapi/v3.0')
 application.register_blueprint(api_v4, url_prefix='/newsapi/v4.0')
 
-# company_list = ["Bratislava",
-#          "Bansk Bystrica",
-#          "Preov",
-#          "Povask Bystrica",
-#          "Zilina",
-#          "Koice",
-#          "Ruomberok",
-#          "Zvolen",
-#          "Poprad"]
+company_list = ["Bratislava",
+         "Bansk Bystrica",
+         "Preov",
+         "Povask Bystrica",
+         "Zilina",
+         "Koice",
+         "Ruomberok",
+         "Zvolen",
+         "Poprad"]
 
 @application.context_processor
 def inject_user():
@@ -231,7 +231,7 @@ def db():
             if amount >= 10:
                 break;
             #print(art['publishedAt'])
-            
+
     sent = []
     for art in articles:
         sent.append(art['sent'])
@@ -331,7 +331,7 @@ def googleNews(instrumentId, startDate, endDate):
     }
     code = instrumentId.split('.', 1)[-1]
     code = code.upper()
-        
+
     if code == 'AX':
         code = "ASX"
     elif code == 'EUX':
