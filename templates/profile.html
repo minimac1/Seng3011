@@ -30,13 +30,17 @@
                               {% endif %}
                             </select>
                     </td>
-
-                    <td>
-                    {% if settings['emailEventPref'] == True %}
-                      <input type="checkbox"  name="eventPref" checked=checked> Recieve email on significant event
-                    {% else %}
-                      <input type="checkbox"  name="eventPref"> Recieve email on significant event
-                    {% endif %}
+                    <td style="height:30px">
+                        <label for="sel1">Recieve email on significant event:</label>
+                            <select style="height:30px" name="eventPref">
+                              {% if settings['emailEventPref'] == 'Yes' %}
+                                <option selected="selected">Yes</option>
+                                <option>No</option>
+                              {% else %}
+                                <option>Yes</option>
+                                <option selected="selected">No</option>
+                              {% endif %}
+                            </select>
                     </td>
 
                     <td><input type="submit" value="Add" class="btn btn-secondary add"></form></td></tr>

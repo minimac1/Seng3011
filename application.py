@@ -94,8 +94,8 @@ def signIn():
             rows = dbCur.fetchall()
             if(len(rows) == 0):
                 print('adding user to database')
-                print(dbCur.mogrify("""INSERT INTO userData VALUES (%s, %s, %s, %s);""", (id, username, email, image)))
-                dbCur.execute("""INSERT INTO userData VALUES (%s, %s, %s, %s);""", (id, username, email, image))
+                print(dbCur.mogrify("""INSERT INTO userData VALUES (%s, %s, %s, %s, %s, %s);""", (id, username, email, image, session['followTime'], session['emailEventPref'])))
+                dbCur.execute("""INSERT INTO userData VALUES (%s, %s, %s, %s, %s, %s);""", (id, username, email, image, session['followTime'], session['emailEventPref']))
                 dbConn.commit()
             else:
                 pass
@@ -113,8 +113,8 @@ def signOut():
     session.pop('userEmail', None)
     session.pop('image', None)
     session.pop('id', None)
-    #pop followTime
-    #pop emailEventPref
+    session.pop('followTime', None)
+    session.pop('emailEventPref', None)
     session.pop('userFol', None)
     return "Log out success"
 
@@ -452,13 +452,25 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
     # update user settings
     new = request.args.get('eventPref')
     if (new is not None):
-        print('setting update: eventPref = ' + True)
-    elif('emailEventPref' in session and not session['emailEventPref']):
-        print('setting update: eventPref = ' + False)
+        if(('emailEventPref' not in session) or (not new == session['emailEventPref'])):
+            print("changing user setting: emailEventPref = "+new)
+            session['emailEventPref'] = new
+            try:
+                dbCur.execute("""UPDATE userData SET emailEvent = %s WHERE id = %s;""", (new, session['id']))
+                dbConn.commit()
+            except:
+                pass
 
     new = request.args.get('time')
-    if (new is not None) and ('followTime' in session) and (new is not session['followTime']):
-        print('setting update: time = ' + new)
+    if (new is not None):
+        if(('followTime' not in session) or (not new == session['followTime'])):
+            print("changing user setting: followTime = "+new)
+            session['followTime'] = new
+            try:
+                dbCur.execute("""UPDATE userData SET followTime = %s WHERE id = %s;""", (new, session['id']))
+                dbConn.commit()
+            except:
+                pass
 
     # get user settings
     if('followTime' in session):
