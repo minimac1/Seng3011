@@ -596,6 +596,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             cId = name
             url = ("http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=" + sDate
              + "&endDate=" + eDate + "&companyId=" + cId)
+            print(url)
             res = requests.get(url).json()
             articles = []
             i = 0
@@ -656,6 +657,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             #Stock price
             curStocks = stockPrice(name)
             today = str(datetime.datetime.today())
+            today = today.date()
             stockChange = curStocks[today]['stock']
             if (stockChange > 0):
                 stockColour = "#7a8c00"
