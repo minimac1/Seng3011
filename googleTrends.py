@@ -93,7 +93,8 @@ def updateGoogleTrends(companyID, dateFrom, dateTo):
         dbCur.execute("""SELECT trend from trendData where cid=%s and date=%s and hour=%s;""", (companyID, dateString, hourString))
         rowCount = dbCur.rowcount
         if (rowCount == 0): #Not in table so add
-            #print("Not in table")
+            print("[GTrends] Not in table, adding to table....\n")
+            #print("[GTrends] Not In Table (Date): " + str(dateString) + "(Hour): " + str(hourString) + " (Res): "+str(newRes))
             dbCur.execute("""INSERT INTO trendData VALUES (%s,%s,%s,%s);""", (companyID, dateString, hourString, newRes))
         else: #In table so get highest
             rows = dbCur.fetchall()
@@ -115,7 +116,8 @@ def updateGoogleTrends(companyID, dateFrom, dateTo):
         dbCur.execute("""SELECT trend from trendData where cid=%s and date=%s and hour=%s;""", (companyID, dateString, hourString))
         rowCount = dbCur.rowcount
         if (rowCount == 0): #Not in table so add
-            #print("Not in table")
+            print("[GTrends] Not in table, adding to table....\n")
+            #print("[GTrends] Not In Table (Date): " + str(dateString) + "(Hour): " + str(hourString) + " (Res): "+str(newRes))
             dbCur.execute("""INSERT INTO trendData VALUES (%s,%s,%s,%s);""", (companyID, dateString, hourString, newRes))
         else: #In table so get highest
             rows = dbCur.fetchall()
@@ -204,7 +206,7 @@ def getCurrentChange(cid):
         dbCur.execute("""SELECT trend from trendData where cid=%s and date=%s and hour=%s;""", (cid, curDateString, hourString))
         rowCount = dbCur.rowcount
         if (rowCount == 0): #Not in table so add
-            #print("Not in table")
+            print("[GTrends-GCC] Today Res. Not In Table (Date): " + str(curDateString) + "(Hour): " + str(hourString))
             #curDateFrom = checkDate - oneday
             #updateGoogleTrends(cid, curDateFrom, checkDate)
             #getCurrentChange(cid) #remove this and return 0 if slow
@@ -232,7 +234,7 @@ def getCurrentChange(cid):
             dbCur.execute("""SELECT trend from trendData where cid=%s and date=%s and hour=%s;""", (cid, curDateString, hourString))
             rowCount = dbCur.rowcount
             if (rowCount == 0): #Not in table so add
-                #print("Not in table")
+                print("[GTrends-GCC] Prev Week ["+str(y+1)+"] Res. Not In Table (Date): " + str(curDateString) + "(Hour): " + str(hourString))
                 #curDateFrom = checkDate - oneday
                 #updateGoogleTrends(cid, curDateFrom, checkDate)
                 #getCurrentChange(cid) #remove this and return 0 if slow
