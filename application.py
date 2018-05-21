@@ -819,7 +819,7 @@ scheduler.add_job(
 scheduler.add_job(
     func=googleTrends.sendEmailHelper,
     trigger=IntervalTrigger(hours=24),
-    args = "Daily"
+    args=['Daily'],
     id='email_daily',
     name='Send daily email',
     replace_existing=True)
@@ -827,7 +827,7 @@ scheduler.add_job(
 scheduler.add_job(
     func=googleTrends.sendEmailHelper,
     trigger=IntervalTrigger(days=7),
-    args = "Weekly"
+    args=['Weekly'],
     id='email_weekly',
     name='Send weekly email',
     replace_existing=True)
@@ -835,7 +835,7 @@ scheduler.add_job(
 scheduler.add_job(
     func=googleTrends.sendEmailHelper,
     trigger=IntervalTrigger(weeks=4),
-    args = "Monthly"
+    args=['Monthly'],
     id='email_monthly',
     name='Send monthly email',
     replace_existing=True)
