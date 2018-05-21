@@ -378,6 +378,8 @@ def autocomplete():
 
 @application.route('/profile', methods=['GET', 'POST'])
 def profile(): # maybe for the demo add the few chosen companies to session['userFol'] before the if
+    greenColour = "#7a8c00"
+    redColour = "#800000"
     session['userEmail'] = "teamturtleseng@gmail.com" #temporary
     #sendEmail("teamturtleseng@gmail.com", "CBA.ax")
     companies = []
@@ -390,10 +392,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
     if new is not None:
         names.append(new)
         session['userFol'] = names
-        if (session['userEmail'] is not None):
-            googleTrends.addIDsToGoogleTrendsUser(session['userEmail'], new, new)
-        else:
-            googleTrends.addIDsToGoogleTrendsUser("notLoggedIn", new, new)
+        #googleTrends.updateMonthlyTrends(new)
         try:
             dbCur.execute("""INSERT INTO userFollows VALUES (%s,%s);""", (session['id'], new))
             dbConn.commit()
@@ -413,7 +412,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
     for name in names: # having most fields with colours, will need to add a function the chooses the colour based on the result
         temp = {}
         temp['name'] = name
-        temp['change'] = str(googleTrends.getCurrentChange(name)) + "%"
+        temp['change'] = str(googleTrends.getCurrentChange(name)) + "%" #name must be form -> "XXX.SX"
         temp['changec'] = greenColour
         temp['recS'] = "Slightly Positive" # doing a sentiment analysis on the articles within past week
         temp['recSc'] = greenColour
@@ -866,12 +865,33 @@ def testPage1():
 # application.run(use_reloader=False)
 # scheduler = BackgroundScheduler()
 # scheduler.start()
-# #Update Google Trends every 6 hours
+# # #Update Google Trends every 1 hours
 # scheduler.add_job(
-#     func=googleTrends.updateAllTrends,
-#     trigger=IntervalTrigger(hours=6),
+#     func=updateAllTrends,
+#     trigger=IntervalTrigger(hours=1),
 #     id='update_all_gtrends',
 #     name='Updates all Google Trends companies [6hours]',
+#     replace_existing=True)
+# #Send daily emails
+# scheduler.add_job(
+#     func=updateAllTrends,
+#     trigger=IntervalTrigger(hours=24),
+#     id='email_daily',
+#     name='Send daily email',
+#     replace_existing=True)
+# #Send weekly emails
+# scheduler.add_job(
+#     func=updateAllTrends,
+#     trigger=IntervalTrigger(days=7),
+#     id='email_weekly',
+#     name='Send weekly email',
+#     replace_existing=True)
+# #Send monthly
+# scheduler.add_job(
+#     func=updateAllTrends,
+#     trigger=IntervalTrigger(weeks=4),
+#     id='email_monthly',
+#     name='Send monthly email',
 #     replace_existing=True)
 # # #Update IndicoIO Sentiment every 24 hours
 # # scheduler.add_job(

@@ -1,32 +1,27 @@
-from flask import Flask, render_template,Blueprint
+from flask import Flask, render_template, Blueprint, session, request, Response
 from flask_restful import Resource, Api, reqparse, fields, marshal
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date, tzinfo
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.interval import IntervalTrigger
+from botocore.exceptions import ClientError
 import v4_0
 import csv
 import collections
 import json
 import requests
+import boto3
 import re
-from application import sendEmail
+import psycopg2
 from pytrends.request import TrendReq
+#utcOffset = tz.utcoffset(dt)
 pytrends = TrendReq(hl='en-us', tz=-600) #change when functioning
-pytrendsUserList = []
-pytrendsCompanyList = []
 
-#
-# IMPORTNANT FUNCTIONS [READ ME!]
-# getCurrentChange("companyid")
-# addIDsToGoogleTrendsUser('userid', 'companyid', 'companyFullname')
-#
-
-pytrendsInstance = {}
-pytrendsInstance['CompanyID'] = fields.String
-pytrendsInstance['Current Hour Results'] = fields.Integer
-pytrendsInstance['Hourly Change (%)'] = fields.Integer
-#Store each user, with their set of company ids (no duplicates)
-userPytrends = {}
-userPytrends['UserEmail'] = fields.String
-userPytrends['CompanyIDList'] = fields.List(fields.String)
+# connect to database
+try:
+    dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
+    dbCur = dbConn.cursor()
+except:
+    print('unable to connect to the database')
 
 # Num weeks is integer of number of weeks for range (max 3)
 # Query is string to query google with
@@ -62,161 +57,270 @@ def trendFromNumWeek(numWeeks, query):
         resArray.append(curr[1])
     return resArray
 
-# Broken function, doesn't return most recent weeks data
-# def trendFromDateRange(startDate, endDate, query):
-#     kw_list = [query]
-#     dateRange = str(startDate)+' '+str(endDate)
-#     pytrends.build_payload(kw_list, cat=0, timeframe=dateRange, geo='', gprop='')
-#     df = pytrends.interest_over_time();
-#     return df[query].values;
+def getCIDList():
+    resList = []
+    try:
+        dbCur.execute("""SELECT DISTINCT company FROM userFollows;""")
+        rows = dbCur.fetchall()
+        for row in rows:
+            curCid = row[0]
+            resList.append(curCid)
+    except:
+        return "Error geting company list"
+    return resList
 
-def userListAsJson():
-    output_fields = {}
-    output_fields['Google Trends Users'] = fields.List(fields.Nested(userPytrends))
-    data = {'Google Trends Users' : pytrendsUserList}
-    return marshal(data, output_fields)
+#update CompanyID with alias to google
+def updateGoogleTrends(companyID, dateFrom, dateTo):
+    companyID = companyID.upper()
+    alias = v4_0.asxCodeToName(companyID)
+    cidNoTrail = v4_0.removeExchangeCode(companyID)
+    print("Updating " + companyID + " W/O Trails: " + cidNoTrail + ". Alias: " + alias)
+    kw_list = [alias, cidNoTrail]
+    dateToHour = dateTo.hour
+    dateFromHour = dateFrom.hour
+    dateRange = str(dateFrom.date())+"T"+str(dateFromHour) + " " + str(dateTo.date())+"T"+str(dateToHour)
+    print("DateFrom: [" + str(dateFrom) + "] DateTo: [" + str(dateTo) + "] DateRange: " + dateRange)
+    pytrends.build_payload(kw_list, cat=0, timeframe=dateRange, geo='', gprop='')
+    df = pytrends.interest_over_time();
 
-def companyListAsJson():
-    output_fields = {}
-    output_fields['Google Trends Companies'] = fields.List(fields.Nested(pytrendsInstance))
-    data = {'Google Trends Companies' : pytrendsCompanyList}
-    return marshal(data, output_fields)
+    for currdate in df[cidNoTrail].index:
+        newRes = df[cidNoTrail].get(currdate)
+        newRes = newRes.item()
+        dateString = str(currdate.date())
+        hourString = str(currdate.hour)
+        #print("Date: " + str(currdate.date()) + "Hour: " + str(currdate.hour) + " Res: "+str(newRes))
+        dbCur.execute("""SELECT trend from trendData where cid=%s and date=%s and hour=%s;""", (companyID, dateString, hourString))
+        rowCount = dbCur.rowcount
+        if (rowCount == 0): #Not in table so add
+            #print("Not in table")
+            dbCur.execute("""INSERT INTO trendData VALUES (%s,%s,%s,%s);""", (companyID, dateString, hourString, newRes))
+        else: #In table so get highest
+            rows = dbCur.fetchall()
+            for row in rows:
+                curRes = row[0]
+                #print("In table: ["+str(curRes)+"]")
+                if (newRes>curRes):
+                    #print ("Res: " + str(newRes) + " > " + str(curRes))
+                    dbCur.execute("""DELETE FROM trendData WHERE cid=%s and date=%s and hour=%s and trend=%s;""", (companyID, dateString, hourString, curRes))
+                    dbCur.execute("""INSERT INTO trendData VALUES (%s,%s,%s,%s);""", (companyID, dateString, hourString, newRes))
+                #else:
+                    #print("lower value [" +str(newRes)+"] <= ["+ str(curRes) + "]")
+    for currdate in df[alias].index:
+        newRes = df[alias].get(currdate)
+        newRes = newRes.item()
+        dateString = str(currdate.date())
+        hourString = str(currdate.hour)
+        #print("Date: " + str(currdate.date()) + "Hour: " + str(currdate.hour) + " Res: "+str(newRes))
+        dbCur.execute("""SELECT trend from trendData where cid=%s and date=%s and hour=%s;""", (companyID, dateString, hourString))
+        rowCount = dbCur.rowcount
+        if (rowCount == 0): #Not in table so add
+            #print("Not in table")
+            dbCur.execute("""INSERT INTO trendData VALUES (%s,%s,%s,%s);""", (companyID, dateString, hourString, newRes))
+        else: #In table so get highest
+            rows = dbCur.fetchall()
+            for row in rows:
+                curRes = row[0]
+                #print("In table: ["+str(curRes)+"]")
+                if (newRes>curRes):
+                    #print ("Res: " + str(newRes) + " > " + str(curRes))
+                    dbCur.execute("""DELETE FROM trendData WHERE cid=%s and date=%s and hour=%s and trend=%s;""", (companyID, dateString, hourString, curRes))
+                    dbCur.execute("""INSERT INTO trendData VALUES (%s,%s,%s,%s);""", (companyID, dateString, hourString, newRes))
+                #else:
+                    #print("lower value [" +str(newRes)+"] <= ["+ str(curRes) + "]")
 
-def getCurrentChange(cid):
-    for curInstance in pytrendsCompanyList:
-        if (curInstance['CompanyID']==cid):
-            return curInstance['Hourly Change (%)']
+    dbConn.commit()
 
 def updateAllTrends():
     print("[GTrends] Updating All Google Trends...\n");
-    for currInstance in pytrendsCompanyList:
-        curCID = currInstance['CompanyID']
-        curAlias = v4_0.fullName(curCID)
-        print("Current CID: " + curCID)
-        print("Current Alias: " + curAlias)
-        updateGoogleTrends(curCID, curAlias)
+    dbCIDList = getCIDList();
+    for curCID in dbCIDList:
+        curCID = curCID.upper()
+        dateTo = datetime.now()
+        tenHours = timedelta(hours=10) #utc time
+        dateTo = dateTo - tenHours
+        oneday = timedelta(days=1)
+        dateFrom = dateTo - oneday
+        updateGoogleTrends(curCID, dateFrom, dateTo)
+        sevenDays = timedelta(days=7)
+        weekoneTo = dateTo - sevenDays
+        weekoneFrom = dateFrom - sevenDays
+        updateGoogleTrends(curCID, weekoneFrom, weekoneTo)
+        weektwoTo = weekoneTo - sevenDays
+        weektwoFrom = weekoneFrom - sevenDays
+        updateGoogleTrends(curCID, weektwoFrom, weektwoTo)
+        weekthreeTo = weektwoTo - sevenDays
+        weekthreeFrom = weektwoFrom - sevenDays
+        updateGoogleTrends(curCID, weekthreeFrom, weekthreeTo)
     print("[GTrends] Completed Updating All Google Trends\n");
 
 
-#update CompanyID with alias to google
-def updateGoogleTrends(companyID, alias):
-    print("updating " + companyID)
-    kw_list = [alias]
-    #pytrends.build_payload(kw_list, cat=0, timeframe='now 1-H', geo='', gprop='')
-    today = date.today()
-    #print(str(today))
-    pytrends.build_payload(kw_list, cat=0, timeframe='now 1-d', geo='', gprop='')
-    df = pytrends.interest_over_time();
-    newRes = df[alias].sum()
-    #print("newres: " + str(newRes))
-    numMonths = 4
-    currDate = today
+def updateMonthlyTrends(cid):
+    print("[GTrends] Updating Monthly Google Trends...\n");
+    curCID = cid.upper()
+    dateTo = datetime.now()
+    tenHours = timedelta(hours=10) #utc time
+    dateTo = dateTo - tenHours
+    oneday = timedelta(days=1)
+    dateFrom = dateTo - oneday
+    updateGoogleTrends(curCID, dateFrom, dateTo)
     sevenDays = timedelta(days=7)
-    changeSum = 0
-    for x in range(0, numMonths):
-        oneweekago = currDate - sevenDays
-        #print("oneweekago: " + str(oneweekago))
-        dateRange = str(oneweekago)+'T00 '+str(oneweekago)+'T23'
-        #print("dateRange: " + str(dateRange))
-        pytrends.build_payload(kw_list, cat=0, timeframe=str(dateRange), geo='', gprop='')
-        df = pytrends.interest_over_time();
-        #print("changeSum: "+str(changeSum)+" inc: " + str(df[alias].sum()))
-        changeSum = changeSum + df[alias].sum()
-        currDate = oneweekago
+    weekoneTo = dateTo - sevenDays
+    weekoneFrom = dateFrom - sevenDays
+    updateGoogleTrends(curCID, weekoneFrom, weekoneTo)
+    weektwoTo = weekoneTo - sevenDays
+    weektwoFrom = weekoneFrom - sevenDays
+    updateGoogleTrends(curCID, weektwoFrom, weektwoTo)
+    weekthreeTo = weektwoTo - sevenDays
+    weekthreeFrom = weektwoFrom - sevenDays
+    updateGoogleTrends(curCID, weekthreeFrom, weekthreeTo)
+    print("[GTrends] Completed Updating All Google Trends\n");
 
-    #print("done loop")
-    #print("total change: " + str(changeSum))
-    average = (changeSum/numMonths)
-    #print("average: " + str(average))
-    change = newRes - average
-    percentChange = (change/average)*100
-    #print("percentagechange: " + str(round(percentChange,4)))
-    cidExits = False
-    for currInstance in pytrendsCompanyList:
-        if (currInstance['CompanyID'] == companyID):
-            cidExits = True
-            print("found"+ str(companyID) + "[updateGoogleTrends]")
-            currInstance['Current Hour Results'] = newRes
-            currInstance['Hourly Change (%)'] = round(percentChange,4)
+#dbCur.execute("""SELECT trend from trendData where cid=%s and date=%s and hour=%s;""", (companyID, dateString, hourString))
+# rows = dbCur.fetchall()
+# for row in rows:
+#     curRes = row[0]
+def getCurrentChange(cid):
+    cid = cid.upper()
+    curDate = datetime.now()
+    tenHours = timedelta(hours=10) #utc time
+    curDate = curDate - tenHours
+    oneHour = timedelta(hours=1)
+    oneday = timedelta(days=1)
+    # dateFrom = dateTo - oneday
+    changeRes = []
+    todayChange = 0
+    checkDate = curDate
+    for x in range(0,24):
+        #print("Hour: " + str(x))
+        curDateString = str(checkDate.date())
+        hourString = str(checkDate.hour)
+        dbCur.execute("""SELECT trend from trendData where cid=%s and date=%s and hour=%s;""", (cid, curDateString, hourString))
+        rowCount = dbCur.rowcount
+        if (rowCount == 0): #Not in table so add
+            #print("Not in table")
+            #curDateFrom = checkDate - oneday
+            #updateGoogleTrends(cid, curDateFrom, checkDate)
+            #getCurrentChange(cid) #remove this and return 0 if slow
+            #break;
+            todayChange = todayChange + 0
+        else:
+            rows = dbCur.fetchall()
+            for row in rows:
+                todayChange = todayChange + row[0]
+                #print("Today Change: " + str(todayChange))
+        checkDate = checkDate - oneHour
+    todayChange = todayChange/24
+    #print("Today Change: " + str(todayChange))
+    prevChangeTotal = 0
+    sevenDays = timedelta(days=7)
+    sixDays = timedelta(days=6)
+    checkDate = curDate - sevenDays
+    for y in range(0,3):
+        prevChange = 0
+        for x in range(0,24):
+            #print("Hour: " + str(x))
+            curDateString = str(checkDate.date())
+            hourString = str(checkDate.hour)
+            #print("Date: " + curDateString + "Hour: " + hourString)
+            dbCur.execute("""SELECT trend from trendData where cid=%s and date=%s and hour=%s;""", (cid, curDateString, hourString))
+            rowCount = dbCur.rowcount
+            if (rowCount == 0): #Not in table so add
+                #print("Not in table")
+                #curDateFrom = checkDate - oneday
+                #updateGoogleTrends(cid, curDateFrom, checkDate)
+                #getCurrentChange(cid) #remove this and return 0 if slow
+                #break;
+                prevChange = prevChange + 0
+            else:
+                rows = dbCur.fetchall()
+                for row in rows:
+                    prevChange = prevChange + row[0]
+                    #print("["+str(x)+"] Today Change: " + str(row[0]))
+            checkDate = checkDate - oneHour
+        prevChange = prevChange/24
+        #print("Prev Change: " + str(prevChange))
+        prevChangeTotal = prevChangeTotal + prevChange
+        #print("Final Change: " + str(prevChangeTotal))
+        checkDate = checkDate - sixDays
+    prevChangeTotal = prevChangeTotal/3
+    #print("Final Check: " + str(prevChangeTotal))
+    change = todayChange - prevChangeTotal
+    if (prevChangeTotal == 0):
+        pChangeRounded = 0
+    else:
+        percentChange = (change/prevChangeTotal)*100
+        pChangeRounded = str(round(percentChange,3))
+        #print("Percentage Change: " + str(pChangeRounded))
+    return pChangeRounded
 
-    if (not cidExits):
-        print(str(companyID)+" doesnt exist, adding new cid [updateGoogleTrends]")
-        newInstance = {'CompanyID' : companyID,
-                       'Current Hour Results' : newRes,
-                       'Hourly Change (%)' : round(percentChange,4)
-                      }
-        pytrendsCompanyList.append(newInstance)
+#updateAllTrends()
+getCurrentChange("CBA.AX")
 
-def removeCIDfromCompanyList(CID):
-    for companyInstance in pytrendsCompanyList:
-        if (companyInstance['CompanyID'] == CID):
-            pytrendsCompanyList.remove(companyInstance)
+#EMAIL STUFF
+def sendEmail(sendToEmail, cIDList):
+    SENDER = "Turtle Trends <teamturtleseng@gmail.com>"
+    RECIPIENT = sendToEmail
+    AWS_REGION = "us-east-1"
+    if (len(cIDList)==1):
+        SUBJECT = "Significant change in "+cIDList[0]+" trends"
+    else:
+        SUBJECT = "Significant change in multiple trends"
+    CHARSET = "UTF-8"
 
-# #add user with provided set of CIDs
-# def addGoogleTrendsUser(userEmail, listOfCIDs):
-#     currUser = {'UserEmail' : userEmail, 'CompanyIDList' : listOfCIDs}
-#     pytrendsUserList.append(currUser)
-#     for CID in listOfCIDs:
-#         updateGoogleTrends(CID, CID)
+    #for non-html email clients
+    BODY_TEXT = ("Amazon SES Test (Python)\r\n"
+                 "This email was sent with Amazon SES using the "
+                 "AWS SDK for Python (Boto)."
+                )
 
-#doesnt add duplicate
-def addIDsToGoogleTrendsUser(userEmail, newCID, newCIDalias):
-    userExists = False
-    for currUser in pytrendsUserList:
-        if (currUser['UserEmail'] == userEmail):
-            print("GTrends: user does exit [addIDstoUser]")
-            userExists = True
-            if (not newCID in currUser['CompanyIDList']):
-                currUser['CompanyIDList'].append(newCID)
-    if (not userExists):
-        print("GTrends: user doesnt exit, adding new user [addIDstoUser]")
-        currUser = {'UserEmail' : userEmail, 'CompanyIDList' : [newCID]}
-        pytrendsUserList.append(currUser)
-    updateGoogleTrends(newCID, newCIDalias)
+    #for normal email clients
+    BODY_HTML = """<html>
+    <head></head>
+    <body>
+      <h1>Amazon SES Test (SDK for Python)</h1>
+      <p>This email was sent with
+        <a href='https://aws.amazon.com/ses/'>Amazon SES</a> using the
+        <a href='https://aws.amazon.com/sdk-for-python/'>
+          AWS SDK for Python (Boto)</a>.</p>
+    </body>
+    </html>
+                """
 
-def removeIDfromGoogleTrendsUser(userEmail, idToRemove):
-    count = 0
-    for currUser in pytrendsUserList:
-        if (idToRemove in currUser['CompanyIDList']):
-            count += 1
-            if (currUser['UserEmail'] == userEmail):
-                currUser['CompanyIDList'].remove(idToRemove)
-    #If this was the only occurance of this CID, remove from pytrendsCompanyList
-    if (count==1):
-        removeCIDfromCompanyList(idToRemove)
+    client = boto3.client('ses',region_name=AWS_REGION)
 
-#Test 1
-# addIDsToGoogleTrendsUser('thisismycookieID', 'CBA.ax', 'Commonwealth Bank of Australia')
-# print("\n.....Printing Company List ['ANZ.ax', 'CBA.ax'].....\n")
-# print(companyListAsJson())
-# print("\n.....Call update again to show change.....\n")
-# updateAllTrends()
-# print(companyListAsJson())
-# print("\n.....Now printinging user database.....\n")
-# print(userListAsJson())
+    # Try to send the email.
+    try:
+        #Provide the contents of the email.
+        response = client.send_email(
+            Destination={
+                'ToAddresses': [
+                    RECIPIENT,
+                ],
+            },
+            Message={
+                'Body': {
+                    'Html': {
+                        'Charset': CHARSET,
+                        'Data': BODY_HTML,
+                    },
+                    'Text': {
+                        'Charset': CHARSET,
+                        'Data': BODY_TEXT,
+                    },
+                },
+                'Subject': {
+                    'Charset': CHARSET,
+                    'Data': SUBJECT,
+                },
+            },
+            Source=SENDER,
+        )
+    # Display an error if something goes wrong.
+    except ClientError as e:
+        print(e.response['Error']['Message'])
+    else:
+        print("Email sent! Message ID:"),
+        print(response['ResponseMetadata']['RequestId'])
 
-#Test 2
-# addIDsToGoogleTrendsUser('user', 'WOW.ax', 'Woolworths')
-# print(str(getCurrentChange("WOW.ax")) + "%")
 
-
-#print (trendFromDateRange("2016-12-14", "2017-01-25", "Woolworths"));
-
-
-# today = date.today()
-# numMonths = 4
-# sevenDays = timedelta(days=7)
-# startRange = today - (sevenDays*numMonths)
-# dateRange =  str(startRange) + ' ' + str(today)
-# print("date range: " + str(dateRange))
-# alias = "Facebook"
-# kw_list = [alias]
-# pytrends.build_payload(kw_list, cat=0, timeframe="today 1-m", geo='', gprop='')
-# df = pytrends.interest_over_time();
-# res = df[alias]
-# print(df[alias])
-# print(str(df[alias].get(0)) + " " + str(today))
-
-# check = trendFromNumWeek(12, "Facebook")
-# print (check)
-# print (len(check))
+#
