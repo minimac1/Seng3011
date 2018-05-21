@@ -631,8 +631,8 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
                     articles[c-1]['sent'] = value
                     articles[c-1]['sentc'] = rgCol(value)
                 articles = sorted(articles, key=lambda k: k['date'])
-            if not leng == 0:
-                avSent = round(totSent/leng,0)
+            if not numArt == 0:
+                avSent = round(totSent/numArt,0)
             else:
                 avSent = 0
             greenColour = "#7a8c00"
