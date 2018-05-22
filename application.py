@@ -492,31 +492,33 @@ def stockPrice(instrumentId):
     #stocks = []
     print(stock_url)
     response = requests.get(stock_url).json()
-    if (response is None):
+    if (response == {}):
         return 0
     #print(response)
-    points = response['Time Series (Daily)']
-    dates = sorted(points)
-    dates.reverse()
-    i = 0
-    #print(points)
-    stocks = {}
-    for point in dates:
-        stocks[point] = {}
-        openS = float(points[point]['1. open'])
-        closeS = float(points[point]['4. close'])
-        change = openS - closeS
-        if openS == 0:
-            percent = 0
-        else:
-            percent = change/openS * 100
-        #print("open is" + str(openS) + "change is " + str(change))
-        #print(percent)
-        stocks[point]['stock']=round((percent),2)
-        #stocks.append(temp)
-        if i >10:
-            break
-        i += 1
+    try:
+        points = response['Time Series (Daily)']
+        dates = sorted(points)
+        dates.reverse()
+        i = 0
+        #print(points)
+        stocks = {}
+        for point in dates:
+            stocks[point] = {}
+            openS = float(points[point]['1. open'])
+            closeS = float(points[point]['4. close'])
+            change = openS - closeS
+            if openS == 0:
+                percent = 0
+            else:
+                percent = change/openS * 100
+            #print("open is" + str(openS) + "change is " + str(change))
+            #print(percent)
+            stocks[point]['stock']=round((percent),2)
+            #stocks.append(temp)
+            if i >10:
+                break
+            i += 1
+
     return stocks
 
 
