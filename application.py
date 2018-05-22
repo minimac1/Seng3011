@@ -670,6 +670,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
 
             #Stock price
             curStocks = stockPrice(name)
+            print(curStocks)
             today = datetime.datetime.today()
             today = today - timedelta(hours=12)
             today = str(today.date())
