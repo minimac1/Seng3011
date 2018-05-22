@@ -469,8 +469,8 @@ def stockPrice(instrumentId):
     s_params = {
         'function': "TIME_SERIES_DAILY",
         'symbol': "",
-        #'apikey': "JSLIQKXENUXYT6V3"
-        'apikey' : "ERXH2MS2R8UU6EDN"
+        'apikey': "JSLIQKXENUXYT6V3"
+        #'apikey' : "ERXH2MS2R8UU6EDN"
 
     }
 
