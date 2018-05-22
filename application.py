@@ -179,6 +179,7 @@ def db():
     company['statement'] = statement
 
     now = (datetime.datetime.now()- timedelta(days=1)) # currently -1day because i can't use current day
+    now = now - timedelta(hours=10) #utc time
     eDate= now.isoformat()
     eDate = eDate[0:23] + "Z" # will probly need to pass in dates to choose the start date, once we've stored a results
     sDate= (now - timedelta(days=14)) # otherwise currently hardcoded to the previous week
@@ -595,6 +596,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
 
             #Sentiment
             now = (datetime.datetime.now()- timedelta(days=1)) # currently -1day because i can't use current day
+            now = now - timedelta(hours=10)
             eDate= now.isoformat()
             eDate = eDate[0:23] + "Z" # will probly need to pass in dates to choose the start date, once we've stored a results
             sDate= (now - timedelta(days=14)) # otherwise currently hardcoded to the previous week
