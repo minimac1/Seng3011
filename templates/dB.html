@@ -1,11 +1,123 @@
 {% extends "base.html" %}
 {% block content %}
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    
     <script type="text/javascript">
-      google.charts.load('current', {'packages':['corechart']});
+      google.charts.load('current', {'packages':['line', 'corechart']});
       google.charts.setOnLoadCallback(drawChart);
 
-      function drawChart() { //should probly get better data ltr with rohan DESIGN the case around the negative article on 04-27
+    function drawChart() {
+
+      var button = document.getElementById('change-chart');
+      var chartDiv = document.getElementById('chart_div');
+
+      var data = google.visualization.arrayToDataTable([
+          ['Date', 'Trends Change', 'Stocks Change'],
+          {% for dict in changes %}
+                ['{{dict['shortDate']}}',{{dict['trends']}},{{dict['stock']}}],
+          {% endfor %}
+        ]);
+      var materialOptions = {
+        chart: {
+          title: 'Trends Change vs Stock Price Change',
+          legend: { position: 'top', alignment: 'start' }
+        },
+        width: 1100,
+        height: 700,
+        series: {
+          // Gives each series an axis name that matches the Y-axis below.
+          0: {axis: 'Temps'},
+          1: {axis: 'Daylight'}
+        },
+        axes: {
+          // Adds labels to each axis; they don't have to match the axis names.
+          y: {
+            Temps: {label: 'Trends Change'},
+            Daylight: {label: 'Stocks Change'}
+          }
+        }
+      };
+
+      var classicOptions = {
+        title: 'Average Temperatures and Daylight in Iceland Throughout the Year',
+        legend: { position: 'top', alignment: 'start' },
+        width: 1100,
+        height: 900,
+        // Gives each series an axis that matches the vAxes number below.
+        series: {
+          0: {targetAxisIndex: 0},
+          1: {targetAxisIndex: 1}
+        },
+        vAxes: {
+          // Adds titles to each axis.
+          0: {title: 'Trends Change'},
+          1: {title: 'Stocks Change'}
+        },
+        hAxis: {
+          viewWindow: {
+            max: 30
+          }
+        },
+        vAxis: {
+          viewWindow: {
+            max: 30
+          }
+        }
+      };
+
+      function drawMaterialChart() {
+        var materialChart = new google.charts.Line(chartDiv);
+        materialChart.draw(data, materialOptions);
+        button.innerText = 'Change to Classic';
+        button.onclick = drawClassicChart;
+      }
+
+      function drawClassicChart() {
+        var classicChart = new google.visualization.LineChart(chartDiv);
+        classicChart.draw(data, classicOptions);
+        button.innerText = 'Change to Material';
+        button.onclick = drawMaterialChart;
+      }
+
+      drawMaterialChart();
+
+    }
+    </script>
+    <div class="container-fluid CL-container"">
+        <table class="dbTable">
+            <tr>
+                <td colspan="4">
+                    <div class="page-title">{{company['name']}}</div>
+                </td>
+                
+            </tr>
+            <tr>
+                <td colspan="1">
+                    <div class="CL-heading2" style="line-height: 1.5;">Trends<br><img class="smallC" src="{{company['trends']}}" title="{{company['trendst']}}"></div>
+                </td>
+                <td colspan="1">
+                    <div class="CL-heading2" style="line-height: 1.5;">Sentiment<br><img class="smallC" src="{{company['sent']}}" title="{{company['sentt']}}"></div>
+                </td>
+                <td colspan="1">
+                    <div class="CL-heading2" style="line-height: 1.5;">Stock<br><img class="smallC" src="{{company['stocks']}}" title="{{company['stockst']}}"></div>
+                </td>
+                <td rowspan="2" style="width:300px;" colspan="1">
+                    <ul style="list-style: circle;">
+                        {% for article in articles %}
+                        <li class="dbl CL-body" style="line-height: 1.2;"> <a style="color:{{article['sentc']}}">{{article['sent']}}</a> <a href="{{article['url']}}" style="float: right;"> {{article['date']}}</a><br> <a style="font-size:16px;">{{article['headline']}}</a></li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+            <tr style="padding-top:20px;">
+                <td colspan="3">
+                      <div id="chart_div"></div>
+                    
+                </td>
+            </tr>
+        </table>
+    </div>
+    <!-- function drawChart() { //should probly get better data ltr with rohan DESIGN the case around the negative article on 04-27
         var data = google.visualization.arrayToDataTable([
           ['Year', 'Trends Change', 'Stocks Change'],
           {% for dict in changes %}
@@ -21,39 +133,5 @@
         var chart = new google.visualization.LineChart(document.getElementById('chart'));
 
         chart.draw(data, options);
-      }
-    </script>
-    <div class="container-fluid CL-container"">
-        <table class="dbTable">
-            <tr>
-                <td colspan="4">
-                    <div class="page-title">{{company['name']}}</div>
-                </td>
-                
-            </tr>
-            <tr>
-                <td colspan="1">
-                    <div class="CL-heading2" style="line-height: 1.5;">Trends<br><img src="{{company['trends']}}" title="{{company['trendst']}}"></div>
-                </td>
-                <td colspan="1">
-                    <div class="CL-heading2" style="line-height: 1.5;">Sentiment<br><img src="{{company['sent']}}" title="{{company['sentt']}}"></div>
-                </td>
-                <td colspan="1">
-                    <div class="CL-heading2" style="line-height: 1.5;">Stock<br><img src="{{company['stocks']}}" title="{{company['stockst']}}"></div>
-                </td>
-                <td rowspan="2" style="width:300px;" colspan="1">
-                    <ul style="list-style: circle;">
-                        {% for article in articles %}
-                        <li class="dbl CL-body" style="line-height: 1.2;"> <a style="color:{{article['sentc']}}">{{article['sent']}}</a> <a href="{{article['url']}}" style="float: right;"> {{article['date']}}</a><br> <a style="font-size:16px;">{{article['headline']}}</a></li>
-                        {% endfor %}
-                    </ul>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="3">
-                    <div id="chart" style="width: 1200px; height: 800px"></div>
-                </td>
-            </tr>
-        </table>
-    </div>
+      }-->
 {% endblock %}
