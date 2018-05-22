@@ -519,6 +519,7 @@ def stockPrice(instrumentId):
     #     i += 1
     #
     # return stocks
+    stocks = {'2018-5-22' : '18', '2018-5-21' :  '20'}
     return []
 
 
