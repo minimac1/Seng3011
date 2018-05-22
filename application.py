@@ -466,60 +466,60 @@ def extractNewText(article):
 #function that returns stock prices in json formating
 #argument instrumentId is a string eg. "ANZ.AX"
 def stockPrice(instrumentId):
-    s_params = {
-        'function': "TIME_SERIES_DAILY",
-        'symbol': "",
-        'apikey': "JSLIQKXENUXYT6V3"
-        #'apikey' : "ERXH2MS2R8UU6EDN"
-
-    }
-
-    a_url = "https://www.alphavantage.co/query?"
-    #instrumentId = instrumentId.split('.')[0]
-    instrumentId = instrumentId.replace('.nyse','')
-    instrumentId = instrumentId.replace('.nasdaq','')
-    if ".eux" in instrumentId:
-        return {}
-    if ".ssx" in instrumentId:
-        return {}
-    if ".lse" in instrumentId:
-        return {}
-    s_params['symbol'] = instrumentId
-
-    stock_url = (a_url + 'function=' + s_params['function']
-    + '&symbol=' + s_params['symbol'] + '&apikey='
-    + s_params['apikey'])
-    #stocks = []
-    print(stock_url)
-    response = requests.get(stock_url).json()
-    if (response == {}):
-        return []
-    #print(response)
-    points = response['Time Series (Daily)']
-    dates = sorted(points)
-    dates.reverse()
-    i = 0
-    #print(points)
-    stocks = {}
-    for point in dates:
-        stocks[point] = {}
-        openS = float(points[point]['1. open'])
-        closeS = float(points[point]['4. close'])
-        change = openS - closeS
-        if openS == 0:
-            percent = 0
-        else:
-            percent = change/openS * 100
-        #print("open is" + str(openS) + "change is " + str(change))
-        #print(percent)
-        stocks[point]['stock']=round((percent),2)
-        #stocks.append(temp)
-        if i >10:
-            break
-        i += 1
-
-    return stocks
-    #return []
+    # s_params = {
+    #     'function': "TIME_SERIES_DAILY",
+    #     'symbol': "",
+    #     'apikey': "JSLIQKXENUXYT6V3"
+    #     #'apikey' : "ERXH2MS2R8UU6EDN"
+    #
+    # }
+    #
+    # a_url = "https://www.alphavantage.co/query?"
+    # #instrumentId = instrumentId.split('.')[0]
+    # instrumentId = instrumentId.replace('.nyse','')
+    # instrumentId = instrumentId.replace('.nasdaq','')
+    # if ".eux" in instrumentId:
+    #     return {}
+    # if ".ssx" in instrumentId:
+    #     return {}
+    # if ".lse" in instrumentId:
+    #     return {}
+    # s_params['symbol'] = instrumentId
+    #
+    # stock_url = (a_url + 'function=' + s_params['function']
+    # + '&symbol=' + s_params['symbol'] + '&apikey='
+    # + s_params['apikey'])
+    # #stocks = []
+    # print(stock_url)
+    # response = requests.get(stock_url).json()
+    # if (response == {}):
+    #     return []
+    # #print(response)
+    # points = response['Time Series (Daily)']
+    # dates = sorted(points)
+    # dates.reverse()
+    # i = 0
+    # #print(points)
+    # stocks = {}
+    # for point in dates:
+    #     stocks[point] = {}
+    #     openS = float(points[point]['1. open'])
+    #     closeS = float(points[point]['4. close'])
+    #     change = openS - closeS
+    #     if openS == 0:
+    #         percent = 0
+    #     else:
+    #         percent = change/openS * 100
+    #     #print("open is" + str(openS) + "change is " + str(change))
+    #     #print(percent)
+    #     stocks[point]['stock']=round((percent),2)
+    #     #stocks.append(temp)
+    #     if i >10:
+    #         break
+    #     i += 1
+    #
+    # return stocks
+    return []
 
 
 #takes in an array of news articles
