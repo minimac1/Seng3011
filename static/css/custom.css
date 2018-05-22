@@ -48,7 +48,10 @@ body {
   90%  { opacity:1; }
   100% { opacity:0; }
 }
-
+.smallC{
+  height:90px;
+  width:90px;
+}
 .page-title{
   font-size: 40px;
   font-family:"Poppins", sans-serif;
