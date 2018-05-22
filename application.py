@@ -519,8 +519,18 @@ def stockPrice(instrumentId):
     #     i += 1
     #
     # return stocks
-    stocks = {'2018-5-22' : '18', '2018-5-21' :  '20'}
-    return []
+    stocks = {}
+    i = 5
+    while i < 20:
+        num = str(i)
+        if i < 10:
+            num = "0" + num
+        date = "2018-05-"+num
+        stocks[date]={}
+        stocks[date]['stock']=0
+        i += 1
+
+    return stocks
 
 
 #takes in an array of news articles
