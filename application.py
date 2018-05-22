@@ -466,70 +466,55 @@ def extractNewText(article):
 #function that returns stock prices in json formating
 #argument instrumentId is a string eg. "ANZ.AX"
 def stockPrice(instrumentId):
-    # s_params = {
-    #     'function': "TIME_SERIES_DAILY",
-    #     'symbol': "",
-    #     'apikey': "JSLIQKXENUXYT6V3"
-    #     #'apikey' : "ERXH2MS2R8UU6EDN"
-    #
-    # }
-    #
-    # a_url = "https://www.alphavantage.co/query?"
-    # #instrumentId = instrumentId.split('.')[0]
-    # instrumentId = instrumentId.replace('.nyse','')
-    # instrumentId = instrumentId.replace('.nasdaq','')
-    # if ".eux" in instrumentId:
-    #     return {}
-    # if ".ssx" in instrumentId:
-    #     return {}
-    # if ".lse" in instrumentId:
-    #     return {}
-    # s_params['symbol'] = instrumentId
-    #
-    # stock_url = (a_url + 'function=' + s_params['function']
-    # + '&symbol=' + s_params['symbol'] + '&apikey='
-    # + s_params['apikey'])
-    # #stocks = []
-    # print(stock_url)
-    # response = requests.get(stock_url).json()
-    # if (response == {}):
-    #     return []
-    # #print(response)
-    # points = response['Time Series (Daily)']
-    # dates = sorted(points)
-    # dates.reverse()
-    # i = 0
-    # #print(points)
-    # stocks = {}
-    # for point in dates:
-    #     stocks[point] = {}
-    #     openS = float(points[point]['1. open'])
-    #     closeS = float(points[point]['4. close'])
-    #     change = openS - closeS
-    #     if openS == 0:
-    #         percent = 0
-    #     else:
-    #         percent = change/openS * 100
-    #     #print("open is" + str(openS) + "change is " + str(change))
-    #     #print(percent)
-    #     stocks[point]['stock']=round((percent),2)
-    #     #stocks.append(temp)
-    #     if i >10:
-    #         break
-    #     i += 1
-    #
-    # return stocks
-    stocks = {}
-    i = 5
-    while i < 20:
-        num = str(i)
-        if i < 10:
-            num = "0" + num
-        date = "2018-05-"+num
-        stocks[date]={}
-        stocks[date]['stock']=0
-        i += 1
+    s_params = {
+        'function': "TIME_SERIES_DAILY",
+        'symbol': "",
+        #'apikey': "JSLIQKXENUXYT6V3"
+        'apikey' : "ERXH2MS2R8UU6EDN"
 
+    }
+
+    a_url = "https://www.alphavantage.co/query?"
+    #instrumentId = instrumentId.split('.')[0]
+    instrumentId = instrumentId.replace('.nyse','')
+    instrumentId = instrumentId.replace('.nasdaq','')
+    if ".eux" in instrumentId:
+        return {}
+    if ".ssx" in instrumentId:
+        return {}
+    if ".lse" in instrumentId:
+        return {}
+    s_params['symbol'] = instrumentId
+
+    stock_url = (a_url + 'function=' + s_params['function']
+    + '&symbol=' + s_params['symbol'] + '&apikey='
+    + s_params['apikey'])
+    #stocks = []
+    #print(stock_url)
+    response = requests.get(stock_url).json()
+    #print(response)
+    points = response['Time Series (Daily)']
+    dates = sorted(points)
+    dates.reverse()
+    i = 0
+    #print(points)
+    stocks = {}
+    for point in dates:
+        stocks[point] = {}
+        openS = float(points[point]['1. open'])
+        closeS = float(points[point]['4. close'])
+        change = openS - closeS
+        if openS == 0:
+            percent = 0
+        else:
+            percent = change/openS * 100
+        #print("open is" + str(openS) + "change is " + str(change))
+        #print(percent)
+        stocks[point]['stock']=round((percent),2)
+        #stocks.append(temp)
+        if i >10:
+            break
+        i += 1
     return stocks
 
 
@@ -684,12 +669,11 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
                 sentColour = "#800000"
 
             #Stock price
-            stockChange = 0
-            # curStocks = stockPrice(name)
-            # print(curStocks)
-            # today = datetime.datetime.today()
-            # today = str(today.date())
-            # stockChange = curStocks[today]['stock']
+            curStocks = stockPrice(name)
+            print(curStocks)
+            today = datetime.datetime.today()
+            today = str(today.date())
+            stockChange = curStocks[today]['stock']
             if (stockChange > 0):
                 stockColour = "#7a8c00"
             elif (stockChange < 0):
@@ -714,7 +698,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             temp['changec'] = trendColour
             temp['recS'] = sentString
             temp['recSc'] = sentColour
-            temp['stock'] = "0"
+            temp['stock'] = stockChange
             temp['stockc'] = stockColour
             companies.append(temp)
         else:
