@@ -492,6 +492,8 @@ def stockPrice(instrumentId):
     #stocks = []
     print(stock_url)
     response = requests.get(stock_url).json()
+    if (response is None):
+        return 0
     #print(response)
     points = response['Time Series (Daily)']
     dates = sorted(points)
