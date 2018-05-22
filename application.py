@@ -493,7 +493,7 @@ def stockPrice(instrumentId):
     print(stock_url)
     response = requests.get(stock_url).json()
     if (response == {}):
-        return 0
+        return []
     #print(response)
     try:
         points = response['Time Series (Daily)']
