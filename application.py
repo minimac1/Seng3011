@@ -684,11 +684,12 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
                 sentColour = "#800000"
 
             #Stock price
-            curStocks = stockPrice(name)
-            print(curStocks)
-            today = datetime.datetime.today()
-            today = str(today.date())
-            stockChange = curStocks[today]['stock']
+            stockChange = 0
+            # curStocks = stockPrice(name)
+            # print(curStocks)
+            # today = datetime.datetime.today()
+            # today = str(today.date())
+            # stockChange = curStocks[today]['stock']
             if (stockChange > 0):
                 stockColour = "#7a8c00"
             elif (stockChange < 0):
@@ -713,7 +714,7 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             temp['changec'] = trendColour
             temp['recS'] = sentString
             temp['recSc'] = sentColour
-            temp['stock'] = stockChange
+            temp['stock'] = "0"
             temp['stockc'] = stockColour
             companies.append(temp)
         else:
