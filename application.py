@@ -490,7 +490,7 @@ def stockPrice(instrumentId):
     + '&symbol=' + s_params['symbol'] + '&apikey='
     + s_params['apikey'])
     #stocks = []
-    #print(stock_url)
+    print(stock_url)
     response = requests.get(stock_url).json()
     #print(response)
     points = response['Time Series (Daily)']
