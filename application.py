@@ -56,6 +56,7 @@ def inject_user():
         image = session['image']
     else:
         image = "https://qualiscare.com/wp-content/uploads/2017/08/default-user-300x300.png"
+        
     # will have to change link to the profile page if logged in
     return dict(user=username,image=image)
 
@@ -188,7 +189,10 @@ def db():
     cId = name
     url = ("http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=" + sDate
      + "&endDate=" + eDate + "&companyId=" + cId)
-    res = requests.get(url).json()
+    #res = requests.get(url)
+    #print(res)
+    res = {}
+    res['NewsDataSet'] = []
     articles = []
     #if 'NewsDataSet' not in re:
         #company['statement'] += re['Developer Notes']['Execution Result']
@@ -347,24 +351,24 @@ def db():
         text = "This sentiment indicates there has been somewhat negative news surrounding this company"
     else:
         img = "https://i.imgur.com/Fk32cdt.jpg"
-        text = "There has been a some quiet bad news surrounding this company, be careful"
+        text = "There has been some bad news surrounding this company, be careful"
     company['sent'] = img
     company['sentt'] = text
     if avTre > 30:
-        img = "https://i.imgur.com/KeZc7m3.jpg"
-        text = "Something big must of happened recently"
+        img = "https://i.imgur.com/Hu2EUzU.jpg"
+        text = "Something big must of happened recently, make sure you look at the sentiment to check whether it was good or bad"
     elif avTre > 0:
-        img = "https://i.imgur.com/bQOWNFw.jpg"
-        text = "Something could of happened but this also might just be normal odds that slightly change as nothing continues to happen"
+        img = "https://i.imgur.com/Q7DZ5Nh.jpg"
+        text = "Slightly more popular than before but nothing significant"
     elif avTre == 0:
         img = "https://i.imgur.com/fq0KzNu.jpg"
         text = "Wow no change, guess there the same stuff that happened last week is continuing to happen"
     elif avTre > -30:
-        img = "https://i.imgur.com/gLAMWd0.jpg"
-        text = "This could just be the normal flow of people slightly more busy this week and not enough time to be using google, or attention surrounding an event has almost died out"
+        img = "https://i.imgur.com/fq0KzNu.jpg"
+        text = "This company has become slightly less popular than last week"
     else:
-        img = "https://i.imgur.com/Fk32cdt.jpg"
-        text = "Likely a recent event has happened but people have lost interest"
+        img = "https://i.imgur.com/fq0KzNu.jpg"
+        text = "People have really lost interest in this company since last week"
     company['trends'] = img
     company['trendst'] = text
     if avSto > 3:
@@ -474,7 +478,7 @@ def stockPrice(instrumentId):
 
     }
 
-        a_url = "https://www.alphavantage.co/query?"
+    a_url = "https://www.alphavantage.co/query?"
     #instrumentId = instrumentId.split('.')[0]
     instrumentId = instrumentId.replace('.nyse','')
     instrumentId = instrumentId.replace('.nasdaq','')
@@ -500,6 +504,21 @@ def stockPrice(instrumentId):
     #stocks = []
     #print(stock_url)
     response = requests.get(stock_url).json()
+    if 'Time Series (Daily)' not in response:
+        i = 0
+        while i < 14:
+            now = datetime.datetime.now() - timedelta(days=i)
+            year = str(now.year)
+            month = str(now.month)
+            day = str(now.day)
+            if day < 10:
+                day = "0" + day
+            date = year + "-" + month + "-" + day
+            stocks = {}
+            stocks[date] = {}
+            stocks[date]['stock'] = 0
+            return stocks
+        
     #print(response)
     points = response['Time Series (Daily)']
     dates = sorted(points)
@@ -615,7 +634,9 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
                 url = ("http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=" + sDate
                  + "&endDate=" + eDate + "&companyId=" + cId)
                 print(url)
-                res = requests.get(url).json()
+                #res = requests.get(url) # for now i removed the .json bit here and in db and then just set it to an empty dict
+                res = {}
+                res['NewsDataSet'] = []
                 articles = []
                 i = 0
                 for art in res['NewsDataSet']:
@@ -635,6 +656,30 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
 
                     articles.append(temp)
                     i+= 1
+                amount = len(articles)
+                if amount < 10:
+                    sDate = sDate[0:10]
+                    eDate = eDate[0:10]
+                    #print("sdate is "+ sDate +"edate is "+ eDate)
+                    gart = googleNews(cId,sDate,eDate)
+                    gart = gart['articles']
+                    #print(gart)
+                    for art in gart:
+                        temp = {}
+                        temp['headline'] = art['title']
+                        date = art['publishedAt']
+                        date = date[0:16]
+                        date = date.replace('T', ' ')
+                        temp['date'] = date
+                        #temp['sent'] = art['description']
+                        temp['url'] = art['url']
+                        temp['sent'] = extractNewText(art['url'])
+                        if not temp['sent']:
+                            continue
+                        articles.append(temp)
+                        amount += 1
+                        if amount >= 10:
+                            break;
                 sent = []
                 for art in articles:
                     sent.append(art['sent'])

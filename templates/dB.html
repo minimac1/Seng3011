@@ -19,49 +19,67 @@
         ]);
       var materialOptions = {
         chart: {
-          title: 'Trends Change vs Stock Price Change',
+          //title: 'Trends Change vs Stock Price Change',
           legend: { position: 'top', alignment: 'start' }
         },
         width: 1100,
         height: 700,
         series: {
           // Gives each series an axis name that matches the Y-axis below.
-          0: {axis: 'Temps'},
-          1: {axis: 'Daylight'}
-        },
-        axes: {
-          // Adds labels to each axis; they don't have to match the axis names.
-          y: {
-            Temps: {label: 'Trends Change'},
-            Daylight: {label: 'Stocks Change'}
-          }
-        }
-      };
-
-      var classicOptions = {
-        title: 'Average Temperatures and Daylight in Iceland Throughout the Year',
-        legend: { position: 'top', alignment: 'start' },
-        width: 1100,
-        height: 900,
-        // Gives each series an axis that matches the vAxes number below.
-        series: {
           0: {targetAxisIndex: 0},
           1: {targetAxisIndex: 1}
         },
         vAxes: {
+          // Adds labels to each axis; they don't have to match the axis names.
+          0: {      title: 'Trends Change',
+                    viewWindowMode: 'pretty',
+                    textStyle: {color: 'red'},
+                    viewWindow: { max: 100, min: -100},
+                    gridlines: {color: '#f44336'}
+             },
+        1: {    title: 'Stocks Change',
+                viewWindowMode: 'pretty',
+                viewWindow: { max: 100, min: -100},
+                gridlines: {color: '#000000'}
+          }
+        }
+        
+      };
+
+      var classicOptions = {
+        //title: 'Trends Change vs Stock Price Change',
+        legend: { position: 'top', alignment: 'start' },
+        width: 1100,
+        height: 550,
+        // Gives each series an axis that matches the vAxes number below.
+        series: {
+          0: {targetAxisIndex: 0, lineWidth: 5},
+          1: {targetAxisIndex: 1, lineWidth: 5}
+        },
+        vAxes: {
           // Adds titles to each axis.
-          0: {title: 'Trends Change'},
-          1: {title: 'Stocks Change'}
+          0: {      title: 'Trends Change',
+                    viewWindowMode: 'pretty',
+                    textStyle: {color: '#f44336',
+                                bold:true,
+                                italic:false,
+                                fontSize: 18},
+                    viewWindow: { max: 40, min: -40}
+                    
+             },
+          1: {      title: 'Stocks Change',
+                    viewWindowMode: 'pretty',
+                    textStyle: {color: 'black',
+                                bold:true,
+                                italic:false,
+                                fontSize: 18},
+                    viewWindow: { max: 4, min: -4}
+                    
+          }
         },
+        colors: ["#f44336","#000000"],
         hAxis: {
-          viewWindow: {
-            max: 30
-          }
-        },
-        vAxis: {
-          viewWindow: {
-            max: 30
-          }
+            title: 'Date'
         }
       };
 
@@ -79,30 +97,30 @@
         button.onclick = drawMaterialChart;
       }
 
-      drawMaterialChart();
-
+      //drawMaterialChart();
+      drawClassicChart();
     }
     </script>
     <div class="container-fluid CL-container"">
         <table class="dbTable">
             <tr>
                 <td colspan="4">
-                    <div class="page-title">{{company['name']}}</div>
+                    <div class="page-title" style="text-align:center;margin-top:30px;">{{company['name']}}</div>
                 </td>
                 
             </tr>
             <tr>
                 <td colspan="1">
-                    <div class="CL-heading2" style="line-height: 1.5;">Trends<br><img class="smallC" src="{{company['trends']}}" title="{{company['trendst']}}"></div>
+                    <div class="CL-heading2" style="line-height: 1.5;">Trends:<br><img class="smallC" src="{{company['trends']}}" title="{{company['trendst']}}"></div>
                 </td>
                 <td colspan="1">
-                    <div class="CL-heading2" style="line-height: 1.5;">Sentiment<br><img class="smallC" src="{{company['sent']}}" title="{{company['sentt']}}"></div>
+                    <div class="CL-heading2" style="line-height: 1.5;">Sentiment:<br><img class="smallC" src="{{company['sent']}}" title="{{company['sentt']}}"></div>
                 </td>
                 <td colspan="1">
-                    <div class="CL-heading2" style="line-height: 1.5;">Stock<br><img class="smallC" src="{{company['stocks']}}" title="{{company['stockst']}}"></div>
+                    <div class="CL-heading2" style="line-height: 1.5;">Stock:<br><img class="smallC" src="{{company['stocks']}}" title="{{company['stockst']}}"></div>
                 </td>
                 <td rowspan="2" style="width:300px;" colspan="1">
-                    <ul style="list-style: circle;">
+                    <ul style="list-style: circle;height:73vh;overflow-y:auto;padding-right:20px;">
                         {% for article in articles %}
                         <li class="dbl CL-body" style="line-height: 1.2;"> <a style="color:{{article['sentc']}}">{{article['sent']}}</a> <a href="{{article['url']}}" style="float: right;"> {{article['date']}}</a><br> <a style="font-size:16px;">{{article['headline']}}</a></li>
                         {% endfor %}
@@ -111,7 +129,7 @@
             </tr>
             <tr style="padding-top:20px;">
                 <td colspan="3">
-                      <div id="chart_div"></div>
+                      <div id="chart_div" style="position:relative;"></div>
                     
                 </td>
             </tr>
