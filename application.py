@@ -699,14 +699,17 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
                 if not numArt == 0:
                     avSent = round(totSent/numArt,0)
                 else:
-                    avSent = 0
+                    avSent = 101
 
                 print("Total Sentiment "+cId+" : " + str(totSent))
                 print("Number Articles "+cId+" : " + str(numArt))
                 print("Average Sentiment "+cId+" : " + str(avSent))
                 greenColour = "#7a8c00"
                 redColour = "#800000"
-                if avSent > 75:
+                if avSent > 100:
+                    sentString = "No articles to perform sentiment analysis"
+                    sentColour = "#000000"
+                elif avSent > 75:
                     sentString = "Extremely Positive"
                     sentColour = "#7a8c00"
                 elif avSent > 50:
