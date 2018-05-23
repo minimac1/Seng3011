@@ -552,7 +552,7 @@ def stockPrice(instrumentId):
 # 1 is super duper positive and 0 is fully negative
 def sentiment(newsText):
     #indicoio.config.api_key = 'd1d92c5989dc9a21f0ed2f4e6c21f46e'
-    ndicoio.config.api_key = '5c28eab27da67528360f23ca9db6e3ea'
+    indicoio.config.api_key = '5c28eab27da67528360f23ca9db6e3ea'
 
     # single example
     #indicoio.sentiment("I love writing code!")
