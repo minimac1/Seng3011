@@ -397,7 +397,7 @@ def getCurrentChange(cid,sendEmailBool):
         percentChange = (change/prevChangeTotal)*100
         pChangeRounded = round(percentChange,3)
         #print("Percentage Change: " + str(pChangeRounded))
-    if (percentChange > 15 and sendEmailBool):
+    if (percentChange > 20 and sendEmailBool):
         now = datetime.now()
         sendEmailSignificant(cid,percentChange,now,None)
     return pChangeRounded
