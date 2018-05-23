@@ -474,15 +474,23 @@ def stockPrice(instrumentId):
 
     }
 
-    a_url = "https://www.alphavantage.co/query?"
+        a_url = "https://www.alphavantage.co/query?"
     #instrumentId = instrumentId.split('.')[0]
     instrumentId = instrumentId.replace('.nyse','')
     instrumentId = instrumentId.replace('.nasdaq','')
+    instrumentId = instrumentId.replace('.NYSE','')
+    instrumentId = instrumentId.replace('.NASDQ','')
     if ".eux" in instrumentId:
         return {}
     if ".ssx" in instrumentId:
         return {}
     if ".lse" in instrumentId:
+        return {}
+    if ".EUX" in instrumentId:
+        return {}
+    if ".SSX" in instrumentId:
+        return {}
+    if ".LSE" in instrumentId:
         return {}
     s_params['symbol'] = instrumentId
 
