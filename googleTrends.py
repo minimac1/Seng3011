@@ -276,7 +276,7 @@ def updateGoogleTrends(companyID, dateFrom, dateTo):
             dbConn.commit()
             dbCur.close()
             dbConn.close()
-       except:
+        except:
             print("error getting trends in update google trends")
     #curRes = getCurrentChange(companyID,True)
     #print("[GTrends] Current Results: " + str(curRes))
