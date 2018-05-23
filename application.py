@@ -456,8 +456,8 @@ def googleNews(instrumentId, startDate, endDate):
 #Argument articles is an array of urls strings
 #returns an array of article texts.
 def extractNewText(article):
-    client = textapi.Client("3dd5c680", "2d20c5a25c086699eb796c7e21d2bfb8")
-
+    #client = textapi.Client("3dd5c680", "2d20c5a25c086699eb796c7e21d2bfb8")
+    client = textapi.Client("87cc72a6", "d119218697f40fe8cef76ad6c3b83434")
     #for c in arr:
 
     extract = client.Extract({"url": article})
