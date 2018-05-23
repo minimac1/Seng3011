@@ -16,11 +16,11 @@ from pytrends.request import TrendReq
 pytrends = TrendReq(hl='en-us', tz=-600) #change when functioning
 
 # connect to database
-try:
-    dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
-    dbCur = dbConn.cursor()
-except:
-    print('unable to connect to the database')
+# try:
+#     dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
+#     dbCur = dbConn.cursor()
+# except:
+#     print('unable to connect to the database')
 
 # Num weeks is integer of number of weeks for range (max 3)
 # Query is string to query google with
@@ -60,39 +60,51 @@ def trendFromNumWeek(numWeeks, query):
 def getEmailsFromCID(cid):
     resList = []
     try:
+        dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
+        dbCur = dbConn.cursor()
         dbCur.execute("""SELECT d.userEmail FROM userData d JOIN userFollows f ON f.id=d.id WHERE f.company=%s;""", (cid,))
         rows = dbCur.fetchall()
         for row in rows:
             curEmail = row[0]
             resList.append(curEmail)
+        dbCur.close()
+        dbConn.close()
     except:
-        return "Error geting email list"
+        return "Error geting email list from cid"
     return resList
 
 def getCIDListFromEmail(email):
     resList = []
     try:
+        dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
+        dbCur = dbConn.cursor()
         dbCur.execute("""SELECT f.company FROM userData d JOIN userFollows f ON f.id=d.id WHERE d.userEmail=%s;""", (email,))
         rows = dbCur.fetchall()
         for row in rows:
             curCid = row[0]
             curCid = curCid.upper()
             resList.append(curCid)
+        dbCur.close()
+        dbConn.close()
     except:
-        return "Error geting company list"
+        return "Error geting company list from email"
     return resList
 
 def getEmailsFromType(type):
     resList = []
     try:
+        dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
+        dbCur = dbConn.cursor()
         dbCur.execute("""SELECT d.userEmail,f.company FROM userData d JOIN userFollows f ON f.id=d.id WHERE d.followTime=%s;""", (type,))
         rows = dbCur.fetchall()
         for row in rows:
             curEmail = row[0]
             if not curEmail in resList:
                 resList.append(curEmail)
+        dbCur.close()
+        dbConn.close()
     except:
-        return "Error geting company list"
+        return "Error geting email from type"
     return resList
 
 def sendEmailSignificant(cid,percentChange,now,email):
@@ -175,12 +187,16 @@ def sendEmailSignificant(cid,percentChange,now,email):
 def getCIDList():
     resList = []
     try:
+        dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
+        dbCur = dbConn.cursor()
         dbCur.execute("""SELECT DISTINCT company FROM userFollows;""")
         rows = dbCur.fetchall()
         for row in rows:
             curCid = row[0]
             curCid = curCid.upper()
             resList.append(curCid)
+        dbCur.close()
+        dbConn.close()
     except:
         return "Error geting company list"
     return resList
@@ -205,23 +221,32 @@ def updateGoogleTrends(companyID, dateFrom, dateTo):
         dateString = str(currdate.date())
         hourString = str(currdate.hour)
         #print("Date: " + str(currdate.date()) + "Hour: " + str(currdate.hour) + " Res: "+str(newRes))
-        dbCur.execute("""SELECT trend from trendData where cid=%s and date=%s and hour=%s;""", (companyID, dateString, hourString))
-        rowCount = dbCur.rowcount
-        if (rowCount == 0): #Not in table so add
-            print("[GTrends] Not in table, adding to table....\n")
-            #print("[GTrends] Not In Table (Date): " + str(dateString) + "(Hour): " + str(hourString) + " (Res): "+str(newRes))
-            dbCur.execute("""INSERT INTO trendData VALUES (%s,%s,%s,%s);""", (companyID, dateString, hourString, newRes))
-        else: #In table so get highest
-            rows = dbCur.fetchall()
-            for row in rows:
-                curRes = row[0]
-                #print("In table: ["+str(curRes)+"]")
-                if (newRes>curRes):
-                    change = newRes - curRes
-                    #pChange = (change/curRes)*100
-                    #print ("Res: " + str(newRes) + " > " + str(curRes))
-                    dbCur.execute("""DELETE FROM trendData WHERE cid=%s and date=%s and hour=%s and trend=%s;""", (companyID, dateString, hourString, curRes))
-                    dbCur.execute("""INSERT INTO trendData VALUES (%s,%s,%s,%s);""", (companyID, dateString, hourString, newRes))
+        try:
+            dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
+            dbCur = dbConn.cursor()
+            dbCur.execute("""SELECT trend from trendData where cid=%s and date=%s and hour=%s;""", (companyID, dateString, hourString))
+            rowCount = dbCur.rowcount
+            if (rowCount == 0): #Not in table so add
+                print("[GTrends] Not in table, adding to table....\n")
+                #print("[GTrends] Not In Table (Date): " + str(dateString) + "(Hour): " + str(hourString) + " (Res): "+str(newRes))
+                dbCur.execute("""INSERT INTO trendData VALUES (%s,%s,%s,%s);""", (companyID, dateString, hourString, newRes))
+
+            else: #In table so get highest
+                rows = dbCur.fetchall()
+                for row in rows:
+                    curRes = row[0]
+                    #print("In table: ["+str(curRes)+"]")
+                    if (newRes>curRes):
+                        change = newRes - curRes
+                        #pChange = (change/curRes)*100
+                        #print ("Res: " + str(newRes) + " > " + str(curRes))
+                        dbCur.execute("""DELETE FROM trendData WHERE cid=%s and date=%s and hour=%s and trend=%s;""", (companyID, dateString, hourString, curRes))
+                        dbCur.execute("""INSERT INTO trendData VALUES (%s,%s,%s,%s);""", (companyID, dateString, hourString, newRes))
+            dbConn.commit()
+            dbCur.close()
+            dbConn.close()
+       except:
+            print("error getting trends in update google trends")
                 #else:
                     #print("lower value [" +str(newRes)+"] <= ["+ str(curRes) + "]")
     for currdate in df[alias].index:
@@ -230,22 +255,29 @@ def updateGoogleTrends(companyID, dateFrom, dateTo):
         dateString = str(currdate.date())
         hourString = str(currdate.hour)
         #print("Date: " + str(currdate.date()) + "Hour: " + str(currdate.hour) + " Res: "+str(newRes))
-        dbCur.execute("""SELECT trend from trendData where cid=%s and date=%s and hour=%s;""", (companyID, dateString, hourString))
-        rowCount = dbCur.rowcount
-        if (rowCount == 0): #Not in table so add
-            print("[GTrends] Not in table, adding to table....\n")
-            #print("[GTrends] Not In Table (Date): " + str(dateString) + "(Hour): " + str(hourString) + " (Res): "+str(newRes))
-            dbCur.execute("""INSERT INTO trendData VALUES (%s,%s,%s,%s);""", (companyID, dateString, hourString, newRes))
-        else: #In table so get highest
-            rows = dbCur.fetchall()
-            for row in rows:
-                curRes = row[0]
-                #print("In table: ["+str(curRes)+"]")
-                if (newRes>curRes):
-                    #print ("Res: " + str(newRes) + " > " + str(curRes))
-                    dbCur.execute("""DELETE FROM trendData WHERE cid=%s and date=%s and hour=%s and trend=%s;""", (companyID, dateString, hourString, curRes))
-                    dbCur.execute("""INSERT INTO trendData VALUES (%s,%s,%s,%s);""", (companyID, dateString, hourString, newRes))
-    dbConn.commit()
+        try:
+            dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
+            dbCur = dbConn.cursor()
+            dbCur.execute("""SELECT trend from trendData where cid=%s and date=%s and hour=%s;""", (companyID, dateString, hourString))
+            rowCount = dbCur.rowcount
+            if (rowCount == 0): #Not in table so add
+                print("[GTrends] Not in table, adding to table....\n")
+                #print("[GTrends] Not In Table (Date): " + str(dateString) + "(Hour): " + str(hourString) + " (Res): "+str(newRes))
+                dbCur.execute("""INSERT INTO trendData VALUES (%s,%s,%s,%s);""", (companyID, dateString, hourString, newRes))
+            else: #In table so get highest
+                rows = dbCur.fetchall()
+                for row in rows:
+                    curRes = row[0]
+                    #print("In table: ["+str(curRes)+"]")
+                    if (newRes>curRes):
+                        #print ("Res: " + str(newRes) + " > " + str(curRes))
+                        dbCur.execute("""DELETE FROM trendData WHERE cid=%s and date=%s and hour=%s and trend=%s;""", (companyID, dateString, hourString, curRes))
+                        dbCur.execute("""INSERT INTO trendData VALUES (%s,%s,%s,%s);""", (companyID, dateString, hourString, newRes))
+            dbConn.commit()
+            dbCur.close()
+            dbConn.close()
+       except:
+            print("error getting trends in update google trends")
     #curRes = getCurrentChange(companyID,True)
     #print("[GTrends] Current Results: " + str(curRes))
 
@@ -343,21 +375,29 @@ def getCurrentChange(cid,sendEmailBool):
         #print("Hour: " + str(x))
         curDateString = str(checkDate.date())
         hourString = str(checkDate.hour)
-        dbCur.execute("""SELECT trend from trendData where cid=%s and date=%s and hour=%s;""", (cid, curDateString, hourString))
-        rowCount = dbCur.rowcount
-        if (rowCount == 0): #Not in table so add
-            print("[GTrends-GCC] Today Res. Not In Table (Date): " + str(curDateString) + "(Hour): " + str(hourString))
-            curDateFrom = checkDate - oneday
-            updateGoogleTrends(cid, curDateFrom, checkDate)
-            #return getCurrentChange(cid, sendEmailBool) #remove this and return 0 if slow
-            #break;
-            todayChange = todayChange + 0
-        else:
-            rows = dbCur.fetchall()
-            for row in rows:
-                todayChange = todayChange + row[0]
-                #print("Today Change: " + str(todayChange))
-        checkDate = checkDate - oneHour
+        try:
+            dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
+            dbCur = dbConn.cursor()
+            dbCur.execute("""SELECT trend from trendData where cid=%s and date=%s and hour=%s;""", (cid, curDateString, hourString))
+            rowCount = dbCur.rowcount
+            if (rowCount == 0): #Not in table so add
+                print("[GTrends-GCC] Today Res. Not In Table (Date): " + str(curDateString) + "(Hour): " + str(hourString))
+                curDateFrom = checkDate - oneday
+                updateGoogleTrends(cid, curDateFrom, checkDate)
+                #return getCurrentChange(cid, sendEmailBool) #remove this and return 0 if slow
+                #break;
+                todayChange = todayChange + 0
+            else:
+                rows = dbCur.fetchall()
+                for row in rows:
+                    todayChange = todayChange + row[0]
+                    #print("Today Change: " + str(todayChange))
+            checkDate = checkDate - oneHour
+            dbConn.commit()
+            dbCur.close()
+            dbConn.close()
+        except:
+            print("update error")
     todayChange = todayChange/24
     #print("Today Change: " + str(todayChange))
     prevChangeTotal = 0
@@ -371,21 +411,29 @@ def getCurrentChange(cid,sendEmailBool):
             curDateString = str(checkDate.date())
             hourString = str(checkDate.hour)
             #print("Date: " + curDateString + "Hour: " + hourString)
-            dbCur.execute("""SELECT trend from trendData where cid=%s and date=%s and hour=%s;""", (cid, curDateString, hourString))
-            rowCount = dbCur.rowcount
-            if (rowCount == 0): #Not in table so add
-                print("[GTrends-GCC] Prev Week ["+str(y+1)+"] Res. Not In Table (Date): " + str(curDateString) + "(Hour): " + str(hourString))
-                curDateFrom = checkDate - oneday
-                updateGoogleTrends(cid, curDateFrom, checkDate)
-                #return getCurrentChange(cid, sendEmailBool) #remove this and return 0 if slow
-                #break;
-                prevChange = prevChange + 0
-            else:
-                rows = dbCur.fetchall()
-                for row in rows:
-                    prevChange = prevChange + row[0]
-                    #print("["+str(x)+"] Today Change: " + str(row[0]))
-            checkDate = checkDate - oneHour
+            try:
+                dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
+                dbCur = dbConn.cursor()
+                dbCur.execute("""SELECT trend from trendData where cid=%s and date=%s and hour=%s;""", (cid, curDateString, hourString))
+                rowCount = dbCur.rowcount
+                if (rowCount == 0): #Not in table so add
+                    print("[GTrends-GCC] Prev Week ["+str(y+1)+"] Res. Not In Table (Date): " + str(curDateString) + "(Hour): " + str(hourString))
+                    curDateFrom = checkDate - oneday
+                    updateGoogleTrends(cid, curDateFrom, checkDate)
+                    #return getCurrentChange(cid, sendEmailBool) #remove this and return 0 if slow
+                    #break;
+                    prevChange = prevChange + 0
+                else:
+                    rows = dbCur.fetchall()
+                    for row in rows:
+                        prevChange = prevChange + row[0]
+                        #print("["+str(x)+"] Today Change: " + str(row[0]))
+                checkDate = checkDate - oneHour
+                dbConn.commit()
+                dbCur.close()
+                dbConn.close()
+            except:
+                print("update error")
         prevChange = prevChange/24
         #print("Prev Change: " + str(prevChange))
         prevChangeTotal = prevChangeTotal + prevChange
