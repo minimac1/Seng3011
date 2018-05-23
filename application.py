@@ -751,8 +751,8 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             curName = curRes['name']
             companyIDs.append(curName)
         sendRegularEmail(curEmail, companyIDs, "Daily")
-        cid = "QAN.AX"
-        percentageChange = "44.02"
+        cid = "CBA.AX"
+        percentageChange = "18.194"
         now = datetime.datetime.now()
         oneday = datetime.timedelta(days=1)
         now = now - oneday
