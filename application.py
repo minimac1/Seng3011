@@ -56,7 +56,7 @@ def inject_user():
         image = session['image']
     else:
         image = "https://qualiscare.com/wp-content/uploads/2017/08/default-user-300x300.png"
-        
+
     # will have to change link to the profile page if logged in
     return dict(user=username,image=image)
 
@@ -483,7 +483,7 @@ def stockPrice(instrumentId):
     instrumentId = instrumentId.replace('.nyse','')
     instrumentId = instrumentId.replace('.nasdaq','')
     instrumentId = instrumentId.replace('.NYSE','')
-    instrumentId = instrumentId.replace('.NASDQ','')
+    instrumentId = instrumentId.replace('.NASDAQ','')
     if ".eux" in instrumentId:
         return {}
     if ".ssx" in instrumentId:
@@ -502,7 +502,7 @@ def stockPrice(instrumentId):
     + '&symbol=' + s_params['symbol'] + '&apikey='
     + s_params['apikey'])
     #stocks = []
-    #print(stock_url)
+    print(stock_url)
     response = requests.get(stock_url).json()
     if 'Time Series (Daily)' not in response:
         i = 0
@@ -518,7 +518,7 @@ def stockPrice(instrumentId):
             stocks[date] = {}
             stocks[date]['stock'] = 0
             return stocks
-        
+
     #print(response)
     points = response['Time Series (Daily)']
     dates = sorted(points)
