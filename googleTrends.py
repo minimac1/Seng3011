@@ -214,7 +214,7 @@ def updateGoogleTrends(companyID, dateFrom, dateTo):
                 #print("In table: ["+str(curRes)+"]")
                 if (newRes>curRes):
                     change = newRes - curRes
-                    pChange = (change/curRes)*100
+                    #pChange = (change/curRes)*100
                     #print ("Res: " + str(newRes) + " > " + str(curRes))
                     dbCur.execute("""DELETE FROM trendData WHERE cid=%s and date=%s and hour=%s and trend=%s;""", (companyID, dateString, hourString, curRes))
                     dbCur.execute("""INSERT INTO trendData VALUES (%s,%s,%s,%s);""", (companyID, dateString, hourString, newRes))
@@ -242,8 +242,8 @@ def updateGoogleTrends(companyID, dateFrom, dateTo):
                     dbCur.execute("""DELETE FROM trendData WHERE cid=%s and date=%s and hour=%s and trend=%s;""", (companyID, dateString, hourString, curRes))
                     dbCur.execute("""INSERT INTO trendData VALUES (%s,%s,%s,%s);""", (companyID, dateString, hourString, newRes))
     dbConn.commit()
-    curRes = getCurrentChange(companyID,True)
-    print("[GTrends] Current Results: " + str(curRes))
+    #curRes = getCurrentChange(companyID,True)
+    #print("[GTrends] Current Results: " + str(curRes))
 
 #force update
 def updateAllTrends():
@@ -267,7 +267,7 @@ def updateAllTrends():
         weekthreeTo = weektwoTo - sevenDays
         weekthreeFrom = weektwoFrom - sevenDays
         updateGoogleTrends(curCID, weekthreeFrom, weekthreeTo)
-        curRes = getCurrentChange(cid,True)
+        curRes = getCurrentChange(curCID,True)
         print("[GTrends] Current Results: " + str(curRes))
     print("[GTrends] Completed Updating All Google Trends\n");
 
@@ -303,16 +303,38 @@ def updateMonthlyTrends(cid, forceBool):
     print("[GTrends] Current Results: " + str(curRes))
 
 def getCurrentChange(cid,sendEmailBool):
+    dbCIDList = getCIDList()
+    inDB = False
+    for curCID in dbCIDList:
+        curCID = curCID.upper()
+        if (cid==curCID):
+            inDB = True
+
     cid = cid.upper()
     curDate = datetime.now()
     tenHours = timedelta(hours=10) #utc time
     curDate = curDate - tenHours
     oneHour = timedelta(hours=1)
     oneday = timedelta(days=1)
+    sevenDays = timedelta(days=7)
+    sixDays = timedelta(days=6)
     # dateFrom = dateTo - oneday
     changeRes = []
     todayChange = 0
     checkDate = curDate
+    if (not inDB):
+        print("[GTrends-GCC]NotInDB, Updating before getting change")
+        curDateFrom = checkDate - oneday
+        updateGoogleTrends(cid, curDateFrom, checkDate)
+        checkDate = checkDate - sevenDays
+        curDateFrom = checkDate - oneday
+        updateGoogleTrends(cid, curDateFrom, checkDate)
+        checkDate = checkDate - sevenDays
+        curDateFrom = checkDate - oneday
+        updateGoogleTrends(cid, curDateFrom, checkDate)
+        checkDate = checkDate - sevenDays
+        curDateFrom = checkDate - oneday
+        updateGoogleTrends(cid, curDateFrom, checkDate)
     for x in range(0,24):
         #print("Hour: " + str(x))
         curDateString = str(checkDate.date())
@@ -321,9 +343,9 @@ def getCurrentChange(cid,sendEmailBool):
         rowCount = dbCur.rowcount
         if (rowCount == 0): #Not in table so add
             print("[GTrends-GCC] Today Res. Not In Table (Date): " + str(curDateString) + "(Hour): " + str(hourString))
-            #curDateFrom = checkDate - oneday
-            #updateGoogleTrends(cid, curDateFrom, checkDate)
-            #getCurrentChange(cid, sendEmailBool) #remove this and return 0 if slow
+            curDateFrom = checkDate - oneday
+            updateGoogleTrends(cid, curDateFrom, checkDate)
+            #return getCurrentChange(cid, sendEmailBool) #remove this and return 0 if slow
             #break;
             todayChange = todayChange + 0
         else:
@@ -349,9 +371,9 @@ def getCurrentChange(cid,sendEmailBool):
             rowCount = dbCur.rowcount
             if (rowCount == 0): #Not in table so add
                 print("[GTrends-GCC] Prev Week ["+str(y+1)+"] Res. Not In Table (Date): " + str(curDateString) + "(Hour): " + str(hourString))
-                #curDateFrom = checkDate - oneday
-                #updateGoogleTrends(cid, curDateFrom, checkDate)
-                #getCurrentChange(cid, sendEmailBool) #remove this and return 0 if slow
+                curDateFrom = checkDate - oneday
+                updateGoogleTrends(cid, curDateFrom, checkDate)
+                #return getCurrentChange(cid, sendEmailBool) #remove this and return 0 if slow
                 #break;
                 prevChange = prevChange + 0
             else:
@@ -379,3 +401,36 @@ def getCurrentChange(cid,sendEmailBool):
         now = datetime.now()
         sendEmailSignificant(cid,percentChange,now,None)
     return pChangeRounded
+
+#print("Change: " + str(getCurrentChange("DMP.AX",True)));
+
+# dbCIDList = getCIDList();
+# for curCID in dbCIDList:
+#     curCID = curCID.upper()
+#     print("Change1: " + str(getCurrentChange(curCID,True)));
+
+#updateAllTrends();
+
+
+# print("[GTrends] Updating All Google Trends for tomorrow...\n");
+# for curCID in dbCIDList:
+#     curCID = curCID.upper()
+#     dateTo = datetime.now()
+#     tenHours = timedelta(hours=5) #utc time
+#     dateTo = dateTo + tenHours
+#     oneday = timedelta(days=1)
+#     dateFrom = dateTo - oneday
+#     #updateGoogleTrends(curCID, dateFrom, dateTo)
+#     sevenDays = timedelta(days=7)
+#     weekoneTo = dateTo - sevenDays
+#     weekoneFrom = dateFrom - sevenDays
+#     updateGoogleTrends(curCID, weekoneFrom, weekoneTo)
+#     weektwoTo = weekoneTo - sevenDays
+#     weektwoFrom = weekoneFrom - sevenDays
+#     updateGoogleTrends(curCID, weektwoFrom, weektwoTo)
+#     weekthreeTo = weektwoTo - sevenDays
+#     weekthreeFrom = weektwoFrom - sevenDays
+#     updateGoogleTrends(curCID, weekthreeFrom, weekthreeTo)
+#     curRes = getCurrentChange(curCID,True)
+#     print("[GTrends] Current Results: " + str(curRes))
+# print("[GTrends] Completed Updating All Google Trends\n");
