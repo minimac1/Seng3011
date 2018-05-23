@@ -117,6 +117,9 @@ def sendEmailSignificant(cid,percentChange,now,email):
                  +cid+
                  "\nVisit the following link to view your profile: "
                  "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/profile"
+                 "\nVisit the following link to view the dashboard for the company: "
+                 "http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/db?company=CBA.ax"
+
                 )
     #for normal email clients
     BODY_HTML = """<html>
@@ -125,6 +128,7 @@ def sendEmailSignificant(cid,percentChange,now,email):
       <h2>Turtle Trends: Significant Change</h2>
       <p>We have detected a substantial increase ("""+percentChange+""") in the trends for """ + cid + """</p>
       <p><a href='http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/profile'>Visit your profile for more</a></p>
+      <p><a href='http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/db?company=CBA.ax'>Visit the dashboard for """+ cid+ """ for more</a></p>
     </body>
     </html>
                 """
