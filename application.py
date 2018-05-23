@@ -595,91 +595,99 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             print("Adding company :)")
 
             #Sentiment
-            now = (datetime.datetime.now()- timedelta(days=1)) # currently -1day because i can't use current day
-            now = now - timedelta(hours=10)
-            eDate= now.isoformat()
-            eDate = eDate[0:23] + "Z" # will probly need to pass in dates to choose the start date, once we've stored a results
-            sDate= (now - timedelta(days=14)) # otherwise currently hardcoded to the previous week
-            sDate = str(sDate).replace(' ','T')
-            sDate = sDate[0:23] + "Z"
-            cId = name
-            url = ("http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=" + sDate
-             + "&endDate=" + eDate + "&companyId=" + cId)
-            print(url)
-            res = requests.get(url).json()
-            articles = []
-            i = 0
-            for art in res['NewsDataSet']:
-                if i > 9:
-                    break; #limiting it to 10 articles
-                temp = {}
-                temp['headline'] = art['Headline']
-                temp['url'] = art['URL']
-                date = art['TimeStamp']
-                date = date[0:16]
-                date = date.replace('T', ' ')
-                temp['date']=date
-                text = art['NewsText']
-                if not text:
-                    continue
-                temp['sent'] = text
+            try:
+                now = (datetime.datetime.now()- timedelta(days=1)) # currently -1day because i can't use current day
+                now = now - timedelta(hours=10)
+                eDate= now.isoformat()
+                eDate = eDate[0:23] + "Z" # will probly need to pass in dates to choose the start date, once we've stored a results
+                sDate= (now - timedelta(days=14)) # otherwise currently hardcoded to the previous week
+                sDate = str(sDate).replace(' ','T')
+                sDate = sDate[0:23] + "Z"
+                cId = name
+                url = ("http://seng3011-turtle.ap-southeast-2.elasticbeanstalk.com/newsapi/v3.0/query?startDate=" + sDate
+                 + "&endDate=" + eDate + "&companyId=" + cId)
+                print(url)
+                res = requests.get(url).json()
+                articles = []
+                i = 0
+                for art in res['NewsDataSet']:
+                    if i > 9:
+                        break; #limiting it to 10 articles
+                    temp = {}
+                    temp['headline'] = art['Headline']
+                    temp['url'] = art['URL']
+                    date = art['TimeStamp']
+                    date = date[0:16]
+                    date = date.replace('T', ' ')
+                    temp['date']=date
+                    text = art['NewsText']
+                    if not text:
+                        continue
+                    temp['sent'] = text
 
-                articles.append(temp)
-                i+= 1
-            sent = []
-            for art in articles:
-                sent.append(art['sent'])
-            totSent = 0;
-            numArt = 0;
-            if sent != []:
-                sent = sentiment(sent)
-                for s in sent:
-                    totSent += round(s*100,0)
-                    numArt += 1
-                for c, value in enumerate(sent,1):
-                    value = round(value*100,0)
-                    articles[c-1]['sent'] = value
-                    articles[c-1]['sentc'] = rgCol(value)
-                articles = sorted(articles, key=lambda k: k['date'])
+                    articles.append(temp)
+                    i+= 1
+                sent = []
+                for art in articles:
+                    sent.append(art['sent'])
+                totSent = 0;
+                numArt = 0;
+                if sent != []:
+                    sent = sentiment(sent)
+                    for s in sent:
+                        totSent += round(s*100,0)
+                        numArt += 1
+                    for c, value in enumerate(sent,1):
+                        value = round(value*100,0)
+                        articles[c-1]['sent'] = value
+                        articles[c-1]['sentc'] = rgCol(value)
+                    articles = sorted(articles, key=lambda k: k['date'])
 
-            if not numArt == 0:
-                avSent = round(totSent/numArt,0)
-            else:
-                avSent = 0
+                if not numArt == 0:
+                    avSent = round(totSent/numArt,0)
+                else:
+                    avSent = 0
 
-            print("Total Sentiment "+cId+" : " + str(totSent))
-            print("Number Articles "+cId+" : " + str(numArt))
-            print("Average Sentiment "+cId+" : " + str(avSent))
-            greenColour = "#7a8c00"
-            redColour = "#800000"
-            if avSent > 75:
-                sentString = "Extremely Positive"
-                sentColour = "#7a8c00"
-            elif avSent > 50:
-                sentString = "Relative Poisitive"
-                sentColour = "#7a8c00"
-            elif avSent == 50:
+                print("Total Sentiment "+cId+" : " + str(totSent))
+                print("Number Articles "+cId+" : " + str(numArt))
+                print("Average Sentiment "+cId+" : " + str(avSent))
+                greenColour = "#7a8c00"
+                redColour = "#800000"
+                if avSent > 75:
+                    sentString = "Extremely Positive"
+                    sentColour = "#7a8c00"
+                elif avSent > 50:
+                    sentString = "Relative Poisitive"
+                    sentColour = "#7a8c00"
+                elif avSent == 50:
+                    sentString = "Half and Half"
+                    sentColour = "#000000"
+                elif avSent > 25:
+                    sentString = "Relatively Negative"
+                    sentColour = "#800000"
+                else:
+                    sentString = "Extremely Negative"
+                    sentColour = "#800000"
+            except:
                 sentString = "Half and Half"
                 sentColour = "#000000"
-            elif avSent > 25:
-                sentString = "Relatively Negative"
-                sentColour = "#800000"
-            else:
-                sentString = "Extremely Negative"
-                sentColour = "#800000"
 
             #Stock price
-            curStocks = stockPrice(name)
-            print(curStocks)
-            today = datetime.datetime.today()
-            today = str(today.date())
-            stockChange = curStocks[today]['stock']
-            if (stockChange > 0):
-                stockColour = "#7a8c00"
-            elif (stockChange < 0):
-                stockColour = "#800000"
-            else:
+            try:
+                curStocks = stockPrice(name)
+                print(curStocks)
+                today = datetime.datetime.today()
+                today = str(today.date())
+                stockChange = curStocks[today]['stock']
+                if (stockChange > 0):
+                    stockColour = "#7a8c00"
+                elif (stockChange < 0):
+                    stockColour = "#800000"
+                else:
+                    stockColour = "#000000"
+            except:
                 stockColour = "#000000"
+                stockChange = 0
 
             #Trends
             trendScore = googleTrends.getCurrentChange(name,True)
@@ -703,8 +711,8 @@ def profile(): # maybe for the demo add the few chosen companies to session['use
             companies.append(temp)
         else:
             print("Adding duplicate company :(")
-    settings = {}
 
+    settings = {}
     # update user settings
     new = request.args.get('eventPref')
     if (new is not None):
