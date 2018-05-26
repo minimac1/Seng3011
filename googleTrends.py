@@ -13,14 +13,8 @@ import boto3
 import re
 import psycopg2
 from pytrends.request import TrendReq
-pytrends = TrendReq(hl='en-us', tz=-600) #change when functioning
+pytrends = TrendReq(hl='en-us', tz=-600)
 
-# connect to database
-# try:
-#     dbConn = psycopg2.connect("dbname='ebdb' user='teamturtleseng' password='SENG3011!' host='aaiweopiy3u4yv.ccig0wydbyxl.ap-southeast-2.rds.amazonaws.com' port='5432'")
-#     dbCur = dbConn.cursor()
-# except:
-#     print('unable to connect to the database')
 
 # Num weeks is integer of number of weeks for range (max 3)
 # Query is string to query google with
@@ -56,7 +50,7 @@ def trendFromNumWeek(numWeeks, query):
         resArray.append(curr[1])
     return resArray
 
-#EMAIL STUFF
+#Get list of emails who follow the given company id
 def getEmailsFromCID(cid):
     resList = []
     try:
@@ -73,6 +67,7 @@ def getEmailsFromCID(cid):
         return "Error geting email list from cid"
     return resList
 
+#Get list of Company's attached to the users email
 def getCIDListFromEmail(email):
     resList = []
     try:
@@ -90,6 +85,7 @@ def getCIDListFromEmail(email):
         return "Error geting company list from email"
     return resList
 
+#Get list of emails for the given email frequency type (Daily, Weekly, Monthly)
 def getEmailsFromType(type):
     resList = []
     try:
@@ -107,6 +103,11 @@ def getEmailsFromType(type):
         return "Error geting email from type"
     return resList
 
+#Send the significant change in google trends email
+#CID is the company with the significant change
+#perchantChange is the google trend change % (will  be >15)
+#now is the datetime when the change was triggered
+#email is the email in string form
 def sendEmailSignificant(cid,percentChange,now,email):
     percentChange = str(percentChange)
     cid = str(cid)
@@ -150,9 +151,6 @@ def sendEmailSignificant(cid,percentChange,now,email):
         # Try to send the email.
         try:
             #Provide the contents of the email.
-            # print("sending to "+str(RECIPIENT))
-            # print(SUBJECT)
-            # print(BODY_HTML)
             response = client.send_email(
                 Destination={
                     'ToAddresses': [
@@ -184,6 +182,7 @@ def sendEmailSignificant(cid,percentChange,now,email):
             print("Email sent! Message ID:"),
             print(response['ResponseMetadata']['RequestId'])
 
+#Get the list of companys that are being followed at the moment
 def getCIDList():
     resList = []
     try:
@@ -281,7 +280,7 @@ def updateGoogleTrends(companyID, dateFrom, dateTo):
     #curRes = getCurrentChange(companyID,True)
     #print("[GTrends] Current Results: " + str(curRes))
 
-#force update
+#force update to all companys that are being followed at the moment
 def updateAllTrends():
     print("[GTrends] Updating All Google Trends...\n");
     dbCIDList = getCIDList();
@@ -307,11 +306,15 @@ def updateAllTrends():
         print("[GTrends] Current Results: " + str(curRes))
     print("[GTrends] Completed Updating All Google Trends\n");
 
-#Manually update,
+#Manually update data for the past month
+#Meant for companies which are not being followed at the moment
+#cid is the company you want to update
+#forcebool is if you want to force an update for a cid already being followed
 def updateMonthlyTrends(cid, forceBool):
     print("[GTrends] Updating Monthly Google Trends...\n");
     curCID = cid.upper()
     dbCIDList = getCIDList();
+    #If being followed and not forcebool, do nothing
     if (curCID in dbCIDList and not forceBool):
         print("[GTrends] Already in list, should be updated every 6 hours\n")
         print("[GTrends] Exiting...\n")
@@ -338,6 +341,8 @@ def updateMonthlyTrends(cid, forceBool):
     curRes = getCurrentChange(cid,True)
     print("[GTrends] Current Results: " + str(curRes))
 
+#Get the current difference between the last months date for today
+#Returns the change in float form
 def getCurrentChange(cid,sendEmailBool):
     dbCIDList = getCIDList()
     inDB = False
@@ -345,7 +350,6 @@ def getCurrentChange(cid,sendEmailBool):
         curCID = curCID.upper()
         if (cid==curCID):
             inDB = True
-
     cid = cid.upper()
     curDate = datetime.now()
     tenHours = timedelta(hours=10) #utc time
@@ -354,7 +358,6 @@ def getCurrentChange(cid,sendEmailBool):
     oneday = timedelta(days=1)
     sevenDays = timedelta(days=7)
     sixDays = timedelta(days=6)
-    # dateFrom = dateTo - oneday
     changeRes = []
     todayChange = 0
     checkDate = curDate
@@ -372,7 +375,6 @@ def getCurrentChange(cid,sendEmailBool):
         curDateFrom = checkDate - oneday
         updateGoogleTrends(cid, curDateFrom, checkDate)
     for x in range(0,24):
-        #print("Hour: " + str(x))
         curDateString = str(checkDate.date())
         hourString = str(checkDate.hour)
         try:
@@ -399,7 +401,6 @@ def getCurrentChange(cid,sendEmailBool):
         except:
             print("update error")
     todayChange = todayChange/24
-    #print("Today Change: " + str(todayChange))
     prevChangeTotal = 0
     sevenDays = timedelta(days=7)
     sixDays = timedelta(days=6)
@@ -407,7 +408,6 @@ def getCurrentChange(cid,sendEmailBool):
     for y in range(0,3):
         prevChange = 0
         for x in range(0,24):
-            #print("Hour: " + str(x))
             curDateString = str(checkDate.date())
             hourString = str(checkDate.hour)
             #print("Date: " + curDateString + "Hour: " + hourString)
@@ -435,12 +435,9 @@ def getCurrentChange(cid,sendEmailBool):
             except:
                 print("update error")
         prevChange = prevChange/24
-        #print("Prev Change: " + str(prevChange))
         prevChangeTotal = prevChangeTotal + prevChange
-        #print("Final Change: " + str(prevChangeTotal))
         checkDate = checkDate - sixDays
     prevChangeTotal = prevChangeTotal/3
-    #print("Final Check: " + str(prevChangeTotal))
     change = todayChange - prevChangeTotal
     if (prevChangeTotal == 0):
         percentChange = 0
@@ -448,41 +445,7 @@ def getCurrentChange(cid,sendEmailBool):
     else:
         percentChange = (change/prevChangeTotal)*100
         pChangeRounded = round(percentChange,3)
-        #print("Percentage Change: " + str(pChangeRounded))
-    if (percentChange > 20 and sendEmailBool):
+    if (percentChange > 15 and sendEmailBool):
         now = datetime.now()
         sendEmailSignificant(cid,percentChange,now,None)
     return pChangeRounded
-
-#print("Change: " + str(getCurrentChange("DMP.AX",True)));
-
-# dbCIDList = getCIDList();
-# for curCID in dbCIDList:
-#     curCID = curCID.upper()
-#     print("Change1: " + str(getCurrentChange(curCID,True)));
-
-#updateAllTrends();
-
-
-# print("[GTrends] Updating All Google Trends for tomorrow...\n");
-# for curCID in dbCIDList:
-#     curCID = curCID.upper()
-#     dateTo = datetime.now()
-#     tenHours = timedelta(hours=5) #utc time
-#     dateTo = dateTo + tenHours
-#     oneday = timedelta(days=1)
-#     dateFrom = dateTo - oneday
-#     #updateGoogleTrends(curCID, dateFrom, dateTo)
-#     sevenDays = timedelta(days=7)
-#     weekoneTo = dateTo - sevenDays
-#     weekoneFrom = dateFrom - sevenDays
-#     updateGoogleTrends(curCID, weekoneFrom, weekoneTo)
-#     weektwoTo = weekoneTo - sevenDays
-#     weektwoFrom = weekoneFrom - sevenDays
-#     updateGoogleTrends(curCID, weektwoFrom, weektwoTo)
-#     weekthreeTo = weektwoTo - sevenDays
-#     weekthreeFrom = weektwoFrom - sevenDays
-#     updateGoogleTrends(curCID, weekthreeFrom, weekthreeTo)
-#     curRes = getCurrentChange(curCID,True)
-#     print("[GTrends] Current Results: " + str(curRes))
-# print("[GTrends] Completed Updating All Google Trends\n");
